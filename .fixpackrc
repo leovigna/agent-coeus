@@ -1,0 +1,54 @@
+{
+    "sortToTop": [
+        "name",
+        "version",
+        "private",
+        "description",
+        "keywords",
+        "homepage",
+        "bugs",
+        "repository",
+        "copyright",
+        "license",
+        "author",
+        "type",
+        "files",
+        "main",
+        "module",
+        "types",
+        "exports",
+        "scripts",
+        "dependencies",
+        "peerDependencies",
+        "devDependencies",
+        "packageManager",
+        "engines"
+    ],
+    "required": [
+        "name",
+        "version"
+    ],
+    "requiredOnPrivate": [
+        "name",
+        "version"
+    ],
+    "warn": [],
+    "warnOnPrivate": [],
+    "sortedSubItems": [
+        "dependencies",
+        "peerDependencies",
+        "devDependencies",
+        "scripts",
+        "keywords"
+    ],
+    "files": [
+        "package.json",
+        "configs/esbuild-config/package.json",
+        "configs/eslint-config/package.json",
+        "configs/tsconfig/package.json",
+        "configs/vite-config/package.json",
+        "packages/starter-typescript/package.json",
+        "packages/starter-react/package.json",
+        "packages/starter-react-revealjs/package.json"
+    ]
+}

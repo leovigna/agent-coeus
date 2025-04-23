@@ -1,0 +1,4 @@
+procs:
+  starter-typescript:
+    cwd: packages/starter-typescript
+    shell: pnpm build:watch

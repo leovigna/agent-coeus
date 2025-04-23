@@ -1,0 +1,14 @@
+{
+  "include": [
+    "src"
+  ],
+  "extends": "@leovigna/tsconfig",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  }
+}

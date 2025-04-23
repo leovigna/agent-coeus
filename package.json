@@ -1,0 +1,55 @@
+{
+  "name": "@leovigna/starter-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Leo Vigna Starter Monorepo",
+  "keywords": [
+    "pnpm",
+    "workspace"
+  ],
+  "license": "MIT",
+  "author": "Leo Vigna",
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "build:force": "turbo run build --force",
+    "changeset:add": "changeset add",
+    "ci:publish": "pnpm publish -r",
+    "ci:version": "changeset version",
+    "clean": "turbo run clean",
+    "clean:node_modules": "rimraf node_modules ./**/node_modules",
+    "depcheck": "depcheck && turbo run depcheck",
+    "dev": "mprocs",
+    "dotenv:login": "dotenv-vault login",
+    "dotenv:pull": "dotenv-vault pull",
+    "dotenv:push": "dotenv-vault push",
+    "fixpack": "fixpack",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "madge": "turbo run madge",
+    "syncpack": "syncpack list-mismatches",
+    "syncpack:fix": "syncpack fix-mismatches",
+    "test": "turbo run test",
+    "test:force": "turbo run test --force",
+    "turbo:link": "turbo link",
+    "turbo:login": "turbo login"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.28.1",
+    "depcheck": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "dotenv-vault": "1.26.2",
+    "fixpack": "4.0.0",
+    "mprocs": "^0.7.2",
+    "repomix": "^0.3.2",
+    "rimraf": "^6.0.1",
+    "syncpack": "^13.0.3",
+    "turbo": "^2.4.4"
+  },
+  "packageManager": "pnpm@9.12.2",
+  "engines": {
+    "npm": ">=v10.5.0",
+    "pnpm": ">=9.12.2",
+    "node": "^18.0.0"
+  }
+}

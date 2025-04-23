@@ -1,0 +1,180 @@
+/* Tailwind-compatible Reveal.js theme */
+
+/* Common variables and transitions */
+:root {
+    --reveal-transition-duration: 0.3s;
+    --reveal-transition-timing: ease;
+}
+
+/* Map Reveal.js theme variables to Tailwind CSS variables */
+.reveal {
+    /* Base colors */
+    --r-background-color: var(--background);
+    --r-main-color: var(--foreground);
+    --r-heading-color: var(--foreground);
+
+    /* Link colors */
+    --r-link-color: var(--primary);
+    --r-link-color-dark: var(--primary-dark, var(--primary));
+    --r-link-color-hover: var(--primary-focus, var(--primary));
+
+    /* Selection */
+    --r-selection-background-color: var(--primary);
+    --r-selection-color: var(--primary-foreground, white);
+
+    /* Typography */
+    font-family: var(--font-sans, sans-serif);
+
+    /* Backgrounds */
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+/* Headings */
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+    color: var(--foreground);
+    font-weight: 600;
+}
+
+/* Links */
+.reveal a {
+    color: var(--primary);
+}
+
+.reveal a:hover {
+    color: var(--primary-focus, var(--primary));
+    text-decoration: underline;
+}
+
+/* Controls and navigation */
+.reveal .controls {
+    color: var(--primary);
+}
+
+.reveal .progress {
+    background: var(--muted);
+}
+
+.reveal .progress span {
+    background: var(--primary);
+}
+
+/* Content elements */
+.reveal blockquote {
+    background: var(--card);
+    border-left: 4px solid var(--primary);
+    padding: 0.5em 1em;
+    color: var(--card-foreground);
+}
+
+.reveal code {
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    padding: 0.2em 0.4em;
+    border-radius: 0.2em;
+}
+
+.reveal table {
+    border-collapse: collapse;
+}
+
+.reveal table th,
+.reveal table td {
+    border: 1px solid var(--border);
+    padding: 0.5em;
+}
+
+.reveal table th {
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+}
+
+/* Responsive text sizing */
+.reveal .slides section h1 {
+    font-size: 1.8em;
+}
+
+.reveal .slides section h2 {
+    font-size: 1.5em;
+}
+
+/* ===== SCROLL VIEW STYLES ===== */
+
+/* Base scroll view styles */
+.reveal-viewport.reveal-scroll {
+    /* Theme variables */
+    --r-scrollbar-width: 8px;
+    --r-overlay-element-bg-color: var(--primary);
+    --r-overlay-element-fg-color: var(--primary-foreground, white);
+
+    /* Core styles */
+    background-color: var(--background);
+    color: var(--foreground);
+    scrollbar-width: var(--r-scrollbar-width);
+}
+
+/* Make backgrounds container visible */
+.reveal-viewport.reveal-scroll .backgrounds {
+    display: block !important;
+    /* Override the 'display: none' from original CSS */
+    background-color: var(--background);
+}
+
+/* Apply background color to all scroll view elements */
+.reveal-viewport.reveal-scroll .slide-background,
+.reveal-viewport.reveal-scroll .slide-background-content,
+.reveal-viewport.reveal-scroll .scroll-page,
+.reveal-viewport.reveal-scroll .scroll-page-sticky,
+.reveal-viewport.reveal-scroll .scroll-page-content {
+    background-color: var(--background);
+}
+
+/* Apply transitions to all themed elements */
+.reveal-viewport.reveal-scroll .backgrounds,
+.reveal-viewport.reveal-scroll .slide-background,
+.reveal-viewport.reveal-scroll .slide-background-content,
+.reveal-viewport.reveal-scroll .scroll-page,
+.reveal-viewport.reveal-scroll .scroll-page-sticky,
+.reveal-viewport.reveal-scroll .scroll-page-content,
+.reveal-viewport.reveal-scroll section {
+    transition: background-color var(--reveal-transition-duration) var(--reveal-transition-timing),
+        color var(--reveal-transition-duration) var(--reveal-transition-timing);
+}
+
+/* Scrollbar styling */
+.reveal-viewport.reveal-scroll .scrollbar {
+    opacity: 1;
+}
+
+.reveal-viewport.reveal-scroll .scrollbar .scrollbar-inner {
+    background-color: var(--muted);
+}
+
+.reveal-viewport.reveal-scroll .scrollbar .scrollbar-playhead {
+    background-color: var(--primary);
+}
+
+.reveal-viewport.reveal-scroll .scrollbar .scrollbar-slide {
+    background-color: var(--muted-foreground);
+    transition: background-color var(--reveal-transition-duration) var(--reveal-transition-timing);
+}
+
+/* WebKit scrollbar styling */
+.reveal-viewport.reveal-scroll::-webkit-scrollbar {
+    width: var(--r-scrollbar-width);
+    height: var(--r-scrollbar-width);
+}
+
+.reveal-viewport.reveal-scroll::-webkit-scrollbar-track {
+    background: var(--muted);
+}
+
+.reveal-viewport.reveal-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: var(--r-scrollbar-width);
+}
