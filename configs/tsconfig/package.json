@@ -1,28 +1,8 @@
 {
-  "name": "@leovigna/tsconfig",
+  "name": "@coeus-agent/tsconfig",
   "version": "0.1.0",
-  "keywords": [
-    "typescript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/leovigna/starter-monorepo.git"
-  },
-  "license": "MIT",
-  "author": {
-    "name": "Leo Vigna",
-    "email": "leo@leovigna.io",
-    "url": "https://github.com/leovigna"
-  },
+  "private": true,
   "files": [
     "tsconfig.json"
-  ],
-  "main": "./tsconfig.json",
-  "module": "./tsconfig.json",
-  "scripts": {
-    "depcheck": "depcheck"
-  },
-  "devDependencies": {
-    "depcheck": "^1.4.7"
-  }
+  ]
 }
