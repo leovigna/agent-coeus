@@ -1,4 +1,4 @@
-# Project Brief: Starter Monorepo
+# Project Brief: Agent Coeus
 
 ## Overview
-This project is a starter monorepo using various devtools.
+See prompt. Update accordingly.

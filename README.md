@@ -1,8 +1,6 @@
-# Starter Monorepo
+# Agent Coeus
 
-Starter monorepo designed to work with pnpm and turbo repo.
-
-[`Use this Template`](https://github.com/leovigna/starter-monorepo/generate)
+Agent Coeus. The AI Assistant of the gods.
 
 <details>
 <summary>Updating to starter-monorepo:latest</summary>
