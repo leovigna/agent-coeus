@@ -72,7 +72,8 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
   "fastify": "^4.x",
   "ws": "^8.x",
   "@fastify/cors": "^9.x",
-  "@fastify/rate-limit": "^9.x"
+  "@fastify/rate-limit": "^9.x",
+  "winston": "^3.x"
 }
 ```
 

@@ -1,5 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+epics/
+tickets/
 # Cline memory bank
 memory-bank/
 # Cline repomix (can just pull again)

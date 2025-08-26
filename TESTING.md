@@ -139,7 +139,7 @@ describe('Company Management Integration', () => {
 
 #### Container Management
 - **Neo4j**: Latest Neo4j 5.x with APOC plugins
-- **Graphiti/Zep**: Mock or containerized semantic service
+- **Graphiti/Zep**: Containerized semantic service
 - **Operational DB**: SQLite for lightweight ops data
 - **Network Isolation**: Each test gets isolated network namespace
 
@@ -160,15 +160,22 @@ export default defineConfig({
 // test/global-setup.ts
 export async function setup() {
   // Start shared test containers
-  const containers = await startTestInfrastructure();
+  const neo4j = await new Neo4jContainer().start();
+  const graphiti = await new GenericContainer('graphiti/graphiti')
+    .withExposedPorts(8080)
+    .withEnv('NEO4J_URI', neo4j.getBoltUri())
+    .withEnv('NEO4J_USERNAME', 'neo4j')
+    .withEnv('NEO4J_PASSWORD', 'password')
+    .start();
 
   // Store connection details for tests
-  process.env.TEST_NEO4J_URI = containers.neo4j.getBoltUri();
-  process.env.TEST_GRAPHITI_URL = containers.graphiti.getHttpUrl();
+  process.env.TEST_NEO4J_URI = neo4j.getBoltUri();
+  process.env.TEST_GRAPHITI_URL = `http://${graphiti.getHost()}:${graphiti.getMappedPort(8080)}`;
 
   return async () => {
     // Cleanup on teardown
-    await stopTestInfrastructure(containers);
+    await graphiti.stop();
+    await neo4j.stop();
   };
 }
 ```
