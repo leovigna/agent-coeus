@@ -171,8 +171,8 @@ configs/tsconfig/
 ## Naming Conventions
 
 ### Package Names
-- **Scope**: All packages use `@coeus/` scope (future npm publishing)
-- **Format**: kebab-case (e.g., `@coeus/domain-schemas`)
+- **Scope**: All packages use `@coeus-agent/` scope (future npm publishing)
+- **Format**: kebab-case (e.g., `@coeus-agent/domain-schemas`)
 - **Descriptive**: Names clearly indicate package purpose
 
 ### File and Directory Names
@@ -224,6 +224,13 @@ packages:
 
 ## Development Workflows
 
+### Package Development
+1. **Create Package**: New TypeScript packages should use the `starter-typescript` package as a template.
+2. **Implement Features**: Follow domain-driven design patterns.
+3. **Write Tests**: Unit tests with mocks, integration tests with Testcontainers.
+4. **Build & Validate**: Ensure TypeScript compilation and test passage.
+5. **Document**: Update README and API documentation.
+
 ### Package Scripts
 Each package includes standard scripts:
 
@@ -263,8 +270,8 @@ Each package includes standard scripts:
 ```json
 {
   "dependencies": {
-    "@coeus/domain-schemas": "workspace:*",
-    "@coeus/graph-client": "workspace:*"
+    "@coeus-agent/domain-schemas": "workspace:*",
+    "@coeus-agent/graph-client": "workspace:*"
   }
 }
 ```

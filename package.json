@@ -1,8 +1,8 @@
 {
-  "name": "@leovigna/starter-monorepo",
+  "name": "@coeus-agent/monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "Leo Vigna Starter Monorepo",
+  "description": "Coeus Agent Monorepo",
   "keywords": [
     "pnpm",
     "workspace"

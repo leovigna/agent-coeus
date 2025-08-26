@@ -1,6 +1,0 @@
-ignores: [
-    "@vitejs/plugin-react-swc",
-    "vite-plugin-node-polyfills",
-    "tailwindcss",
-    "tw-animate-css"
-]
