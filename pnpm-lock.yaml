@@ -179,6 +179,31 @@ importers:
         specifier: ^1.2.2
         version: 1.6.1(@types/node@22.14.1)(lightningcss@1.29.2)
 
+  packages/mcp-kit:
+    dependencies:
+      '@coeus-agent/domain-schemas':
+        specifier: workspace:*
+        version: link:../domain-schemas
+    devDependencies:
+      '@coeus-agent/esbuild-config':
+        specifier: workspace:*
+        version: link:../../configs/esbuild-config
+      '@coeus-agent/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint-config
+      '@coeus-agent/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.3
+      vitest:
+        specifier: ^1.2.2
+        version: 1.6.1(@types/node@22.14.1)(lightningcss@1.29.2)
+
   packages/starter-typescript:
     devDependencies:
       '@coeus-agent/esbuild-config':
@@ -6768,9 +6793,9 @@ snapshots:
       mime-types: 3.0.1
       negotiator: 1.0.0
 
-  acorn-jsx@5.3.2(acorn@8.14.1):
+  acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
 
   acorn-walk@8.3.4:
     dependencies:
@@ -7820,8 +7845,8 @@ snapshots:
 
   espree@10.3.0:
     dependencies:
-      acorn: 8.14.1
-      acorn-jsx: 5.3.2(acorn@8.14.1)
+      acorn: 8.15.0
+      acorn-jsx: 5.3.2(acorn@8.15.0)
       eslint-visitor-keys: 4.2.0
 
   esprima@1.2.5: {}
