@@ -1,0 +1,10 @@
+{
+  "extends": "@coeus-agent/tsconfig/tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

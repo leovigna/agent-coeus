@@ -1,0 +1,31 @@
+{
+  "name": "@coeus-agent/coeus-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "pnpm run clean && esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/index.js",
+    "clean": "rimraf dist",
+    "dev": "pnpm run build --watch",
+    "lint": "eslint .",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@coeus-agent/domain-schemas": "workspace:*",
+    "@coeus-agent/graph-client": "workspace:*",
+    "@coeus-agent/mcp-kit": "workspace:*",
+    "@coeus-agent/ops-db": "workspace:*",
+    "fastify": "^4.26.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@coeus-agent/esbuild-config": "workspace:*",
+    "@coeus-agent/eslint-config": "workspace:*",
+    "@coeus-agent/tsconfig": "workspace:*",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  }
+}
