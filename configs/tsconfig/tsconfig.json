@@ -16,9 +16,13 @@
     "outDir": "dist",
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "src",
+    "test"
+  ]
 }
