@@ -5,66 +5,62 @@ This document tracks key architectural decisions made for the Coeus MCP CRM proj
 
 ## Current Decisions
 
-### ADR-001: Graph Database Selection (Neo4j)
+### ADR-001: Graph Database Selection (Zep Cloud)
 **Status**: Accepted
 **Date**: 2025-01-26
 **Context**: Need to choose a graph database for storing CRM entities and relationships
 
 **Options Considered**:
-1. **Neo4j** - Mature graph database with Cypher query language
-2. **Amazon Neptune** - Managed graph database service
-3. **ArangoDB** - Multi-model database with graph capabilities
-4. **TigerGraph** - High-performance graph database
+1. **Zep Cloud** - Managed graph database with semantic layer
+2. **Neo4j** - Mature graph database with Cypher query language
+3. **Amazon Neptune** - Managed graph database service
+4. **ArangoDB** - Multi-model database with graph capabilities
+5. **TigerGraph** - High-performance graph database
 
-**Decision**: Use Neo4j 5.x as the primary graph database
+**Decision**: Use Zep Cloud as the primary graph database and semantic layer
 
 **Rationale**:
-- Mature ecosystem with extensive documentation and community support
-- Native graph storage and processing (not layered on relational DB)
-- Cypher query language is intuitive for graph operations
-- Strong ACID compliance and transaction support
-- Excellent performance for relationship traversal
-- Vector search capabilities for semantic operations
-- Docker support for development and testing
+- Managed service reduces infrastructure overhead
+- Integrated semantic search and entity linking
+- Graph-native storage and processing
+- Simplified architecture with a single service for graph and semantic operations
+- Good performance for relationship traversal and semantic search
+- Easy to use SDK
 
 **Implications**:
-- Team needs to learn Cypher query language
-- Requires Neo4j infrastructure management
-- Vendor lock-in to Neo4j ecosystem
-- Licensing considerations for production deployment
+- Vendor lock-in to Zep Cloud ecosystem
+- Cloud dependency for local development
 
 **Alternatives Rejected**:
+- Neo4j: Requires separate semantic layer and more infrastructure management
 - Neptune: AWS lock-in, less flexible for development
 - ArangoDB: Multi-model complexity not needed
 - TigerGraph: Overkill for CRM use case, higher complexity
 
 ---
 
-### ADR-002: Semantic Layer Integration (Graphiti/Zep)
+### ADR-002: Semantic Layer Integration (Zep Cloud)
 **Status**: Accepted
 **Date**: 2025-01-26
 **Context**: Need semantic search and entity linking capabilities over the graph
 
 **Options Considered**:
-1. **Graphiti/Zep** - Graph-native semantic layer
+1. **Zep Cloud** - Integrated graph-native semantic layer
 2. **Custom embedding solution** - Build our own with OpenAI/Anthropic
 3. **Pinecone + Neo4j** - Separate vector database
 4. **Neo4j Vector Index only** - Use built-in vector capabilities
 
-**Decision**: Integrate Graphiti/Zep as the semantic layer over Neo4j
+**Decision**: Use Zep Cloud as the integrated semantic layer
 
 **Rationale**:
 - Purpose-built for graph + semantic operations
 - Handles entity linking and deduplication automatically
-- Integrates naturally with Neo4j
 - Reduces complexity of managing separate vector store
 - Provides graph-aware semantic search
 - Handles embedding generation and management
 
 **Implications**:
-- Additional service dependency
-- Learning curve for Graphiti/Zep APIs
-- Potential performance overhead
+- Cloud dependency for local development
 - Cost considerations for embedding generation
 
 **Alternatives Rejected**:
@@ -158,7 +154,7 @@ configs/        # Shared configurations
 1. **Jest + Docker Compose** - Traditional testing with manual setup
 2. **Vitest + Testcontainers** - Modern testing with automated containers
 3. **Mocked everything** - No real database testing
-4. **Vitest + In-memory Neo4j** - Embedded database testing
+4. **Vitest + In-memory Zep Cloud** - Embedded database testing
 
 **Decision**: Use Vitest with Testcontainers for integration testing
 
@@ -179,7 +175,7 @@ configs/        # Shared configurations
 **Alternatives Rejected**:
 - Jest: Slower, less TypeScript-friendly
 - Mocked only: Misses integration issues
-- In-memory: Limited Neo4j feature support
+- In-memory: Limited Zep Cloud feature support
 
 ---
 

@@ -25,3 +25,13 @@
 **Correction:** The user informed me that the correct file extension for imports in this project is `.js`, even for `.ts` files, due to how the TypeScript compiler and module resolution are configured.
 
 **Future Action:** I will always use the `.js` extension when importing other TypeScript files within the project to comply with the project's module resolution strategy and avoid linting errors.
+
+## Ticketing
+
+### Follow Naming Conventions Strictly
+
+**Incident:** I created tickets and epics with filenames that did not include their titles, making them difficult to identify in the file explorer. I also created ticket folders for epics that did not include the epic title.
+
+**Correction:** The user instructed me to re-read the `.clinerules/tickets.md` file and update the filenames to include the titles.
+
+**Future Action:** I will strictly adhere to the file naming conventions outlined in the ticketing rules, ensuring that all ticket, epic, and epic folder names are descriptive and easy to understand.

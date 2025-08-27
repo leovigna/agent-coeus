@@ -6,55 +6,25 @@ This document defines all environment variables used across the Coeus system. Va
 ## Environment Variable Categories
 
 ### Graph Database Configuration
-Variables for Neo4j and Graphiti/Zep integration.
+Variables for Zep Cloud integration.
 
-#### `GRAPHITI_BASE_URL`
+#### `ZEP_API_KEY`
 - **Component**: graph-client, coeus-mcp
 - **Required**: Yes
-- **Description**: Base URL for Graphiti/Zep service
-- **Format**: Valid HTTP/HTTPS URL
-- **Example**: `https://api.graphiti.ai`
-- **Validation**: Must be valid URL, HTTPS recommended for production
-
-#### `GRAPHITI_API_KEY`
-- **Component**: graph-client, coeus-mcp
-- **Required**: Yes
-- **Description**: Authentication key for Graphiti/Zep service
+- **Description**: Authentication key for Zep Cloud service
 - **Format**: String (typically UUID or JWT)
-- **Example**: `gti_1234567890abcdef`
+- **Example**: `zep_1234567890abcdef`
 - **Validation**: Non-empty string, length > 10 characters
 - **Security**: Sensitive - never log or expose
 
-#### `GRAPH_NAMESPACE`
+#### `ZEP_API_URL`
 - **Component**: graph-client, coeus-mcp
 - **Required**: No
-- **Description**: Namespace for graph isolation (multi-tenancy)
-- **Format**: Alphanumeric string with underscores/hyphens
-- **Default**: `default`
-- **Example**: `acme_corp_prod`
-- **Validation**: `/^[a-zA-Z0-9_-]+$/`, max 50 characters
-
-#### `NEO4J_URI`
-- **Component**: graph-client (direct connection mode)
-- **Required**: No (when using Graphiti)
-- **Description**: Direct Neo4j connection URI
-- **Format**: Neo4j connection string
-- **Example**: `neo4j://localhost:7687`
-- **Validation**: Valid Neo4j URI format
-
-#### `NEO4J_USERNAME`
-- **Component**: graph-client (direct connection mode)
-- **Required**: No (when using Graphiti)
-- **Description**: Neo4j database username
-- **Default**: `neo4j`
-- **Example**: `neo4j`
-
-#### `NEO4J_PASSWORD`
-- **Component**: graph-client (direct connection mode)
-- **Required**: No (when using Graphiti)
-- **Description**: Neo4j database password
-- **Format**: String
-- **Security**: Sensitive - never log or expose
+- **Description**: Base URL for Zep Cloud service
+- **Format**: Valid HTTP/HTTPS URL
+- **Default**: `https://api.getzep.com`
+- **Example**: `https://api.getzep.com`
+- **Validation**: Must be valid URL, HTTPS recommended for production
 
 ### Application Configuration
 Core application runtime settings.
@@ -151,8 +121,8 @@ Optional configuration for semantic search capabilities.
 - **Required**: No
 - **Description**: Which embedding service to use
 - **Format**: Enum string
-- **Default**: `graphiti` (via Graphiti/Zep)
-- **Values**: `graphiti`, `openai`, `anthropic`, `local`
+- **Default**: `zep` (via Zep Cloud)
+- **Values**: `zep`, `openai`, `anthropic`, `local`
 - **Validation**: Must be one of allowed values
 
 #### `EMBEDDING_MODEL`
@@ -183,17 +153,10 @@ Variables specific to development and testing environments.
 - **Default**: `sqlite::memory:` (in-memory SQLite)
 - **Example**: `sqlite:./test/test.db`
 
-#### `TEST_NEO4J_URI`
+#### `TEST_ZEP_API_URL`
 - **Component**: graph-client (integration tests)
 - **Required**: No (set by Testcontainers)
-- **Description**: Neo4j URI for integration testing
-- **Format**: Neo4j connection string
-- **Example**: `neo4j://localhost:7687`
-
-#### `TEST_GRAPHITI_URL`
-- **Component**: graph-client (integration tests)
-- **Required**: No (set by Testcontainers)
-- **Description**: Graphiti service URL for testing
+- **Description**: Zep Cloud service URL for testing
 - **Format**: HTTP URL
 - **Example**: `http://localhost:8080`
 
@@ -265,10 +228,9 @@ Each component loads only the variables it needs:
 ```typescript
 // Required variables
 const config = {
-  graphiti: {
-    baseUrl: process.env.GRAPHITI_BASE_URL!, // Required
-    apiKey: process.env.GRAPHITI_API_KEY!,   // Required
-    namespace: process.env.GRAPH_NAMESPACE || 'default'
+  zep: {
+    apiKey: process.env.ZEP_API_KEY!,   // Required
+    apiUrl: process.env.ZEP_API_URL || 'https://api.getzep.com'
   },
   server: {
     port: parseInt(process.env.MCP_PORT || '3000'),
@@ -283,13 +245,12 @@ const config = {
 #### `packages/graph-client/`
 ```typescript
 const config = {
-  graphiti: {
-    baseUrl: process.env.GRAPHITI_BASE_URL!,
-    apiKey: process.env.GRAPHITI_API_KEY!,
-    namespace: process.env.GRAPH_NAMESPACE || 'default'
+  zep: {
+    apiKey: process.env.ZEP_API_KEY!,
+    apiUrl: process.env.ZEP_API_URL || 'https://api.getzep.com'
   },
   embeddings: {
-    provider: process.env.EMBEDDING_PROVIDER || 'graphiti',
+    provider: process.env.EMBEDDING_PROVIDER || 'zep',
     openaiKey: process.env.OPENAI_API_KEY,
     threshold: parseFloat(process.env.SEMANTIC_SEARCH_THRESHOLD || '0.7')
   }
@@ -302,9 +263,8 @@ const config = {
 ```typescript
 // Example validation schema
 const envSchema = z.object({
-  GRAPHITI_BASE_URL: z.string().url(),
-  GRAPHITI_API_KEY: z.string().min(10),
-  GRAPH_NAMESPACE: z.string().regex(/^[a-zA-Z0-9_-]+$/).max(50).optional(),
+  ZEP_API_KEY: z.string().min(10),
+  ZEP_API_URL: z.string().url().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug', 'trace']).optional(),
   MCP_PORT: z.coerce.number().int().min(1024).max(65535).optional(),
@@ -324,8 +284,7 @@ const envSchema = z.object({
 
 ### Sensitive Variables
 Never log or expose these variables:
-- `GRAPHITI_API_KEY`
-- `NEO4J_PASSWORD`
+- `ZEP_API_KEY`
 - `DATABASE_URL` (if contains credentials)
 - `OPENAI_API_KEY`
 
@@ -342,8 +301,7 @@ Never log or expose these variables:
 Create `.env.local` file:
 ```bash
 # Required for local development
-GRAPHITI_BASE_URL=https://api.graphiti.ai
-GRAPHITI_API_KEY=your_graphiti_key_here
+ZEP_API_KEY=your_zep_api_key_here
 DATABASE_URL=sqlite:./data/coeus-dev.db
 
 # Optional for enhanced features

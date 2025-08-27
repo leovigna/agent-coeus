@@ -27,8 +27,7 @@ graph TB
     end
 
     subgraph "Storage"
-        Neo4j["Neo4j Database<br/>(Graph Data)"]
-        Graphiti["Graphiti/Zep<br/>(Semantic Layer)"]
+        ZepCloud["Zep Cloud<br/>(Graph Data)"]
         SQLite["SQLite/PostgreSQL<br/>(Operational Data)"]
     end
 
@@ -42,8 +41,7 @@ graph TB
     MCPKit --> Schemas
     MCP --> GraphClient
     MCP --> OpsDB
-    GraphClient --> Neo4j
-    GraphClient --> Graphiti
+    GraphClient --> ZepCloud
     OpsDB --> SQLite
 ```
 
@@ -109,8 +107,7 @@ interface Relationship {
 ### Graph Client (`packages/graph-client`) - To be created later
 **Purpose**: Abstraction layer for graph database operations
 **Responsibilities**:
-- Neo4j connection management and pooling
-- Graphiti/Zep integration for semantic operations
+- Zep Cloud SDK integration for all graph and semantic operations
 - CRUD operations for entities and relationships
 - Graph traversal and path finding
 - Semantic search implementation
@@ -182,15 +179,15 @@ sequenceDiagram
     participant MCP as MCP Server
     participant Schemas
     participant GraphClient
-    participant Neo4j
+    participant ZepCloud
     participant OpsDB
 
     Agent->>MCP: create_company(data)
     MCP->>Schemas: validate(data)
     Schemas-->>MCP: validated_data
     MCP->>GraphClient: createEntity('Company', validated_data)
-    GraphClient->>Neo4j: CREATE (c:Company {...})
-    Neo4j-->>GraphClient: node_id
+    GraphClient->>ZepCloud: CREATE (c:Company {...})
+    ZepCloud-->>GraphClient: node_id
     GraphClient-->>MCP: entity_result
     MCP->>OpsDB: log_request(request, response)
     MCP-->>Agent: success_response
@@ -202,17 +199,16 @@ sequenceDiagram
     participant Agent
     participant MCP as MCP Server
     participant GraphClient
-    participant Graphiti
-    participant Neo4j
+    participant ZepCloud
 
     Agent->>MCP: search_entities("software engineers at tech companies")
     MCP->>GraphClient: searchEntities(query, options)
-    GraphClient->>Graphiti: embed_query(query)
-    Graphiti-->>GraphClient: query_embedding
-    GraphClient->>Neo4j: vector_search(embedding, filters)
-    Neo4j-->>GraphClient: matching_nodes
-    GraphClient->>Neo4j: expand_relationships(nodes)
-    Neo4j-->>GraphClient: enriched_results
+    GraphClient->>ZepCloud: embed_query(query)
+    ZepCloud-->>GraphClient: query_embedding
+    GraphClient->>ZepCloud: vector_search(embedding, filters)
+    ZepCloud-->>GraphClient: matching_nodes
+    GraphClient->>ZepCloud: expand_relationships(nodes)
+    ZepCloud-->>GraphClient: enriched_results
     GraphClient-->>MCP: search_results
     MCP-->>Agent: formatted_results
 ```
@@ -223,12 +219,12 @@ sequenceDiagram
     participant Agent
     participant MCP as MCP Server
     participant GraphClient
-    participant Neo4j
+    participant ZepCloud
 
     Agent->>MCP: get_relationships(person_id, "REPORTS_TO", depth=2)
     MCP->>GraphClient: traverseRelationships(person_id, ["REPORTS_TO"], 2)
-    GraphClient->>Neo4j: MATCH path=(start)-[:REPORTS_TO*1..2]-(end)
-    Neo4j-->>GraphClient: relationship_paths
+    GraphClient->>ZepCloud: MATCH path=(start)-[:REPORTS_TO*1..2]-(end)
+    ZepCloud-->>GraphClient: relationship_paths
     GraphClient->>GraphClient: format_hierarchy(paths)
     GraphClient-->>MCP: hierarchy_result
     MCP-->>Agent: formatted_hierarchy
@@ -280,7 +276,7 @@ CREATE INDEX person_email FOR (p:Person) ON (p.email);
 CREATE INDEX works_at_company FOR ()-[r:WORKS_AT]-() ON (r.company_id);
 CREATE INDEX reports_to_manager FOR ()-[r:REPORTS_TO]-() ON (r.manager_id);
 
--- Vector search (Graphiti managed)
+-- Vector search (Zep Cloud managed)
 CREATE VECTOR INDEX entity_embeddings FOR (n) ON (n.embedding);
 ```
 
@@ -371,8 +367,7 @@ graph TD
 ```
 
 ### External Dependencies
-- **Neo4j Driver**: Direct connection to graph database
-- **Graphiti/Zep SDK**: Semantic operations and embeddings
+- **Zep Cloud SDK**: Semantic operations and embeddings
 - **Zod**: Schema validation and type inference
 - **Winston**: Structured logging
 - **Fastify**: HTTP server framework (if needed)
@@ -380,10 +375,10 @@ graph TD
 ## Scalability Considerations
 
 ### Graph Database
-- **Connection Pooling**: Managed connection pool for Neo4j
-- **Query Optimization**: Indexed lookups and efficient traversals
-- **Batch Operations**: Bulk entity creation and updates
-- **Namespace Isolation**: Multi-tenant support through graph namespaces
+- **Managed Service**: Zep Cloud handles all database management, scaling, and maintenance.
+- **Query Optimization**: Zep Cloud provides indexed lookups and efficient traversals.
+- **Batch Operations**: Bulk entity creation and updates are supported via the Zep Cloud SDK.
+- **Namespace Isolation**: Multi-tenancy is supported through Zep Cloud projects.
 
 ### Semantic Search
 - **Embedding Caching**: Cache frequently used embeddings
@@ -412,15 +407,15 @@ graph TD
 - **Rate Limiting**: Prevent abuse and DoS attacks
 
 ### Infrastructure Security
-- **Database Encryption**: Encrypted connections to Neo4j
-- **Secret Management**: Environment-based secret handling
-- **Network Security**: Restricted database access
-- **Container Security**: Minimal attack surface in deployments
+- **Database Encryption**: Encrypted connections to Zep Cloud are handled by the SDK.
+- **Secret Management**: Environment-based secret handling for ZEP_API_KEY.
+- **Network Security**: Zep Cloud manages network security.
+- **Container Security**: Not applicable as we are using a managed service.
 
 ## Decision Log Pointers
 See [DECISIONS.md](./DECISIONS.md) for detailed architectural decision records including:
-- Choice of Neo4j over other graph databases
-- Graphiti/Zep integration approach
+- Choice of Zep Cloud over other graph databases
+- Zep integration approach
 - MCP protocol implementation strategy
 - Monorepo structure decisions
 - Testing strategy choices

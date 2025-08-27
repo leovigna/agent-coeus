@@ -11,8 +11,7 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 - **ES2022** - Modern JavaScript features and syntax
 
 ### Database Stack
-- **Neo4j 5.x** - Primary graph database for entities and relationships
-- **Graphiti/Zep** - Semantic layer for embeddings and entity linking
+- **Zep Cloud** - Primary graph database for entities, relationships, and semantic layer
 - **SQLite/Turso** - Operational database for server state and logs
 - **Drizzle ORM** - Type-safe database operations and migrations
 
@@ -43,7 +42,6 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 ### Testing
 - **Vitest** - Modern testing framework with TypeScript support
 - **Testcontainers** - Integration testing with real services
-- **@testcontainers/neo4j** - Neo4j containers for testing
 - **c8** - Code coverage reporting
 
 ## Core Dependencies
@@ -51,8 +49,7 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 ### Graph & Database
 ```json
 {
-  "neo4j-driver": "^5.x",
-  "graphiti-sdk": "^1.x",
+  "@getzep/zep-cloud": "^3.x",
   "@libsql/client": "^0.5.x",
   "drizzle-orm": "^0.29.x"
 }
@@ -106,7 +103,6 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 {
   "vitest": "^1.x",
   "testcontainers": "^10.x",
-  "@testcontainers/neo4j": "^10.x",
   "@vitest/coverage-c8": "^0.33.x"
 }
 ```
@@ -133,7 +129,7 @@ apps/
 
 packages/
 ├── domain-schemas/     # Zod schemas and validation
-├── graph-client/       # Neo4j + Graphiti integration
+├── graph-client/       # Zep Cloud integration
 ├── ops-db/            # Operational database client
 └── mcp-kit/           # MCP protocol utilities
 
@@ -154,8 +150,7 @@ configs/
 ## External Services
 
 ### Required Services
-- **Graphiti/Zep API** - Semantic operations and embeddings
-- **Neo4j Database** - Graph storage (can be self-hosted)
+- **Zep Cloud API** - Semantic operations and embeddings
 
 ### Optional Services
 - **OpenAI API** - Fallback embedding provider
@@ -168,13 +163,10 @@ configs/
 - **TypeScript Extension** - Enhanced TS support
 - **ESLint Extension** - Real-time linting
 - **Prettier Extension** - Code formatting
-- **Neo4j Extension** - Cypher syntax highlighting
 - **Docker Extension** - Container management
 
 ### Database Tools
-- **Neo4j Desktop** - Graph database management
-- **Neo4j Browser** - Query interface
-- **Cypher Shell** - Command-line interface
+- **Zep Cloud Console** - Graph database management and query interface
 
 ### Monitoring & Debugging
 - **Node.js Inspector** - Built-in debugging
@@ -188,7 +180,7 @@ configs/
 - **Redis** - Distributed caching (future)
 
 ### Connection Management
-- **Neo4j Driver Pool** - Database connection pooling
+- **Zep Cloud SDK** - Handles connection pooling and management
 - **HTTP Keep-Alive** - Persistent connections
 
 ### Optimization
@@ -254,14 +246,12 @@ configs/
 - Node.js: 20.0.0
 - pnpm: 8.0.0
 - TypeScript: 5.8.2
-- Neo4j: 5.0.0
 - Docker: 20.0.0
 
 ### Recommended Versions
 - Node.js: 20.11.0 (LTS)
 - pnpm: 8.15.0
 - TypeScript: 5.8.2
-- Neo4j: 5.15.0
 - Docker: 24.0.0
 
 ## Browser Compatibility (Future Web UI)
@@ -277,8 +267,7 @@ configs/
 
 ## License Considerations
 - **MIT Licensed**: Most dependencies use MIT license
-- **Neo4j**: Community Edition (GPL) or Enterprise (Commercial)
-- **Graphiti/Zep**: Commercial service with API pricing
+- **Zep Cloud**: Commercial service with API pricing
 
 ## Migration Path
 The tech stack is designed for gradual adoption:
