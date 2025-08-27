@@ -55,7 +55,7 @@ A high-level description of the epic, including its goals and success criteria.
 ### Ticket Creation
 1. **Identify Task**: A new task is identified from the implementation roadmap or as a bug/feature request.
 2. **Create Epic (if needed)**: If the task is part of a larger body of work, create an epic first.
-3. **Create Ticket**: Create a new Markdown file in the `tickets/` folder with a unique ID.
+3. **Create Ticket**: Create a new Markdown file in the `tickets/` folder or `tickets/$epic/` folder (when ticket is linked to an epic) with a unique ID.
 4. **Fill Details**: Add a title, description, epic, complexity, and any related tickets.
 5. **Assign**: Assign the ticket to a team member.
 
