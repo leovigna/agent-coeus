@@ -5,5 +5,7 @@ Typescript code should be linted using the `lint` and `lint:fix` commands as des
 
 For more info on modern ESLint configuration, see https://eslint.org/docs/latest/use/configure/configuration-files that explains flat config files.
 
+I MUST read [eslint.config.mjs](../packages/starter-typescript/eslint.config.mjs) and the relevant package's [eslint.config] whenever I write some Typescript code - this is not optional.
+
 ## Solidity Linting
 Solidity code should be formatted using `forge fmt`
