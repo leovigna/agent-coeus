@@ -1,7 +1,12 @@
 # Ticketing System
 
 ## Overview
-This project uses a lightweight, file-based ticketing system inspired by Jira. All tickets are stored as Markdown files in the `tickets/` folder, and epics are stored in the `epics/` folder. This approach keeps all project management artifacts within the repository, providing a single source of truth for both code and tasks.
+This project uses a lightweight, file-based ticketing system inspired by Jira.
+
+* Tickets are stored as Markdown files in the `tickets/` folder with a unique ticket number and brief title (eg. `TICKET-01-configure-monorepo.md`)
+* Epics are stored as Markdown files in the `epics/` folder with a unique epic number and brief title (eg. `EPIC-01-setup-project.md`)
+
+This approach keeps all project management artifacts within the repository, providing a single source of truth for both code and tasks.
 
 ## Ticket Structure
 Each ticket is a Markdown file with the following structure:
