@@ -10,7 +10,7 @@ This roadmap outlines the development phases for the Coeus MCP CRM project, from
 - **M4: Production Ready** - Weeks 7-8 (Deployment & Monitoring)
 
 ## Milestone 1: Core Foundation
-**Duration**: 2 weeks  
+**Duration**: 2 weeks
 **Goal**: Establish solid foundation with basic MCP functionality
 
 ### Week 1: Infrastructure Setup
@@ -18,8 +18,8 @@ This roadmap outlines the development phases for the Coeus MCP CRM project, from
 - [ ] **Monorepo Structure**: Complete apps/packages/configs organization
 - [ ] **Shared Configurations**: ESLint, TypeScript, ESBuild, Vitest configs
 - [ ] **Domain Schemas Package**: Company and Person entities with Zod validation
-- [ ] **Basic Graph Client**: Neo4j connection and simple CRUD operations
 - [ ] **MCP Kit Package**: Core MCP protocol utilities and abstractions
+- [ ] **Ops Database Package**: SQLite/Turso client and schema
 
 #### Technical Tasks
 ```
@@ -58,10 +58,6 @@ packages/mcp-kit/
 
 ### Week 2: Basic MCP Server
 #### Deliverables
-- [ ] **MCP Server Application**: Basic server with protocol compliance
-- [ ] **Core Resources**: Companies and People resource handlers
-- [ ] **Basic Tools**: create_company, create_person, basic search
-- [ ] **Operational Database**: SQLite setup for server state
 - [ ] **Testing Infrastructure**: Testcontainers setup for integration tests
 
 #### Technical Tasks
@@ -104,7 +100,7 @@ test/
 ---
 
 ## Milestone 2: Full MCP Implementation
-**Duration**: 2 weeks  
+**Duration**: 2 weeks
 **Goal**: Complete MCP contract with all tools and resources
 
 ### Week 3: Advanced Graph Operations
@@ -189,7 +185,7 @@ docs/
 ---
 
 ## Milestone 3: Integration & Testing
-**Duration**: 2 weeks  
+**Duration**: 2 weeks
 **Goal**: Comprehensive testing and performance validation
 
 ### Week 5: End-to-End Testing
@@ -282,7 +278,7 @@ Quality Assurance:
 ---
 
 ## Milestone 4: Production Ready
-**Duration**: 2 weeks  
+**Duration**: 2 weeks
 **Goal**: Production deployment and monitoring
 
 ### Week 7: Production Preparation

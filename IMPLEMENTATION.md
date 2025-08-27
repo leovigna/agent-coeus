@@ -10,15 +10,14 @@ Coeus follows a graph-first architecture with the following key components:
 
 ### Workspace Structure (Option B)
 ```
-apps/
-├── coeus-mcp/           # MCP server application
-└── ...                 # Future apps (web UI, CLI tools)
-
 packages/
-├── graph-client/        # Neo4j + Graphiti client library
 ├── domain-schemas/      # TypeScript schemas for entities
 ├── ops-db/             # Operational database client
 └── mcp-kit/            # MCP protocol utilities
+
+apps/
+├── coeus-mcp/           # MCP server application (to be created later)
+└── ...                 # Future apps (web UI, CLI tools)
 
 configs/
 ├── eslint-config/      # Shared ESLint configuration
@@ -44,16 +43,8 @@ configs/
   - [ ] Create entity linking and normalization utilities
   - [ ] Export TypeScript types for all schemas
 
-- [ ] **Graph Client Package** (`packages/graph-client`)
-  - [ ] Implement Neo4j connection management
-  - [ ] Integrate Graphiti/Zep for semantic operations
-  - [ ] Create CRUD operations for entities
-  - [ ] Implement relationship management
-  - [ ] Add semantic search capabilities
-  - [ ] Create graph traversal utilities
-
 - [ ] **Operational Database Package** (`packages/ops-db`)
-  - [ ] Set up lightweight SQLite/PostgreSQL client
+  - [ ] Set up lightweight SQLite/Turso client
   - [ ] Create schema for MCP request logs
   - [ ] Implement server state management
   - [ ] Add migration utilities
@@ -65,7 +56,7 @@ configs/
   - [ ] Create resource and tool abstractions
 
 ### Phase 3: MCP Server Application
-- [ ] **Core MCP Server** (`apps/coeus-mcp`)
+- [ ] **Core MCP Server** (`apps/coeus-mcp`) - To be created later
   - [ ] Initialize MCP server with protocol compliance
   - [ ] Implement resource handlers (companies, people, relationships)
   - [ ] Implement tool handlers (CRUD, search, linking)

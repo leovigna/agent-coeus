@@ -49,7 +49,7 @@ graph TB
 
 ## Component Details
 
-### MCP Server (`apps/coeus-mcp`)
+### MCP Server (`apps/coeus-mcp`) - To be created later
 **Purpose**: Single point of entry for all agent interactions
 **Responsibilities**:
 - MCP protocol compliance and request handling
@@ -57,13 +57,6 @@ graph TB
 - Resource and tool endpoint implementation
 - Logging and monitoring
 - Health checks and status reporting
-
-**Key Files**:
-- `server.ts` - Main MCP server setup and configuration
-- `resources/` - Resource handlers (companies, people, relationships)
-- `tools/` - Tool handlers (CRUD, search, linking operations)
-- `middleware/` - Request validation, logging, error handling
-- `health.ts` - Health check endpoints
 
 ### Domain Schemas (`packages/domain-schemas`)
 **Purpose**: Centralized type definitions and validation
@@ -113,7 +106,7 @@ interface Relationship {
 }
 ```
 
-### Graph Client (`packages/graph-client`)
+### Graph Client (`packages/graph-client`) - To be created later
 **Purpose**: Abstraction layer for graph database operations
 **Responsibilities**:
 - Neo4j connection management and pooling

@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const CompanySchema = z.object({
     id: z.string().uuid(),
     name: z.string().min(1),
     domain: z.string().optional(),
     industry: z.string().optional(),
-    size: z.enum(['startup', 'small', 'medium', 'large', 'enterprise']).optional(),
+    size: z.enum(["startup", "small", "medium", "large", "enterprise"]).optional(),
     location: z.object({
         city: z.string().optional(),
         state: z.string().optional(),
@@ -40,7 +40,7 @@ export const PersonSchema = z.object({
     updated_at: z.string().datetime(),
 });
 
-export const RelationshipTypeSchema = z.enum(['WORKS_AT', 'REPORTS_TO']);
+export const RelationshipTypeSchema = z.enum(["WORKS_AT", "REPORTS_TO"]);
 
 export const RelationshipSchema = z.object({
     type: RelationshipTypeSchema,
