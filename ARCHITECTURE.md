@@ -332,6 +332,51 @@ graph TD
     GraphClient --> TSConfig
 ```
 
+### Dependency Graph
+```mermaid
+graph TD
+    subgraph "Applications"
+        A["@coeus-agent/coeus-mcp"]
+    end
+
+    subgraph "Packages"
+        B["@coeus-agent/domain-schemas"]
+        C["@coeus-agent/graph-client"]
+        D["@coeus-agent/mcp-kit"]
+        E["@coeus-agent/ops-db"]
+    end
+
+    subgraph "Configs"
+        F["@coeus-agent/eslint-config"]
+        G["@coeus-agent/tsconfig"]
+        H["@coeus-agent/esbuild-config"]
+    end
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+
+    C --> B
+    D --> B
+
+    A --> F
+    A --> G
+    A --> H
+
+    B --> F
+    B --> G
+
+    C --> F
+    C --> G
+
+    D --> F
+    D --> G
+
+    E --> F
+    E --> G
+```
+
 ### External Dependencies
 - **Neo4j Driver**: Direct connection to graph database
 - **Graphiti/Zep SDK**: Semantic operations and embeddings

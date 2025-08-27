@@ -41,6 +41,7 @@
     "dotenv-vault": "1.26.2",
     "fixpack": "4.0.0",
     "mprocs": "^0.7.2",
+    "npm-run-all": "^4.1.5",
     "repomix": "^0.3.2",
     "rimraf": "^6.0.1",
     "syncpack": "^13.0.3",
