@@ -1,3 +1,3 @@
-import { buildLib } from "@leovigna/esbuild-config";
+import esbuild from "@coeus-agent/esbuild-config";
 
-await buildLib();
+await esbuild.buildLib();

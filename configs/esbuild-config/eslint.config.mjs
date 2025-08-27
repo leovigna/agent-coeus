@@ -1,4 +1,4 @@
-import { configs } from "@leovigna/eslint-config"
+import { configs } from "@coeus-agent/eslint-config"
 
 export default [
     ...configs,

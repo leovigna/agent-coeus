@@ -1,4 +1,4 @@
-import { typecheckedConfigs } from "@leovigna/eslint-config"
+import { typecheckedConfigs } from "@coeus-agent/eslint-config"
 
 export default [
     ...typecheckedConfigs,

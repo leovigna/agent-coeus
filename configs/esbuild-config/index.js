@@ -1,4 +1,4 @@
-const { build } = require('esbuild');
+import { build } from 'esbuild';
 
 const baseConfig = {
     entryPoints: ['src/index.ts'],
@@ -8,13 +8,16 @@ const baseConfig = {
     external: [],
 };
 
-async function buildPackage(format) {
+export async function buildLib() {
     await build({
         ...baseConfig,
-        format,
-        outfile: `dist/index.${format === 'esm' ? 'js' : 'cjs'}`,
+        format: 'esm',
+        outfile: 'dist/index.js',
+    });
+
+    await build({
+        ...baseConfig,
+        format: 'cjs',
+        outfile: 'dist/index.cjs',
     });
 }
-
-buildPackage('esm');
-buildPackage('cjs');
