@@ -1,8 +1,0 @@
-{
-  "extends": "@coeus-agent/tsconfig",
-  "include": [
-    "src",
-    "vite.config.ts",
-    "vitest.setup.ts"
-  ]
-}
