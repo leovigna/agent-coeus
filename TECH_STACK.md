@@ -66,10 +66,7 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 ### Server & Protocol
 ```json
 {
-  "fastify": "^4.x",
-  "ws": "^8.x",
-  "@fastify/cors": "^9.x",
-  "@fastify/rate-limit": "^9.x",
+  "@modelcontextprotocol/sdk": "latest",
   "winston": "^3.x"
 }
 ```
@@ -129,9 +126,7 @@ apps/
 
 packages/
 ├── domain-schemas/     # Zod schemas and validation
-├── graph-client/       # Zep Cloud integration
-├── ops-db/            # Operational database client
-└── mcp-kit/           # MCP protocol utilities
+└── ops-db/            # Operational database client
 
 configs/
 ├── eslint-config/     # Shared ESLint configuration

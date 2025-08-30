@@ -18,11 +18,9 @@ graph TB
 
     subgraph "Domain Layer"
         Schemas["Domain Schemas<br/>(packages/domain-schemas)"]
-        MCPKit["MCP Kit<br/>(packages/mcp-kit)"]
     end
 
     subgraph "Data Layer"
-        GraphClient["Graph Client<br/>(packages/graph-client)"]
         OpsDB["Ops Database<br/>(packages/ops-db)"]
     end
 
@@ -35,13 +33,10 @@ graph TB
     Client --> MCP
     MCP --> Resources
     MCP --> Tools
-    MCP --> MCPKit
     Resources --> Schemas
     Tools --> Schemas
-    MCPKit --> Schemas
-    MCP --> GraphClient
     MCP --> OpsDB
-    GraphClient --> ZepCloud
+    MCP --> ZepCloud
     OpsDB --> SQLite
 ```
 
@@ -50,11 +45,11 @@ graph TB
 ### MCP Server (`apps/coeus-mcp`) - To be created later
 **Purpose**: Single point of entry for all agent interactions
 **Responsibilities**:
-- MCP protocol compliance and request handling
-- Request validation and error handling
-- Resource and tool endpoint implementation
-- Logging and monitoring
-- Health checks and status reporting
+- Implements the MCP server using the official `@modelcontextprotocol/sdk`.
+- Defines and registers MCP tools and resources.
+- Integrates with domain packages (graph-client, ops-db) to fulfill tool requests.
+- Handles server configuration, logging, and lifecycle management.
+- Ensures compliance with the MCP specification through the SDK.
 
 ### Domain Schemas (`packages/domain-schemas`)
 **Purpose**: Centralized type definitions and validation
@@ -104,39 +99,6 @@ interface Relationship {
 }
 ```
 
-### Graph Client (`packages/graph-client`) - To be created later
-**Purpose**: Abstraction layer for graph database operations
-**Responsibilities**:
-- Zep Cloud SDK integration for all graph and semantic operations
-- CRUD operations for entities and relationships
-- Graph traversal and path finding
-- Semantic search implementation
-- Transaction management
-
-**Key Operations**:
-- `createEntity(type, data)` - Create new graph nodes
-- `updateEntity(id, data)` - Update existing nodes
-- `deleteEntity(id)` - Remove nodes and relationships
-- `createRelationship(from, to, type, properties)` - Link entities
-- `searchEntities(query, options)` - Semantic search
-- `traverseRelationships(startId, relationshipTypes, depth)` - Graph traversal
-- `findPath(fromId, toId, relationshipTypes)` - Shortest path finding
-
-### MCP Kit (`packages/mcp-kit`)
-**Purpose**: Reusable MCP protocol utilities
-**Responsibilities**:
-- MCP request/response validation
-- Error handling patterns and types
-- Resource and tool abstractions
-- Protocol compliance utilities
-- Request logging and metrics
-
-**Key Utilities**:
-- `validateMCPRequest(request)` - Request validation
-- `createMCPResponse(data)` - Response formatting
-- `handleMCPError(error)` - Error response handling
-- `createResource(definition)` - Resource factory
-- `createTool(definition)` - Tool factory
 
 ### Operational Database (`packages/ops-db`)
 **Purpose**: Lightweight storage for operational data
@@ -185,10 +147,8 @@ sequenceDiagram
     Agent->>MCP: create_company(data)
     MCP->>Schemas: validate(data)
     Schemas-->>MCP: validated_data
-    MCP->>GraphClient: createEntity('Company', validated_data)
-    GraphClient->>ZepCloud: CREATE (c:Company {...})
-    ZepCloud-->>GraphClient: node_id
-    GraphClient-->>MCP: entity_result
+    MCP->>ZepCloud: createEntity('Company', validated_data)
+    ZepCloud-->>MCP: entity_result
     MCP->>OpsDB: log_request(request, response)
     MCP-->>Agent: success_response
 ```
@@ -202,14 +162,8 @@ sequenceDiagram
     participant ZepCloud
 
     Agent->>MCP: search_entities("software engineers at tech companies")
-    MCP->>GraphClient: searchEntities(query, options)
-    GraphClient->>ZepCloud: embed_query(query)
-    ZepCloud-->>GraphClient: query_embedding
-    GraphClient->>ZepCloud: vector_search(embedding, filters)
-    ZepCloud-->>GraphClient: matching_nodes
-    GraphClient->>ZepCloud: expand_relationships(nodes)
-    ZepCloud-->>GraphClient: enriched_results
-    GraphClient-->>MCP: search_results
+    MCP->>ZepCloud: searchEntities(query, options)
+    ZepCloud-->>MCP: search_results
     MCP-->>Agent: formatted_results
 ```
 
@@ -222,11 +176,8 @@ sequenceDiagram
     participant ZepCloud
 
     Agent->>MCP: get_relationships(person_id, "REPORTS_TO", depth=2)
-    MCP->>GraphClient: traverseRelationships(person_id, ["REPORTS_TO"], 2)
-    GraphClient->>ZepCloud: MATCH path=(start)-[:REPORTS_TO*1..2]-(end)
-    ZepCloud-->>GraphClient: relationship_paths
-    GraphClient->>GraphClient: format_hierarchy(paths)
-    GraphClient-->>MCP: hierarchy_result
+    MCP->>ZepCloud: traverseRelationships(person_id, ["REPORTS_TO"], 2)
+    ZepCloud-->>MCP: hierarchy_result
     MCP-->>Agent: formatted_hierarchy
 ```
 
@@ -291,9 +242,7 @@ graph TD
 
     subgraph "Packages"
         Schemas["domain-schemas"]
-        GraphClient["graph-client"]
         OpsDB["ops-db"]
-        MCPKit["mcp-kit"]
     end
 
     subgraph "Configs"
@@ -303,12 +252,7 @@ graph TD
     end
 
     CoeusApp --> Schemas
-    CoeusApp --> GraphClient
     CoeusApp --> OpsDB
-    CoeusApp --> MCPKit
-
-    GraphClient --> Schemas
-    MCPKit --> Schemas
 
     CoeusApp --> ESLint
     CoeusApp --> TSConfig
@@ -330,8 +274,6 @@ graph TD
 
     subgraph "Packages"
         B["@coeus-agent/domain-schemas"]
-        C["@coeus-agent/graph-client"]
-        D["@coeus-agent/mcp-kit"]
         E["@coeus-agent/ops-db"]
     end
 
@@ -342,12 +284,7 @@ graph TD
     end
 
     A --> B
-    A --> C
-    A --> D
     A --> E
-
-    C --> B
-    D --> B
 
     A --> F
     A --> G
@@ -367,10 +304,10 @@ graph TD
 ```
 
 ### External Dependencies
+- **@modelcontextprotocol/sdk**: The official MCP TypeScript SDK for building the server.
 - **Zep Cloud SDK**: Semantic operations and embeddings
 - **Zod**: Schema validation and type inference
 - **Winston**: Structured logging
-- **Fastify**: HTTP server framework (if needed)
 
 ## Scalability Considerations
 
