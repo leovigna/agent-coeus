@@ -51,6 +51,10 @@
     "tsc:trace": "tsc --generateTrace lib/trace && analyze-trace lib/trace",
     "tsc:watch": "tsc -w"
   },
+  "dependencies": {
+    "zod": "^3.22.4",
+    "@modelcontextprotocol/sdk": "^1.17.4"
+  },
   "devDependencies": {
     "@coeus-agent/esbuild-config": "workspace:*",
     "@coeus-agent/eslint-config": "workspace:*",
