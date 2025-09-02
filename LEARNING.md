@@ -26,6 +26,16 @@
 
 **Future Action:** I will always use the `.js` extension when importing other TypeScript files within the project to comply with the project's module resolution strategy and avoid linting errors.
 
+## Templates
+
+### Use `cp -R` for Template Creation
+
+**Incident:** When creating a new application from a template, I first created the parent directory (`apps/`) and then used `cp -r` to copy the template into it. This resulted in an incorrect nested directory structure (e.g., `apps/coeus-mcp/starter-typescript`).
+
+**Correction:** The user pointed out the error and instructed me to re-read the `.clinerules/templates.md` file.
+
+**Future Action:** I will strictly follow the template creation workflow. I will use a single `cp -R source/template-name destination/new-app-name` command to both copy and rename the template in one atomic operation, ensuring the correct directory structure.
+
 ## Ticketing
 
 ### Follow Naming Conventions Strictly
