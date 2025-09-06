@@ -1,4 +1,10 @@
 procs:
-  starter-typescript:
-    cwd: packages/starter-typescript
-    shell: pnpm build:watch
+  mcp-server:
+    cwd: apps/coeus-mcp
+    shell: pnpm dev
+  mcp-inspector:
+    cwd: .
+    shell: npx @modelcontextprotocol/inspector --mcp-url=http://localhost:3000
+  ngrok:
+    cwd: .
+    shell: ngrok http --url=neat-perfectly-buck.ngrok-free.app 3000
