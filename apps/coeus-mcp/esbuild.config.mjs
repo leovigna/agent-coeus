@@ -1,3 +1,4 @@
-import { buildLib } from "@coeus-agent/esbuild-config";
+import { buildLibESM, buildDistESM } from "@coeus-agent/esbuild-config";
 
-await buildLib();
+await buildLibESM();
+await buildDistESM();
