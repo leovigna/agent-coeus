@@ -9,6 +9,11 @@ const inputSchema = {
     group_id: z.string().describe("ID of the group to clear"),
 };
 
+/**
+ * Clear all data from the graph memory and rebuild indices.
+ *
+ * @param {string} group_id - ID of the group to clear.
+ */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { group_id } = params;
     const result = await zepClient.graph.delete(group_id);

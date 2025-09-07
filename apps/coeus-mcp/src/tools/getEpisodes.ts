@@ -10,6 +10,12 @@ const inputSchema = {
     last_n: z.number().default(10).describe("Number of most recent episodes to retrieve"),
 };
 
+/**
+ * Get the most recent memory episodes for a specific group.
+ *
+ * @param {string} [group_id] - ID of the group to retrieve episodes from. If not provided, uses the default group_id.
+ * @param {number} [last_n=10] - Number of most recent episodes to retrieve.
+ */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { group_id, last_n } = params;
     if (!group_id) {

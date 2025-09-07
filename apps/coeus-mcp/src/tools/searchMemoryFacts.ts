@@ -12,6 +12,14 @@ const inputSchema = {
     center_node_uuid: z.string().optional().describe("Optional UUID of a node to center the search around"),
 };
 
+/**
+ * Search the graph memory for relevant facts.
+ *
+ * @param {string} query - The search query.
+ * @param {string[]} [group_ids] - Optional list of group IDs to filter results.
+ * @param {number} [max_facts=10] - Maximum number of facts to return.
+ * @param {string} [center_node_uuid] - Optional UUID of a node to center the search around.
+ */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { query, group_ids, max_facts, center_node_uuid } = params;
     const results = await zepClient.graph.search({

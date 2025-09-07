@@ -9,6 +9,11 @@ const inputSchema = {
     uuid: z.string().describe("UUID of the entity edge to delete"),
 };
 
+/**
+ * Delete an entity edge from the graph memory.
+ *
+ * @param {string} uuid - UUID of the entity edge to delete.
+ */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { uuid } = params;
     const result = await zepClient.graph.edge.delete(uuid);

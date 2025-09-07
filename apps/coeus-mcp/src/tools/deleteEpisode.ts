@@ -9,6 +9,11 @@ const inputSchema = {
     uuid: z.string().describe("UUID of the episode to delete"),
 };
 
+/**
+ * Delete an episode from the graph memory.
+ *
+ * @param {string} uuid - UUID of the episode to delete.
+ */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { uuid } = params;
     const result = await zepClient.graph.episode.delete(uuid);
