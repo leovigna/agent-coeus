@@ -2,7 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
 import express from "express";
+import { fetchServerConfig, MCPAuth } from "mcp-auth";
 
+import { LOGTO_APP_ID, LOGTO_ISSUER_URL } from "./envvars.js";
 import {
     addMemoryTool,
     clearGraphTool,
@@ -46,6 +48,38 @@ For optimal performance, ensure the database is properly configured and accessib
 API keys are provided for any language model operations.
 `;
 
+if (!LOGTO_APP_ID) {
+    throw new Error("LOGTO_APP_ID is not set");
+}
+
+if (!LOGTO_ISSUER_URL) {
+    throw new Error("LOGTO_ISSUER_URL is not set");
+}
+
+const mcpAuth = new MCPAuth({
+    server: await fetchServerConfig(LOGTO_ISSUER_URL, { type: "oidc" }),
+});
+
+const verifyToken = async (token: string) => {
+    const { userinfoEndpoint, issuer } = mcpAuth.config.server.metadata;
+    const response = await fetch(userinfoEndpoint!, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Token verification failed");
+
+    const userInfo = await response.json() as {
+        sub: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
+    return {
+        token,
+        issuer,
+        subject: userInfo.sub,
+        claims: userInfo,
+    };
+};
+
 const server = new McpServer({
     name: "coeus-mcp",
     version: "1.0.0",
@@ -55,6 +89,14 @@ const server = new McpServer({
 // TODO: Add models for episodes/memory etc..
 // TODO: Connect Zep.js
 // TODO: Add status resource for underlying zep.js connection
+
+// Auth Tools
+server.tool("whoami", ({ authInfo }) => ({
+    content: [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        { type: "text", text: JSON.stringify((authInfo as any)?.claims ?? { error: "Not authenticated" }) },
+    ],
+}));
 
 // OpenAI Required Tools
 server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
@@ -78,6 +120,8 @@ await server.connect(transport);
 
 const app = express();
 app.use(express.json());
+app.use(mcpAuth.delegatedRouter());
+app.use(mcpAuth.bearerAuth(verifyToken));
 
 app.use(cors({
     origin: "*",

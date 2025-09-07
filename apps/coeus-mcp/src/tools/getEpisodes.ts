@@ -3,10 +3,11 @@ import { z, ZodRawShape } from "zod";
 
 import { zepClient } from "../zep-client.js";
 
+import { AuthInfo } from "./AuthInfo.js";
 import { Tool } from "./Tool.js";
 
 const inputSchema = {
-    group_id: z.string().optional().describe("ID of the group to retrieve episodes from"),
+    group_id: z.string().optional().describe("A unique ID for this graph. If not provided, uses the default group_id from auth sub."),
     last_n: z.number().default(10).describe("Number of most recent episodes to retrieve"),
 };
 
@@ -16,11 +17,12 @@ const inputSchema = {
  * @param {string} [group_id] - ID of the group to retrieve episodes from. If not provided, uses the default group_id.
  * @param {number} [last_n=10] - Number of most recent episodes to retrieve.
  */
-const cb: ToolCallback<typeof inputSchema> = async (params) => {
-    const { group_id, last_n } = params;
-    if (!group_id) {
-        throw new Error("group_id is required");
-    }
+const cb: ToolCallback<typeof inputSchema> = async (params, { authInfo }) => {
+    const { subject } = authInfo! as AuthInfo;
+    // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
+    const group_id = subject!;
+    const { last_n } = params;
+
     const result = await zepClient.graph.episode.getByGraphId(group_id, {
         lastn: last_n,
     });

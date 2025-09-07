@@ -3,10 +3,11 @@ import { z, ZodRawShape } from "zod";
 
 import { zepClient } from "../zep-client.js";
 
+import { AuthInfo } from "./AuthInfo.js";
 import { Tool } from "./Tool.js";
 
 const inputSchema = {
-    group_id: z.string().describe("ID of the group to clear"),
+    group_id: z.string().optional().describe("A unique ID for this graph. If not provided, uses the default group_id from auth sub."),
 };
 
 /**
@@ -14,8 +15,12 @@ const inputSchema = {
  *
  * @param {string} group_id - ID of the group to clear.
  */
-const cb: ToolCallback<typeof inputSchema> = async (params) => {
-    const { group_id } = params;
+const cb: ToolCallback<typeof inputSchema> = async (_, { authInfo }) => {
+    const { subject } = authInfo! as AuthInfo;
+    // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
+    const group_id = subject!;
+    // const { group_id } = params;
+
     const result = await zepClient.graph.delete(group_id);
     return {
         outputs: [

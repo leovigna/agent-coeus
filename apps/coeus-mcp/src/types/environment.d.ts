@@ -3,6 +3,8 @@ declare global {
         interface ProcessEnv {
             NODE_ENV: "development" | "production" | "test";
             ZEP_API_KEY?: string;
+            LOGTO_APP_ID?: string;
+            LOGTO_ISSUER_URL?: string;
         }
     }
 }
