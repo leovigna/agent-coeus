@@ -1,3 +1,4 @@
+import { Zep } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
@@ -8,7 +9,7 @@ import { Tool } from "./Tool.js";
 const inputSchema = {
     name: z.string().describe("Name of the episode"),
     episode_body: z.string().describe("The content of the episode to persist to memory."),
-    group_id: z.string().optional().describe("A unique ID for this graph."),
+    group_id: z.string().describe("A unique ID for this graph."),
     source: z.enum(["text", "json", "message"]).default("text").describe("Source type"),
     source_description: z.string().default("").describe("Description of the source"),
     uuid: z.string().optional().describe("Optional UUID for the episode"),
@@ -19,7 +20,7 @@ const inputSchema = {
  *
  * @param {string} name - Name of the episode.
  * @param {string} episode_body - The content of the episode to persist to memory. When source='json', this must be a properly escaped JSON string.
- * @param {string} [group_id] - A unique ID for this graph. If not provided, uses the default group_id.
+ * @param {string} [group_id] - A unique ID for this graph.
  * @param {string} [source="text"] - Source type, must be one of: 'text', 'json', 'message'.
  * @param {string} [source_description=""] - Description of the source.
  * @param {string} [uuid] - Optional UUID for the episode.
@@ -79,6 +80,18 @@ const inputSchema = {
  */
 const cb: ToolCallback<typeof inputSchema> = async (params) => {
     const { episode_body, group_id, source, source_description } = params;
+    try {
+        await zepClient.graph.get(group_id);
+    }
+    catch (error) {
+        if (error instanceof Zep.NotFoundError) {
+            await zepClient.graph.create({ graphId: group_id });
+        }
+        else {
+            throw error;
+        }
+    }
+
     const episode = await zepClient.graph.add({
         data: episode_body,
         type: source,
