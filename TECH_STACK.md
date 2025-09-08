@@ -58,7 +58,7 @@ Coeus uses a modern, graph-first technology stack optimized for AI agent interac
 ### Validation & Schemas
 ```json
 {
-  "zod": "^3.x",
+  "zod": "^4.0.0",
   "@types/json-schema": "^7.x"
 }
 ```

@@ -3,11 +3,13 @@ import { readFileSync } from "fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
-import express from "express";
-import { fetchServerConfig, MCPAuth } from "mcp-auth";
-import morgan from "morgan";
+import express, { Request, Response } from "express";
+import * as swaggerUi from "swagger-ui-express";
+import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 
 import { LOGTO_APP_ID, LOGTO_ISSUER_URL } from "./envvars.js";
+import { openApiDocument } from "./openapi.js";
+import { appRouter } from "./procedures/index.js";
 import {
     addMemoryTool,
     clearGraphTool,
@@ -30,30 +32,6 @@ if (!LOGTO_APP_ID) {
 if (!LOGTO_ISSUER_URL) {
     throw new Error("LOGTO_ISSUER_URL is not set");
 }
-
-const mcpAuth = new MCPAuth({
-    server: await fetchServerConfig(LOGTO_ISSUER_URL, { type: "oidc" }),
-});
-
-const verifyToken = async (token: string) => {
-    const { userinfoEndpoint, issuer } = mcpAuth.config.server.metadata;
-    const response = await fetch(userinfoEndpoint!, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Token verification failed");
-
-    const userInfo = await response.json() as {
-        sub: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-    };
-    return {
-        token,
-        issuer,
-        subject: userInfo.sub,
-        claims: userInfo,
-    };
-};
 
 const server = new McpServer({
     name: "coeus-mcp",
@@ -93,24 +71,34 @@ const transport = new StreamableHTTPServerTransport({
 
 await server.connect(transport);
 
+// Express App
 const app = express();
+// CORS Middleware
+app.use(cors({ origin: "*" }));
+// Parse JSON
 app.use(express.json());
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-app.use(morgan("combined"));
+// MCP Auth Middleware
 // app.use(mcpAuth.delegatedRouter());
 // app.use(mcpAuth.bearerAuth(verifyToken));
 
-app.use(cors({
-    origin: "*",
-    exposedHeaders: ["Mcp-Session-Id"],
-}));
+// OpenAPI Middleware
+app.use("/api", createOpenApiExpressMiddleware({ router: appRouter }));
+// OpenAPI spec
+app.get("/openapi.json", (_: Request, res: Response) => {
+    res.json(openApiDocument);
+});
+// OpenAPI docs
+// Serve Swagger UI with our OpenAPI schema
+app.use("/", swaggerUi.serve);
+app.get("/", swaggerUi.setup(openApiDocument));
 
+// MCP JSON-RPC Endpoint
 app.post("/mcp", async (req, res) => {
     await transport.handleRequest(req, res, req.body);
 });
 
+// Start server
 const port = process.env.PORT ?? 3000;
-
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
