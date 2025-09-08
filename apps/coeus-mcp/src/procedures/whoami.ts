@@ -12,7 +12,7 @@ export const whoamiProcedure = publicProcedure
             summary: "Get current auth info",
         },
     })
-    .input(z.object({}))
+    .input(z.void())
     .output(CallToolResultSchema)
     .mutation(({ ctx }) => {
         const authInfo = ctx.authInfo;
