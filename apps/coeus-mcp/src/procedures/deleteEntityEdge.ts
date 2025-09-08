@@ -2,23 +2,24 @@ import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.j
 import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { fetchTool } from "../tools/fetch.js";
+import { deleteEntityEdgeTool } from "../tools/deleteEntityEdge.js";
 import { publicProcedure } from "../trpc.js";
 
-export const fetchProcedure = publicProcedure
+export const deleteEntityEdgeProcedure = publicProcedure
     .meta({
         openapi: {
             method: "POST",
-            path: `/${fetchTool.name}`,
+            path: `/${deleteEntityEdgeTool.name}`,
             tags: ["tools"],
-            summary: fetchTool.config.title,
+            summary: deleteEntityEdgeTool.config.title,
+            description: deleteEntityEdgeTool.config.description,
         },
     })
-    .input(z.object(fetchTool.config.inputSchema))
+    .input(z.object(deleteEntityEdgeTool.config.inputSchema))
     .output(CallToolResultSchema)
     .mutation(async ({ input, ctx }) => {
         const authInfo = ctx.authInfo;
         const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await fetchTool.cb(input, extra);
+        const result = await deleteEntityEdgeTool.cb(input, extra);
         return result;
     });

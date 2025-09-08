@@ -2,23 +2,24 @@ import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.j
 import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { fetchTool } from "../tools/fetch.js";
+import { searchMemoryFactsTool } from "../tools/searchMemoryFacts.js";
 import { publicProcedure } from "../trpc.js";
 
-export const fetchProcedure = publicProcedure
+export const searchMemoryFactsProcedure = publicProcedure
     .meta({
         openapi: {
             method: "POST",
-            path: `/${fetchTool.name}`,
+            path: `/${searchMemoryFactsTool.name}`,
             tags: ["tools"],
-            summary: fetchTool.config.title,
+            summary: searchMemoryFactsTool.config.title,
+            description: searchMemoryFactsTool.config.description,
         },
     })
-    .input(z.object(fetchTool.config.inputSchema))
+    .input(z.object(searchMemoryFactsTool.config.inputSchema))
     .output(CallToolResultSchema)
     .mutation(async ({ input, ctx }) => {
         const authInfo = ctx.authInfo;
         const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await fetchTool.cb(input, extra);
+        const result = await searchMemoryFactsTool.cb(input, extra);
         return result;
     });
