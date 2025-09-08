@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
 import express, { Request, Response } from "express";
+import { fetchServerConfig, MCPAuth } from "mcp-auth";
 import * as swaggerUi from "swagger-ui-express";
 import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 
@@ -22,6 +23,7 @@ import {
     searchMemoryNodesTool,
     searchTool,
 } from "./tools/index.js";
+import { createContext } from "./trpc.js";
 
 const instructions = readFileSync("./COEUS_MCP.md", "utf-8");
 
@@ -77,12 +79,43 @@ const app = express();
 app.use(cors({ origin: "*" }));
 // Parse JSON
 app.use(express.json());
-// MCP Auth Middleware
-// app.use(mcpAuth.delegatedRouter());
-// app.use(mcpAuth.bearerAuth(verifyToken));
 
+// MCP Auth Middleware
+const mcpAuth = new MCPAuth({
+    server: await fetchServerConfig(LOGTO_ISSUER_URL, { type: "oidc" }),
+});
+// Delegated Authorization Server
+app.use(mcpAuth.delegatedRouter());
+// Bearer Auth Handler
+const verifyToken = async (token: string) => {
+    const { userinfoEndpoint, issuer } = mcpAuth.config.server.metadata;
+    const response = await fetch(userinfoEndpoint!, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Token verification failed");
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const userInfo = await response.json();
+    return {
+        token,
+        issuer,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        subject: userInfo.sub,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        claims: userInfo,
+    };
+};
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+app.use("/auth", mcpAuth.bearerAuth(verifyToken));
+
+// Protected endpoints
 // OpenAPI Middleware
-app.use("/api", createOpenApiExpressMiddleware({ router: appRouter }));
+app.use("/auth/api", createOpenApiExpressMiddleware({ router: appRouter, createContext }));
+// MCP JSON-RPC Endpoint
+app.post("/auth/mcp", async (req, res) => {
+    await transport.handleRequest(req, res, req.body);
+});
+
+// Public endpoints
 // OpenAPI spec
 app.get("/openapi.json", (_: Request, res: Response) => {
     res.json(openApiDocument);
@@ -91,11 +124,6 @@ app.get("/openapi.json", (_: Request, res: Response) => {
 // Serve Swagger UI with our OpenAPI schema
 app.use("/", swaggerUi.serve);
 app.get("/", swaggerUi.setup(openApiDocument));
-
-// MCP JSON-RPC Endpoint
-app.post("/mcp", async (req, res) => {
-    await transport.handleRequest(req, res, req.body);
-});
 
 // Start server
 const port = process.env.PORT ?? 3000;
