@@ -144,3 +144,11 @@
 **Correction:** The user clarified that while `express` was the correct technology choice, my implementation was overly complex for the current need. I should have identified a simpler pattern from the documentation or examples.
 
 **Future Action:** I will always aim to match the complexity of my solution to the user's immediate requirements. When consulting documentation or examples, I will evaluate different implementation patterns (e.g., stateless vs. stateful) and choose the simplest one that fulfills the task. I will avoid implementing advanced features like session management unless they are explicitly requested or clearly necessary.
+
+### Do Not Delete Commented-Out or Unused Code
+
+**Incident:** I deleted commented-out code and unused variables, assuming they were no longer needed.
+
+**Correction:** The user instructed me not to delete commented-out or unused code, as the developer may want it for later reference.
+
+**Future Action:** I will not delete commented-out code or unused variables unless explicitly instructed to do so. I will preserve the code as it is, trusting that the developer has left it there for a reason.
