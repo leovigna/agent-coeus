@@ -6,7 +6,7 @@ memory-bank/
 # Cline repomix (can just pull again)
 repomix/
 # Prompt resources
-prompts/
+./prompts/
 
 # Solidity VSCode extension binary output
 bin/
