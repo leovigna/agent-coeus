@@ -1,4 +1,6 @@
-import { buildLibESM, buildDistESM } from "@coeus-agent/esbuild-config";
+import { buildLibESM, buildDistCJS, cjsBundleConfig } from "@coeus-agent/esbuild-config";
 
 await buildLibESM();
-await buildDistESM();
+
+cjsBundleConfig.platform = "node";
+await buildDistCJS();

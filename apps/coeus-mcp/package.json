@@ -35,7 +35,7 @@
     }
   },
   "scripts": {
-    "start": "node ./_esm/lib/server.js",
+    "start": "node ./_cjs/dist/index.cjs",
     "dev": "tsx --watch ./src/server.ts",
     "build": "npm-run-all -p tsc esbuild",
     "build:watch": "npm-run-all -p tsc:watch esbuild:watch",

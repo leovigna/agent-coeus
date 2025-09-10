@@ -2,15 +2,24 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 
 import { getExpressApp, getMcpServer } from "./server.js";
 
-const mcpServer = getMcpServer();
-const mcpTransport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-});
+async function main() {
+    const mcpServer = getMcpServer();
+    const mcpTransport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: undefined,
+    });
 
-// Start server
-const port = process.env.PORT ?? 3000;
+    // Start server
+    const port = process.env.PORT ?? 3000;
 
-const app = await getExpressApp({ mcpServer, mcpTransport });
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-});
+    const app = await getExpressApp({ mcpServer, mcpTransport });
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
+    });
+}
+
+if (require.main === module) {
+    main().catch((err) => {
+        console.error("Error starting server:", err);
+        process.exit(1);
+    });
+}

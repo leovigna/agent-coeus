@@ -11,8 +11,12 @@ const filesMts = globSync("src/**/*.{ts,mts,tsx,json}");
 const excludeNodeModulesPlugin = NodeResolvePlugin({
     extensions: [".ts", ".js", ".json"],
     onResolved: (resolved) => {
-        // console.debug(resolved)
-        if (resolved.includes("node_modules")) {
+        if (resolved.startsWith("node:")) {
+            return {
+                external: true,
+            };
+        }
+        else if (resolved.includes("node_modules")) {
             return {
                 external: true,
             };
@@ -23,7 +27,7 @@ const excludeNodeModulesPlugin = NodeResolvePlugin({
 
 const ESBUILD_WATCH = process.env.ESBUILD_WATCH === "true" || process.env.ESBUILD_WATCH === "1";
 
-const external = ["url", "events", "path"];
+const external = ["url", "events", "path", "fs"];
 const inject = []; // ['./react-shim.mjs']
 
 export const baseConfig = {
@@ -31,7 +35,6 @@ export const baseConfig = {
     platform: "neutral",
     target: ["esnext"],
     inject,
-    plugins: [excludeNodeModulesPlugin],
 };
 
 // CJS Library (Testing)
@@ -41,6 +44,7 @@ export const cjsLibConfig = {
     outdir: "_cjs/lib",
     // outExtension: { '.js': '.cjs' },
     format: "cjs",
+    plugins: [excludeNodeModulesPlugin],
     ...baseConfig,
 };
 
@@ -50,6 +54,7 @@ export const esmLibConfig = {
     bundle: false,
     outdir: "_esm/lib",
     format: "esm",
+    plugins: [excludeNodeModulesPlugin],
     ...baseConfig,
 };
 

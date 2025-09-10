@@ -26,7 +26,7 @@ import {
 } from "./tools/index.js";
 import { createContext } from "./trpc.js";
 
-const instructions = readFileSync("./COEUS_MCP.md", "utf-8");
+const instructions = readFileSync("./MCP_INSTRUCTIONS.md", "utf-8");
 
 if (!OIDC_CLIENT_ID) {
     throw new Error("OIDC_CLIENT_ID is not set");
