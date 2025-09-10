@@ -63,6 +63,9 @@ COPY --from=builder /app/apps/coeus-mcp/_esm/dist/index.mjs .
 # Copy env.vault for envvars, make sure to set DOTENV_KEY to load them
 # COPY .env.vault .env.vault
 
+# Copy MCP Instructions
+COPY apps/coeus-mcp/MCP_INSTRUCTIONS.md .
+
 EXPOSE 3000
 ENV NODE_ENV="production"
 CMD ["node", "index.mjs"]
