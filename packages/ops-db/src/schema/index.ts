@@ -1,2 +1,2 @@
-export * from "./integrationTwentyCRM.js";
+export * from "./pluginTwentyCRM.js";
 export * from "./user.js";
