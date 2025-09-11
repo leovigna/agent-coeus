@@ -3,6 +3,7 @@
   "include": [
     "src",
     "vite.config.ts",
-    "vitest.setup.ts"
+    "vitest.setup.ts",
+    "drizzle.config.ts"
   ]
 }
