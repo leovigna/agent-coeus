@@ -58,7 +58,7 @@ WORKDIR /app
 
 # Copy encrypted envvars
 #COPY .env.vault .env.vault
-COPY --from=builder /app/apps/coeus-mcp/_esm/dist/index.mjs .
+COPY --from=builder /app/apps/coeus-mcp/_cjs/dist/index.cjs .
 
 # Copy env.vault for envvars, make sure to set DOTENV_KEY to load them
 # COPY .env.vault .env.vault
@@ -68,4 +68,4 @@ COPY apps/coeus-mcp/MCP_INSTRUCTIONS.md .
 
 EXPOSE 3000
 ENV NODE_ENV="production"
-CMD ["node", "index.mjs"]
+CMD ["node", "index.cjs"]

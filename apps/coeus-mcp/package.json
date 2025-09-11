@@ -36,7 +36,7 @@
   },
   "scripts": {
     "start": "node ./_cjs/dist/index.cjs",
-    "dev": "tsx --watch ./src/server.ts",
+    "dev": "tsx --watch ./src/index.ts",
     "build": "npm-run-all -p tsc esbuild",
     "build:watch": "npm-run-all -p tsc:watch esbuild:watch",
     "clean": "rimraf _cjs _esm _types .turbo",

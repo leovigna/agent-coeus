@@ -55,6 +55,7 @@ temp.*
 .env.test.local
 .env.production.local
 .env
+.env.yaml
 # dotenv vault
 !.env.vault
 
