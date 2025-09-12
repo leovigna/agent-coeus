@@ -2,7 +2,7 @@ import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.j
 import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { clearGraphTool } from "../tools/clearGraph.js";
+import { clearGraphTool } from "../tools/index.js";
 import { publicProcedure } from "../trpc.js";
 
 export const clearGraphProcedure = publicProcedure

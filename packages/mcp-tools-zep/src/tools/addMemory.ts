@@ -118,7 +118,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function addMemoryTool(zepClient: ZepClient) {
+export function getAddMemoryTool(zepClient: ZepClient) {
     return {
         name: "add_memory",
         config: {

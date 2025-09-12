@@ -38,7 +38,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function clearGraphTool(zepClient: ZepClient) {
+export function getClearGraphTool(zepClient: ZepClient) {
     return {
         name: "clear_graph",
         config: {

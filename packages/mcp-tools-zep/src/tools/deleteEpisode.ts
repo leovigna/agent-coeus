@@ -33,7 +33,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function deleteEpisodeTool(zepClient: ZepClient) {
+export function getDeleteEpisodeTool(zepClient: ZepClient) {
     return {
         name: "delete_episode",
         config: {

@@ -42,7 +42,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getEpisodesTool(zepClient: ZepClient) {
+export function getGetEpisodesTool(zepClient: ZepClient) {
     return {
         name: "get_episodes",
         config: {

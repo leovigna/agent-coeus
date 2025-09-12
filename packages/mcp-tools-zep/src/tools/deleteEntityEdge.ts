@@ -33,7 +33,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function deleteEntityEdgeTool(zepClient: ZepClient) {
+export function getDeleteEntityEdgeTool(zepClient: ZepClient) {
     return {
         name: "delete_entity_edge",
         config: {

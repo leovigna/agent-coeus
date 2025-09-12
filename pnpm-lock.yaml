@@ -44,6 +44,9 @@ importers:
 
   apps/coeus-mcp:
     dependencies:
+      '@coeus-agent/mcp-tools-zep':
+        specifier: workspace:*
+        version: link:../../packages/mcp-tools-zep
       '@getzep/zep-cloud':
         specifier: ^3.4.1
         version: 3.4.1

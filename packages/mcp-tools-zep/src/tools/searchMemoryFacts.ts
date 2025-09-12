@@ -50,7 +50,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function searchMemoryFactsTool(zepClient: ZepClient) {
+export function getSearchMemoryFactsTool(zepClient: ZepClient) {
     return {
         name: "search_memory_facts",
         config: {

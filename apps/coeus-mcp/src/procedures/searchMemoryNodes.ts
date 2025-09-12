@@ -2,7 +2,7 @@ import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.j
 import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { searchMemoryNodesTool } from "../tools/searchMemoryNodes.js";
+import { searchMemoryNodesTool } from "../tools/index.js";
 import { publicProcedure } from "../trpc.js";
 
 export const searchMemoryNodesProcedure = publicProcedure

@@ -58,7 +58,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function searchMemoryNodesTool(zepClient: ZepClient) {
+export function getSearchMemoryNodesTool(zepClient: ZepClient) {
     return {
         name: "search_memory_nodes",
         config: {

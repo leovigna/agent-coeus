@@ -1,7 +1,6 @@
 /* eslint-disable @stylistic/indent */
+import { AuthInfo } from "@coeus-agent/mcp-tools-zep";
 import { initTRPC } from "@trpc/server";
-
-import { AuthInfo } from "../tools/AuthInfo.js";
 
 export interface RequestMiddlewareCtxOut {
     auth: AuthInfo;

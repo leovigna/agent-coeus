@@ -17,12 +17,10 @@ import {
     clearGraphTool,
     deleteEntityEdgeTool,
     deleteEpisodeTool,
-    fetchTool,
     getEntityEdgeTool,
     getEpisodesTool,
     searchMemoryFactsTool,
     searchMemoryNodesTool,
-    searchTool,
 } from "./tools/index.js";
 import { createContext } from "./trpc.js";
 
@@ -61,9 +59,10 @@ export function getMcpServer() {
         ],
     }));
 
-    // OpenAI Required Tools
-    server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
-    server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
+    // OpenAI Deep Research Tools
+    // TODO: Implement these later
+    // server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
+    // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
 
     // Zep Tools
     server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb);

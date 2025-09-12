@@ -1,10 +1,12 @@
-export * from "./addMemory.js";
-export * from "./clearGraph.js";
-export * from "./deleteEntityEdge.js";
-export * from "./deleteEpisode.js";
-export * from "./fetch.js";
-export * from "./getEntityEdge.js";
-export * from "./getEpisodes.js";
-export * from "./search.js";
-export * from "./searchMemoryFacts.js";
-export * from "./searchMemoryNodes.js";
+import { getAddMemoryTool, getClearGraphTool, getDeleteEntityEdgeTool, getDeleteEpisodeTool, getGetEntityEdgeTool, getGetEpisodesTool, getSearchMemoryFactsTool, getSearchMemoryNodesTool } from "@coeus-agent/mcp-tools-zep";
+
+import { zepClient } from "../zep-client.js";
+
+export const addMemoryTool = getAddMemoryTool(zepClient);
+export const clearGraphTool = getClearGraphTool(zepClient);
+export const deleteEntityEdgeTool = getDeleteEntityEdgeTool(zepClient);
+export const deleteEpisodeTool = getDeleteEpisodeTool(zepClient);
+export const getEntityEdgeTool = getGetEntityEdgeTool(zepClient);
+export const getEpisodesTool = getGetEpisodesTool(zepClient);
+export const searchMemoryFactsTool = getSearchMemoryFactsTool(zepClient);
+export const searchMemoryNodesTool = getSearchMemoryNodesTool(zepClient);

@@ -2,7 +2,7 @@ import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.j
 import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-import { getEntityEdgeTool } from "../tools/getEntityEdge.js";
+import { getEntityEdgeTool } from "../tools/index.js";
 import { publicProcedure } from "../trpc.js";
 
 export const getEntityEdgeProcedure = publicProcedure

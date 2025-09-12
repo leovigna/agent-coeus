@@ -33,7 +33,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getEntityEdgeTool(zepClient: ZepClient) {
+export function getGetEntityEdgeTool(zepClient: ZepClient) {
     return {
         name: "get_entity_edge",
         config: {
