@@ -148,9 +148,7 @@ async function setResourceScopesToOrganizationRole(client: LogToClient, roleId: 
     return resourceScopes;
 }
 
-/**
-     * Fetch current LogTo data
-     */
+/*
 async function getLogToData(client: LogToClient) {
     // Global Roles
     const roles = (await client.GET("/api/roles")).data!;
@@ -178,6 +176,7 @@ async function getLogToData(client: LogToClient) {
         console.debug(ownerRolePermissions);
     }
 }
+*/
 
 /**
  * Setup LogTo with standard SaaS resources, scopes, and roles
@@ -236,4 +235,7 @@ async function main() {
     // console.debug({ globalRoles });
 }
 
-await main();
+main().catch((err) => {
+    console.error("Error starting server:", err);
+    process.exit(1);
+});
