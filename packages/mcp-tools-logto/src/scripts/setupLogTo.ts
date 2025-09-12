@@ -120,6 +120,35 @@ async function getOrCreateOrganizationRoles(client: LogToClient, roleNames = ["o
 }
 
 /**
+ * Sets resource scopes to a role
+ * @param client
+ * @param roleId
+ * @param resourceScopeIds
+ * @returns
+ */
+async function setResourceScopesToRole(client: LogToClient, roleId: string, resourceScopeIds: string[]) {
+    const existingResourceScopes = (await client.GET("/api/roles/{id}/scopes", {
+        params: { path: { id: roleId } },
+    })).data!;
+    const existingScopeIds = existingResourceScopes.map(s => s.id);
+
+    const missingScopeIds = resourceScopeIds.filter(id => !existingScopeIds.includes(id));
+    if (missingScopeIds.length > 0) {
+        await client.POST("/api/roles/{id}/scopes", {
+            params: { path: { id: roleId } },
+            body: {
+                scopeIds: missingScopeIds,
+            },
+        });
+    }
+
+    const resourceScopes = (await client.GET("/api/roles/{id}/scopes", {
+        params: { path: { id: roleId } },
+    })).data!;
+    return resourceScopes;
+}
+
+/**
  * Sets resource scopes to an organization role
  * @param client
  * @param roleId
@@ -189,13 +218,16 @@ async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) {
         indicator: new URL("/org/", indicatorBaseUrl).toString(),
     });
     // Org resource scopes
-    // const createOrgScope = org.resourceScopes.find(s => s.name === "create:org")!;
+    const createOrgScope = orgResource.resourceScopes.find(s => s.name === "create:org")!;
     const readOrgScope = orgResource.resourceScopes.find(s => s.name === "read:org")!;
     const updateOrgScope = orgResource.resourceScopes.find(s => s.name === "update:org")!;
     const deleteOrgScope = orgResource.resourceScopes.find(s => s.name === "delete:org")!;
 
     // User role (Note: Go to console to set this as default role)
-    const [userRole] = await getOrCreateRoles(client, ["user"]);
+    const roles = await getOrCreateRoles(client, ["user"]);
+    const userRole = roles.find(r => r.name === "user")!;
+    // User role gets CREATE org scope
+    const userResourceScopes = await setResourceScopesToRole(client, userRole.id, [createOrgScope.id]);
 
     // Owner/Admin/Member organization roles
     const orgRoles = await getOrCreateOrganizationRoles(client);
@@ -213,6 +245,7 @@ async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) {
     return {
         orgResource,
         userRole,
+        userResourceScopes,
         orgRoles,
         ownerResourceScopes,
         adminResourceScopes,
