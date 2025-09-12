@@ -1,6 +1,6 @@
-# Zep MCP Tools
+# MCP Tools LogTo
 
-MCP Tools for interacting with [Zep](https://www.getzep.com/) graph database to manage agent context.
+MCP Tools for interacting with [LogTo](https://logto.io/) Admin API to manage multi-tenant MCP Servers.
 
 These tools are designed to be usable with [MCP Typescript SDK](https://github.com/modelcontextprotocol/typescript-sdk) but could also support any similar SDK with a similar interface.
 
@@ -11,4 +11,4 @@ The purpose of this package is to keep the implementation of tools modular:
 ## Dependencies
 - [zod](https://www.npmjs.com/package/zod)
 - [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
-- [@getzep/zep-cloud](https://www.npmjs.com/package/@getzep/zep-cloud)
+- [@logto/api](https://www.npmjs.com/package/@logto/api)

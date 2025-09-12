@@ -265,6 +265,58 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
+  packages/mcp-tools-logto:
+    dependencies:
+      '@logto/api':
+        specifier: ^1.31.0
+        version: 1.31.0
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.17.4
+        version: 1.17.4
+      zod:
+        specifier: ^3.22.4
+        version: 3.24.3
+    devDependencies:
+      '@coeus-agent/esbuild-config':
+        specifier: workspace:*
+        version: link:../../configs/esbuild-config
+      '@coeus-agent/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint-config
+      '@coeus-agent/tsconfig':
+        specifier: workspace:*
+        version: link:../../configs/tsconfig
+      '@coeus-agent/vite-config':
+        specifier: workspace:*
+        version: link:../../configs/vite-config
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.14.1
+      '@typescript/analyze-trace':
+        specifier: ^0.10.1
+        version: 0.10.1
+      depcheck:
+        specifier: ^1.4.7
+        version: 1.4.7
+      madge:
+        specifier: ^8.0.0
+        version: 8.0.0(typescript@5.8.3)
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.0.1
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: ^6.3.1
+        version: 6.3.2(@types/node@22.14.1)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.20.5)(yaml@2.8.1)
+      vitest:
+        specifier: ^3.0.8
+        version: 3.1.1(@types/node@22.14.1)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.20.5)(yaml@2.8.1)
+
   packages/mcp-tools-zep:
     dependencies:
       '@getzep/zep-cloud':
@@ -1173,6 +1225,10 @@ packages:
     resolution: {integrity: sha512-Fj0j8RnBpo43tVZUVoNK6BV/9AtDUM5S7DF3LB4qTYg1LMSZqi3yeCneUTLJD6XomQJlZzbI4mst89yspVSAnA==}
     cpu: [x64]
     os: [win32]
+
+  '@logto/api@1.31.0':
+    resolution: {integrity: sha512-XBdfbbytLSzFLXoWJ1cGCgM8n5wrkc47gfrCA7ioJEDjiRwbzRrFk2hxxOmOAN29fgp1rTkNtdwTw/R7kVlukQ==}
+    engines: {node: ^22.14.0 || ^24.0.0}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -4437,6 +4493,12 @@ packages:
     resolution: {integrity: sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==}
     engines: {node: '>=18'}
 
+  openapi-fetch@0.14.0:
+    resolution: {integrity: sha512-PshIdm1NgdLvb05zp8LqRQMNSKzIlPkyMxYFxwyHR+UlKD4t2nUjkDhNxeRbhRSEd3x5EUNh2w5sJYwkhOH4fg==}
+
+  openapi-typescript-helpers@0.0.15:
+    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
+
   openapi3-ts@4.4.0:
     resolution: {integrity: sha512-9asTNB9IkKEzWMcHmVZE7Ts3kC9G7AFHfs8i7caD8HbI76gEjdkId4z/AkP83xdZsH7PLAnnbl47qZkXuxpArw==}
 
@@ -6579,6 +6641,10 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.5.22':
     optional: true
+
+  '@logto/api@1.31.0':
+    dependencies:
+      openapi-fetch: 0.14.0
 
   '@manypkg/find-root@1.1.0':
     dependencies:
@@ -10217,6 +10283,12 @@ snapshots:
   onetime@7.0.0:
     dependencies:
       mimic-function: 5.0.1
+
+  openapi-fetch@0.14.0:
+    dependencies:
+      openapi-typescript-helpers: 0.0.15
+
+  openapi-typescript-helpers@0.0.15: {}
 
   openapi3-ts@4.4.0:
     dependencies:
