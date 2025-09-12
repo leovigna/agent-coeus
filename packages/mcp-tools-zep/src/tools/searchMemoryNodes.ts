@@ -1,9 +1,9 @@
-import { ZepClient } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
 import { AuthInfo } from "../AuthInfo.js";
 import { Tool } from "../Tool.js";
+import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
     query: z.string().describe("The search query"),
@@ -25,8 +25,11 @@ const inputSchema = {
  * @param {string} [center_node_uuid] - Optional UUID of a node to center the search around.
  * @param {string} [entity=""] - Optional single entity type to filter results (permitted: "Preference", "Procedure").
  */
-function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
+function getCallback(provider: ZepClientProvider): ToolCallback<typeof inputSchema> {
     return async (params, { authInfo }) => {
+        // Get Zep Client
+        const zepClient = await resolveZepClient(provider, authInfo as unknown as AuthInfo); // forced casting here due to extending type
+
         const { subject } = authInfo! as AuthInfo;
         // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
         const group_id = subject!;
@@ -58,7 +61,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getSearchMemoryNodesTool(zepClient: ZepClient) {
+export function getSearchMemoryNodesTool(provider: ZepClientProvider) {
     return {
         name: "search_memory_nodes",
         config: {
@@ -66,6 +69,6 @@ export function getSearchMemoryNodesTool(zepClient: ZepClient) {
             description: "Search the graph memory for relevant node summaries.",
             inputSchema,
         },
-        cb: getCallback(zepClient),
+        cb: getCallback(provider),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }

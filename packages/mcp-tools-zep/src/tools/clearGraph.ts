@@ -1,9 +1,9 @@
-import { ZepClient } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
 import { AuthInfo } from "../AuthInfo.js";
 import { Tool } from "../Tool.js";
+import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
     group_id: z.string().optional().describe("A unique ID for this graph. If not provided, uses the default group_id from auth sub."),
@@ -14,8 +14,11 @@ const inputSchema = {
  *
  * @param {string} group_id - ID of the group to clear.
  */
-function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
+function getCallback(provider: ZepClientProvider): ToolCallback<typeof inputSchema> {
     return async (_, { authInfo }) => {
+        // Get Zep Client
+        const zepClient = await resolveZepClient(provider, authInfo as unknown as AuthInfo); // forced casting here due to extending type
+
         const { subject } = authInfo! as AuthInfo;
         // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
         const group_id = subject!;
@@ -38,7 +41,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getClearGraphTool(zepClient: ZepClient) {
+export function getClearGraphTool(provider: ZepClientProvider) {
     return {
         name: "clear_graph",
         config: {
@@ -46,6 +49,6 @@ export function getClearGraphTool(zepClient: ZepClient) {
             description: "Clear all data from the graph memory and rebuild indices.",
             inputSchema,
         },
-        cb: getCallback(zepClient),
+        cb: getCallback(provider),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }

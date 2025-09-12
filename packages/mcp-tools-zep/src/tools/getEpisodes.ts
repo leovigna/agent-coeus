@@ -1,9 +1,9 @@
-import { ZepClient } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
 import { AuthInfo } from "../AuthInfo.js";
 import { Tool } from "../Tool.js";
+import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
     group_id: z.string().optional().describe("A unique ID for this graph. If not provided, uses the default group_id from auth sub."),
@@ -16,8 +16,11 @@ const inputSchema = {
  * @param {string} [group_id] - ID of the group to retrieve episodes from. If not provided, uses the default group_id.
  * @param {number} [last_n=10] - Number of most recent episodes to retrieve.
  */
-function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
+function getCallback(provider: ZepClientProvider): ToolCallback<typeof inputSchema> {
     return async (params, { authInfo }) => {
+        // Get Zep Client
+        const zepClient = await resolveZepClient(provider, authInfo as unknown as AuthInfo); // forced casting here due to extending type
+
         const { subject } = authInfo! as AuthInfo;
         // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
         const group_id = subject!;
@@ -42,7 +45,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getGetEpisodesTool(zepClient: ZepClient) {
+export function getGetEpisodesTool(provider: ZepClientProvider) {
     return {
         name: "get_episodes",
         config: {
@@ -50,6 +53,6 @@ export function getGetEpisodesTool(zepClient: ZepClient) {
             description: "Get the most recent memory episodes for a specific group.",
             inputSchema,
         },
-        cb: getCallback(zepClient),
+        cb: getCallback(provider),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }

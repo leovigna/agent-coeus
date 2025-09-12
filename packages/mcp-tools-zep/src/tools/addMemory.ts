@@ -1,9 +1,10 @@
-import { Zep, ZepClient } from "@getzep/zep-cloud";
+import { Zep } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
 import { AuthInfo } from "../AuthInfo.js";
 import { Tool } from "../Tool.js";
+import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
     name: z.string().describe("Name of the episode"),
@@ -77,8 +78,10 @@ const inputSchema = {
  *  - Entities will be created from appropriate JSON properties
  *  - Relationships between entities will be established based on the JSON structure
  */
-function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
+function getCallback(provider: ZepClientProvider): ToolCallback<typeof inputSchema> {
     return async (params, { authInfo }) => {
+        const zepClient = await resolveZepClient(provider, authInfo as unknown as AuthInfo);
+
         const { subject } = authInfo! as AuthInfo;
         // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
         const group_id = subject!;
@@ -118,7 +121,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getAddMemoryTool(zepClient: ZepClient) {
+export function getAddMemoryTool(provider: ZepClientProvider) {
     return {
         name: "add_memory",
         config: {
@@ -126,6 +129,6 @@ export function getAddMemoryTool(zepClient: ZepClient) {
             description: "Add an episode to memory. This is the primary way to add information to the graph.",
             inputSchema,
         },
-        cb: getCallback(zepClient),
+        cb: getCallback(provider),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }

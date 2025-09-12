@@ -1,8 +1,9 @@
-import { ZepClient } from "@getzep/zep-cloud";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
+import { AuthInfo } from "../AuthInfo.js";
 import { Tool } from "../Tool.js";
+import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
     uuid: z.string().describe("UUID of the episode to delete"),
@@ -13,8 +14,11 @@ const inputSchema = {
  *
  * @param {string} uuid - UUID of the episode to delete.
  */
-function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
-    return async (params) => {
+function getCallback(provider: ZepClientProvider): ToolCallback<typeof inputSchema> {
+    return async (params, { authInfo }) => {
+        // Get Zep Client
+        const zepClient = await resolveZepClient(provider, authInfo as unknown as AuthInfo); // forced casting here due to extending type
+
         const { uuid } = params;
         const result = await zepClient.graph.episode.delete(uuid);
         return {
@@ -33,7 +37,7 @@ function getCallback(zepClient: ZepClient): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getDeleteEpisodeTool(zepClient: ZepClient) {
+export function getDeleteEpisodeTool(provider: ZepClientProvider) {
     return {
         name: "delete_episode",
         config: {
@@ -41,6 +45,6 @@ export function getDeleteEpisodeTool(zepClient: ZepClient) {
             description: "Delete an episode from the graph memory.",
             inputSchema,
         },
-        cb: getCallback(zepClient),
+        cb: getCallback(provider),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }
