@@ -298,6 +298,9 @@ importers:
       depcheck:
         specifier: ^1.4.7
         version: 1.4.7
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.5.0
       madge:
         specifier: ^8.0.0
         version: 8.0.0(typescript@5.8.3)
