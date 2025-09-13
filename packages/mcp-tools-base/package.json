@@ -1,5 +1,5 @@
 {
-  "name": "@coeus-agent/mcp-tools-zep",
+  "name": "@coeus-agent/mcp-tools-base",
   "version": "0.1.0",
   "private": true,
   "keywords": [],
@@ -51,11 +51,7 @@
     "tsc:trace": "tsc --generateTrace lib/trace && analyze-trace lib/trace",
     "tsc:watch": "tsc -w"
   },
-  "dependencies": {
-    "@coeus-agent/mcp-tools-base": "workspace:*"
-  },
   "peerDependencies": {
-    "@getzep/zep-cloud": "^3.4.1",
     "@modelcontextprotocol/sdk": "^1.17.4",
     "zod": "^3.22.4"
   },

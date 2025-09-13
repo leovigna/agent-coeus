@@ -54,6 +54,7 @@
     "tsc:watch": "tsc -w"
   },
   "dependencies": {
+    "@coeus-agent/mcp-tools-base": "workspace:*",
     "@coeus-agent/mcp-tools-zep": "workspace:*",
     "@getzep/zep-cloud": "^3.4.1",
     "@modelcontextprotocol/sdk": "^1.17.4",

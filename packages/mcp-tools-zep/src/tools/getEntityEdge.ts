@@ -1,8 +1,7 @@
+import type { AuthInfo, Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
-import { AuthInfo } from "../AuthInfo.js";
-import { Tool } from "../Tool.js";
 import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
 
 const inputSchema = {
