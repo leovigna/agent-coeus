@@ -1,4 +1,4 @@
-import { Tool } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
@@ -9,21 +9,38 @@ const inputSchema = {
 };
 
 function getCallback(client: LogToClient): ToolCallback<typeof inputSchema> {
-    return async (params) => {
+    return async (params, { authInfo }) => {
         const { id } = params;
 
-        const response = await client.GET("/api/organizations/{id}", {
+        const { subject } = authInfo! as AuthInfo;
+        const roles = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
+            params: {
+                path: {
+                    id,
+                    userId: subject!,
+                },
+            },
+        })).data!;
+
+        if (roles.some((r: { name: string }) => r.name === "owner" || r.name === "admin" || r.name === "member") === false) {
+            return {
+                content: [
+                    { type: "text", text: JSON.stringify({ error: "User is not authorized to access this organization." }) },
+                ],
+            };
+        }
+
+        const org = (await client.GET("/api/organizations/{id}", {
             params: {
                 path: {
                     id,
                 },
             },
-        });
-        const result = response.data!;
+        })).data!;
 
         return {
             content: [
-                { type: "text", text: JSON.stringify(result) },
+                { type: "text", text: JSON.stringify(org) },
             ],
         };
     };

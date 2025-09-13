@@ -20,6 +20,7 @@ import {
     deleteEpisodeTool,
     getEntityEdgeTool,
     getEpisodesTool,
+    getOrganizationTool,
     listOrganizationsTool,
     searchMemoryFactsTool,
     searchMemoryNodesTool,
@@ -60,6 +61,7 @@ export function getMcpServer() {
     // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
 
     // Logto Tools
+    server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb);
     server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb);
     server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb);
     server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
