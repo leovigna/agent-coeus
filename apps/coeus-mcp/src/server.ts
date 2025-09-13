@@ -63,11 +63,11 @@ export function getMcpServer() {
     // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
 
     // Logto Tools
-    server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb);
-    server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb);
-    server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb);
-    server.registerTool(updateOrganizationTool.name, updateOrganizationTool.config, updateOrganizationTool.cb);
-    server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb);
+    server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb as unknown as ToolCallback<typeof getOrganizationTool.config.inputSchema>);
+    server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb as unknown as ToolCallback<typeof createOrganizationTool.config.inputSchema>);
+    server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb as unknown as ToolCallback<typeof listOrganizationsTool.config.inputSchema>);
+    server.registerTool(updateOrganizationTool.name, updateOrganizationTool.config, updateOrganizationTool.cb as unknown as ToolCallback<typeof updateOrganizationTool.config.inputSchema>);
+    server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb as unknown as ToolCallback<typeof deleteOrganizationTool.config.inputSchema>);
     server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
     // Zep Tools
     server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb as unknown as ToolCallback<typeof addMemoryTool.config.inputSchema>);

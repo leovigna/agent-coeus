@@ -34,13 +34,19 @@ This workflow automates the creation of a new tool within an existing MCP tool l
 ```typescript
 import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
-// Note: The provider import path will need to be adjusted based on the library.
-import { ClientProvider } from "../ClientProvider.js";
+// Note: The provider/client import path will need to be adjusted based on the library.
+import { Client } from "../Client.js";
 
 export const {{toolName}}InputSchema = {
     // {{zodSchema}}
 };
 
+// CHOOSE ONE PATTERN:
+// Pattern A: Static Client (e.g., LogTo)
+export async function {{toolName}}(client: Client, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+    // Business logic uses 'client' directly
+
+// Pattern B: Dynamic Client Provider (e.g., Zep)
 export async function {{toolName}}(provider: ClientProvider, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     const client = await provider(authInfo);
     // const { ... } = params; // Deconstruct params here
@@ -73,7 +79,7 @@ import { partial } from "lodash-es";
 import { ZodRawShape } from "zod";
 import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
 // Note: The provider import path will need to be adjusted.
-import { ClientProvider } from "../ClientProvider.js";
+import { Client } from "../Client.js";
 
 async function {{toolName}}ToolCallback(...params: Parameters<typeof {{toolName}}>) {
     const result = await {{toolName}}(...params);
@@ -82,10 +88,10 @@ async function {{toolName}}ToolCallback(...params: Parameters<typeof {{toolName}
     } satisfies CallToolResult;
 }
 
-export function get{{ToolName}}Tool(provider: ClientProvider) {
+export function get{{ToolName}}Tool(clientOrProvider: Client | ClientProvider) {
     return {
         ...{{toolName}}Metadata,
-        cb: partial({{toolName}}ToolCallback, provider),
+        cb: partial({{toolName}}ToolCallback, clientOrProvider),
     } as const satisfies Tool<typeof {{toolName}}Metadata.config.inputSchema, ZodRawShape>;
 }
 ```
@@ -105,10 +111,10 @@ import { OpenApiMeta } from "trpc-to-openapi";
 import { z } from "zod";
 import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
 // Note: The provider import path will need to be adjusted.
-import { ClientProvider } from "../ClientProvider.js";
+import { Client } from "../Client.js";
 
-export function create{{ToolName}}Procedure(provider: ClientProvider, tags = ["tools"]) {
-    const {{toolName}}WithProvider = partial({{toolName}}, provider);
+export function create{{ToolName}}Procedure(clientOrProvider: Client | ClientProvider, tags = ["tools"]) {
+    const {{toolName}}WithProvider = partial({{toolName}}, clientOrProvider);
     const t = initTRPC.context<{ authInfo: AuthInfo }>().meta<OpenApiMeta>().create();
 
     return t.procedure.meta({

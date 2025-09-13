@@ -1,48 +1,38 @@
-import { AuthInfo, hasRequiredScopes, Tool } from "@coeus-agent/mcp-tools-base";
-import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Tool } from "@coeus-agent/mcp-tools-base";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { partial } from "lodash-es";
 import { ZodRawShape } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
+import { listOrganizations, listOrganizationsMetadata } from "../sdk/listOrganizations.js";
 
-const inputSchema = {};
-
-function getCallback(client: LogToClient): ToolCallback<typeof inputSchema> {
-    return async (_, { authInfo }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        if (!hasRequiredScopes(authInfo?.scopes ?? [], ["list:orgs"])) {
-            return {
-                content: [
-                    { type: "text", text: JSON.stringify({ error: "Missing scope list:orgs" }) },
-                ],
-            };
-        }
-
-        const { subject } = authInfo! as AuthInfo;
-        const response = await client.GET("/api/users/{userId}/organizations", {
-            params: {
-                path: {
-                    userId: subject!,
-                },
-            },
-        });
-        const result = response.data!;
-
+export async function listOrganizationsToolCallback(...params: Parameters<typeof listOrganizations>) {
+    try {
+        const result = await listOrganizations(...params);
         return {
             content: [
-                { type: "text", text: JSON.stringify(result) },
+                {
+                    type: "text",
+                    text: JSON.stringify(result),
+                },
             ],
-        };
-    };
+        } satisfies CallToolResult;
+    }
+    catch (error) {
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({ error: (error as Error).message }),
+                },
+            ],
+        } satisfies CallToolResult;
+    }
 }
 
 export function getListOrganizationsTool(client: LogToClient) {
     return {
-        name: "list_organizations",
-        config: {
-            title: "List organizations",
-            description: "List all organizations with support for pagination and search queries.",
-            inputSchema,
-        },
-        cb: getCallback(client),
-    } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
+        ...listOrganizationsMetadata,
+        cb: partial(listOrganizationsToolCallback, client),
+    } as const satisfies Tool<typeof listOrganizationsMetadata.config.inputSchema, ZodRawShape>;
 }

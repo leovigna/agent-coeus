@@ -52,14 +52,18 @@
     "tsc:watch": "tsc -w"
   },
   "dependencies": {
-    "@coeus-agent/mcp-tools-base": "workspace:*"
+    "@coeus-agent/mcp-tools-base": "workspace:*",
+    "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "@logto/api": "^1.31.0",
     "@modelcontextprotocol/sdk": "^1.17.4",
+    "@trpc/server": "^11.5.1",
+    "trpc-to-openapi": "^2.4.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@coeus-agent/esbuild-config": "workspace:*",
     "@coeus-agent/eslint-config": "workspace:*",
     "@coeus-agent/tsconfig": "workspace:*",

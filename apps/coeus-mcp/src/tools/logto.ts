@@ -3,8 +3,8 @@ import { getCreateOrganizationTool, getDeleteOrganizationTool, getGetOrganizatio
 import { logToClient } from "../clients/logto-client.js";
 
 export const createOrganizationTool = getCreateOrganizationTool(logToClient);
-export const listOrganizationsTool = getListOrganizationsTool(logToClient);
-export const getOrganizationTool = getGetOrganizationTool(logToClient);
-export const updateOrganizationTool = getUpdateOrganizationTool(logToClient);
 export const deleteOrganizationTool = getDeleteOrganizationTool(logToClient);
+export const getOrganizationTool = getGetOrganizationTool(logToClient);
+export const listOrganizationsTool = getListOrganizationsTool(logToClient);
+export const updateOrganizationTool = getUpdateOrganizationTool(logToClient);
 export const whoAmITool = getWhoAmITool(logToClient);
