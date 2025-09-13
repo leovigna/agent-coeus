@@ -58,6 +58,16 @@
 
 ## SDK Usage
 
+### Client vs. Provider Pattern
+
+**Incident:** I incorrectly assumed that all tool libraries required a "client provider" function (e.g., `(authInfo) => client`). I created one for the `mcp-tools-logto` package.
+
+**Correction:** The user explained that the provider pattern is only necessary when the client instance can change based on the user's authentication context (multi-tenant scenarios, like with Zep). For services with a single, static client (like the LogTo M2M client), the client instance should be passed directly as an argument.
+
+**Future Action:** Before implementing the SDK layer for a new tool library, I will determine the correct client injection pattern:
+1.  **Multi-Tenant/Dynamic Client:** If different users require different client instances (e.g., separate API keys, different database connections), I will implement the `ClientProvider` pattern: `(authInfo) => Client`.
+2.  **Single/Static Client:** If there is only one client instance for the entire service (e.g., a single M2M token), I will pass the `Client` instance directly to the SDK functions.
+
 ### Verify SDK APIs Before Implementation
 
 **Incident:** I made several incorrect attempts to instantiate `SSEServerTransport` and `StreamableHTTPServerTransport`, causing a series of TypeScript errors. This demonstrated a lack of understanding of the SDK's API.
@@ -112,6 +122,22 @@
 3.  Proceed only after receiving explicit approval. This will prevent miscommunication and ensure my actions align with both the user's intent and the project's technical needs.
 
 ## Terminal and Package Management
+
+### Use Built-in Package Scripts
+
+**Incident:** I ran a raw `pnpm --filter ... build` command which failed due to TypeScript errors in an un-related script file.
+
+**Correction:** The user advised me to prefer the built-in scripts defined in a package's `package.json` (e.g., `pnpm build`, `pnpm tsc`).
+
+**Future Action:** I will always check the `scripts` section of the relevant `package.json` before running commands. I will prefer using these scripts as they are the intended way to perform actions like building, testing, and linting for that specific package.
+
+### Differentiate Between Relevant and Irrelevant Errors
+
+**Incident:** A build command failed due to TypeScript errors in a script file (`setupLogTo.ts`) that was unrelated to the main refactoring task. This blocked progress.
+
+**Correction:** The user advised that if a file had errors at the start of a task and those errors persist, they might be irrelevant to the current work. A good practice is to run a typecheck or build *before* starting to establish a baseline of existing errors.
+
+**Future Action:** Before starting a task, I will consider running a baseline typecheck (e.g., `pnpm tsc`) on the relevant package. When a build fails, I will compare the new errors to the baseline. If the errors are pre-existing and in unrelated files, I will not attempt to fix them unless instructed. I will focus only on fixing errors directly caused by my code changes to avoid getting sidetracked by irrelevant issues.
 
 ### Pay Close Attention to Terminal Errors
 
