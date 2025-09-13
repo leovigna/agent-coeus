@@ -74,6 +74,14 @@
 
 **Future Action:** I will always verify that the URLs I use for `repomix` point to the official, canonical repository for the library in question to ensure I am learning from the correct source of truth.
 
+### Read Existing Code Before Refactoring
+
+**Incident:** When refactoring the Zep tools, I did not first read the original, working implementation. This led me to guess at the Zep client's API methods (e.g., `graph.clear`, `graph.deleteEdge`), causing TypeScript errors and rework.
+
+**Correction:** The user instructed me to always load the original implementation of a tool to understand its business logic and external API calls *before* attempting to migrate it to the new SDK pattern.
+
+**Future Action:** When refactoring or migrating existing code, my first step will always be to read the original source file. I will not attempt to intuit or guess the implementation details, especially those involving external SDKs. I will use the working code as the primary source of truth for its logic.
+
 ### Clarify Ambiguous Requests
 
 **Incident:** When the user asked for a way to test the MCP server, I proposed creating a new client application from a template. The user's intent was to use an *existing* tool or example, not to create a new one.
