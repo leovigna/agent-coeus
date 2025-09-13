@@ -18,12 +18,14 @@ import {
     createOrganizationTool,
     deleteEntityEdgeTool,
     deleteEpisodeTool,
+    deleteOrganizationTool,
     getEntityEdgeTool,
     getEpisodesTool,
     getOrganizationTool,
     listOrganizationsTool,
     searchMemoryFactsTool,
     searchMemoryNodesTool,
+    updateOrganizationTool,
     whoAmITool,
 } from "./tools/index.js";
 import { createContext } from "./trpc.js";
@@ -64,6 +66,8 @@ export function getMcpServer() {
     server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb);
     server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb);
     server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb);
+    server.registerTool(updateOrganizationTool.name, updateOrganizationTool.config, updateOrganizationTool.cb);
+    server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb);
     server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
     // Zep Tools
     server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb);
