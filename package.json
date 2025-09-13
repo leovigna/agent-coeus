@@ -13,6 +13,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:force": "turbo run build --force",
+    "build:watch": "mprocs -c mprocs-build.yaml",
     "changeset:add": "changeset add",
     "ci:publish": "pnpm publish -r",
     "ci:version": "changeset version",

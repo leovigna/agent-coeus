@@ -1,4 +1,14 @@
 /**
+ * Simple util checks if all scopes are included
+ * @param userScopes
+ * @param requiredScopes
+ * @returns true if auth scopes fulfill requirement
+ */
+export const hasRequiredScopes = (userScopes: string[], requiredScopes: string[]): boolean => {
+    return requiredScopes.every(scope => userScopes.includes(scope));
+};
+
+/**
      *
      * **Notes from mcp-auth:**
      *

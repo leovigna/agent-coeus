@@ -47,12 +47,18 @@ importers:
       '@coeus-agent/mcp-tools-base':
         specifier: workspace:*
         version: link:../../packages/mcp-tools-base
+      '@coeus-agent/mcp-tools-logto':
+        specifier: workspace:*
+        version: link:../../packages/mcp-tools-logto
       '@coeus-agent/mcp-tools-zep':
         specifier: workspace:*
         version: link:../../packages/mcp-tools-zep
       '@getzep/zep-cloud':
         specifier: ^3.4.1
         version: 3.4.1
+      '@logto/api':
+        specifier: ^1.31.0
+        version: 1.31.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.17.4
         version: 1.17.4

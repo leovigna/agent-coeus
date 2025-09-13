@@ -1,5 +1,5 @@
 /* eslint-disable @stylistic/indent */
-import { AuthInfo } from "@coeus-agent/mcp-tools-zep";
+import { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import { initTRPC } from "@trpc/server";
 
 export interface RequestMiddlewareCtxOut {

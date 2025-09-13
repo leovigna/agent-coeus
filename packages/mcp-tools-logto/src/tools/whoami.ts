@@ -9,14 +9,15 @@ const inputSchema = {};
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCallback(_: LogToClient): ToolCallback<typeof inputSchema> {
     return (_, { authInfo }) => {
-        const auth = authInfo as unknown as AuthInfo | undefined; // forced casting here due to extending type
+        if (!authInfo) return { content: [{ type: "text", text: "Not authenticated" }] };
+        const { subject } = authInfo as unknown as AuthInfo;
 
-        return {
+        return ({
             content: [
 
-                { type: "text", text: JSON.stringify((auth)?.claims ?? { error: "Not authenticated" }) },
+                { type: "text", text: JSON.stringify({ subject }) },
             ],
-        };
+        });
     };
 }
 

@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 
-import { AuthInfo } from "@coeus-agent/mcp-tools-zep";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
@@ -16,12 +15,15 @@ import { appRouter } from "./procedures/index.js";
 import {
     addMemoryTool,
     clearGraphTool,
+    createOrganizationTool,
     deleteEntityEdgeTool,
     deleteEpisodeTool,
     getEntityEdgeTool,
     getEpisodesTool,
+    listOrganizationsTool,
     searchMemoryFactsTool,
     searchMemoryNodesTool,
+    whoAmITool,
 } from "./tools/index.js";
 import { createContext } from "./trpc.js";
 
@@ -52,25 +54,15 @@ export function getMcpServer() {
     // TODO: Connect Zep.js
     // TODO: Add status resource for underlying zep.js connection
 
-    // Auth Tools
-    server.tool("whoami", ({ authInfo }) => {
-        if (!authInfo) return { content: [{ type: "text", text: "Not authenticated" }] };
-        const auth = authInfo as unknown as AuthInfo;
-        console.debug(auth);
-
-        return ({
-            content: [
-
-                { type: "text", text: JSON.stringify({ subject: auth.subject }) },
-            ],
-        });
-    });
-
     // OpenAI Deep Research Tools
     // TODO: Implement these later
     // server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
     // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
 
+    // Logto Tools
+    server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb);
+    server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb);
+    server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
     // Zep Tools
     server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb);
     server.registerTool(searchMemoryNodesTool.name, searchMemoryNodesTool.config, searchMemoryNodesTool.cb);

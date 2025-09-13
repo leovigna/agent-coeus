@@ -55,8 +55,10 @@
   },
   "dependencies": {
     "@coeus-agent/mcp-tools-base": "workspace:*",
+    "@coeus-agent/mcp-tools-logto": "workspace:*",
     "@coeus-agent/mcp-tools-zep": "workspace:*",
     "@getzep/zep-cloud": "^3.4.1",
+    "@logto/api": "^1.31.0",
     "@modelcontextprotocol/sdk": "^1.17.4",
     "@trpc/server": "^11.5.1",
     "cors": "^2.8.5",

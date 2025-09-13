@@ -1,4 +1,4 @@
-import { Tool } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, hasRequiredScopes, Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
@@ -12,22 +12,75 @@ const inputSchema = {
 };
 
 function getCallback(client: LogToClient): ToolCallback<typeof inputSchema> {
-    return async (params) => {
+    return async (params, { authInfo }) => {
+        const { subject, scopes } = authInfo! as AuthInfo;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        if (!hasRequiredScopes(scopes, ["create:org"])) {
+            return {
+                content: [
+                    { type: "text", text: JSON.stringify({ error: "Missing scope create:org" }) },
+                ],
+            };
+        }
+
         const { name, description, customData, isMfaRequired } = params;
 
-        const response = await client.POST("/api/organizations", {
+        const org = (await client.POST("/api/organizations", {
             body: {
                 name,
                 description,
                 custom_data: customData,
                 is_mfa_required: isMfaRequired,
             },
+        })).data!;
+
+        // TODO: Get this up at top-level of configuration of server
+        const orgRoles = (await client.GET("/api/organization-roles")).data!;
+        const memberRole = orgRoles.find(r => r.name === "member")!;
+        const ownerRole = orgRoles.find(r => r.name === "owner")!;
+
+        // Add user to organization
+        await client.POST("/api/organizations/{id}/users", {
+            params: {
+                path: {
+                    id: org.id,
+                },
+            },
+            body: {
+                userIds: [subject!],
+            },
+            parseAs: "stream",
         });
-        const result = response.data!;
+        // Set user as owner
+        await client.POST("/api/organizations/{id}/users/{userId}/roles", {
+            params: {
+                path: {
+                    id: org.id,
+                    userId: subject!,
+                },
+            },
+            body: {
+                organizationRoleIds: [ownerRole.id],
+            },
+            parseAs: "stream",
+        });
+        // Set JIT Role Member (auto-assign to new member)
+        await client.POST("/api/organizations/{id}/jit/roles", {
+            params: {
+                path: {
+                    id: org.id,
+                },
+            },
+            body: {
+                organizationRoleIds: [memberRole.id],
+            },
+            parseAs: "stream",
+        });
 
         return {
             content: [
-                { type: "text", text: JSON.stringify(result) },
+                { type: "text", text: JSON.stringify(org) },
             ],
         };
     };

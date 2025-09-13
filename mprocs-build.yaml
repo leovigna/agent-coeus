@@ -1,0 +1,13 @@
+procs:
+  mcp-tools-base:
+    cwd: packages/mcp-tools-base
+    shell: pnpm build:watch
+  mcp-tools-logto:
+    cwd: packages/mcp-tools-logto
+    shell: pnpm build:watch
+  mcp-tools-zep:
+    cwd: packages/mcp-tools-zep
+    shell: pnpm build:watch
+  coeus-mcp:
+    cwd: apps/coeus-mcp
+    shell: pnpm build:watch

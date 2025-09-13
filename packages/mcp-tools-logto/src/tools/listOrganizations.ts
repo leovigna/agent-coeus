@@ -1,25 +1,27 @@
-import { Tool } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, hasRequiredScopes, Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z, ZodRawShape } from "zod";
+import { ZodRawShape } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
 
-const inputSchema = {
-    q: z.string().optional().describe("The query to filter organizations."),
-    page: z.number().optional().default(1).describe("Page number."),
-    page_size: z.number().optional().default(20).describe("Entries per page."),
-};
+const inputSchema = {};
 
 function getCallback(client: LogToClient): ToolCallback<typeof inputSchema> {
-    return async (params) => {
-        const { q, page, page_size } = params;
+    return async (_, { authInfo }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        if (!hasRequiredScopes(authInfo?.scopes ?? [], ["list:orgs"])) {
+            return {
+                content: [
+                    { type: "text", text: JSON.stringify({ error: "Missing scope list:orgs" }) },
+                ],
+            };
+        }
 
-        const response = await client.GET("/api/organizations", {
+        const { subject } = authInfo! as AuthInfo;
+        const response = await client.GET("/api/users/{userId}/organizations", {
             params: {
-                query: {
-                    q,
-                    page,
-                    page_size,
+                path: {
+                    userId: subject!,
                 },
             },
         });
