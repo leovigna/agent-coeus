@@ -92,6 +92,14 @@
 
 **Future Action:** When refactoring or migrating existing code, my first step will always be to read the original source file. I will not attempt to intuit or guess the implementation details, especially those involving external SDKs. I will use the working code as the primary source of truth for its logic.
 
+### Adhere Strictly to the Stated Task Scope
+
+**Incident:** After being told that I had missed preserving comments during a refactor, the user asked me to update my learnings. I correctly updated `LEARNING.md`, but then I proactively started the work of adding back all the missing comments, which was not explicitly requested.
+
+**Correction:** The user clarified that the request was only to update the documentation, not to perform the corrective code changes at that time.
+
+**Future Action:** I must listen carefully to the user's instructions and not go beyond the stated scope of a task. If a user points out a mistake and asks me to document the learning, I will do exactly that and only that. I will not proactively start fixing the mistake unless the user explicitly tells me to, as they may have other priorities. I will confirm the next action with the user if I am unsure.
+
 ### Clarify Ambiguous Requests
 
 **Incident:** When the user asked for a way to test the MCP server, I proposed creating a new client application from a template. The user's intent was to use an *existing* tool or example, not to create a new one.
@@ -178,6 +186,14 @@
 **Correction:** The user clarified that while `express` was the correct technology choice, my implementation was overly complex for the current need. I should have identified a simpler pattern from the documentation or examples.
 
 **Future Action:** I will always aim to match the complexity of my solution to the user's immediate requirements. When consulting documentation or examples, I will evaluate different implementation patterns (e.g., stateless vs. stateful) and choose the simplest one that fulfills the task. I will avoid implementing advanced features like session management unless they are explicitly requested or clearly necessary.
+
+### Preserve All Comments During Refactoring
+
+**Incident:** While refactoring the `logto` and `zep` tools, I moved the core logic but failed to preserve the original TSDoc comments that explained the functions, their parameters, and examples.
+
+**Correction:** The user pointed out that all comments, especially documentation comments, must be preserved during refactoring to maintain code quality and context.
+
+**Future Action:** When refactoring or moving code, I will treat comments as an integral part of the implementation. I will ensure that all associated comments, including TSDoc blocks, inline comments, and `TODO` notes, are moved along with the code to its new location.
 
 ### Do Not Delete Commented-Out or Unused Code
 

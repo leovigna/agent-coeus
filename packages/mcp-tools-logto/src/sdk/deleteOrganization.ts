@@ -7,6 +7,11 @@ export const deleteOrganizationInputSchema = {
     id: z.string().describe("The ID of the organization."),
 };
 
+/**
+ * Delete an organization by its ID.
+ *
+ * @param {string} id - The ID of the organization.
+ */
 export async function deleteOrganization(client: LogToClient, params: z.objectOutputType<typeof deleteOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     const { id } = params;
     const { subject } = authInfo;

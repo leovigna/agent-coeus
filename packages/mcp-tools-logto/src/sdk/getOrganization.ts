@@ -7,6 +7,11 @@ export const getOrganizationInputSchema = {
     id: z.string().describe("The ID of the organization."),
 };
 
+/**
+ * Get an organization by its ID.
+ *
+ * @param {string} id - The ID of the organization.
+ */
 export async function getOrganization(client: LogToClient, params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     const { id } = params;
     const { subject } = authInfo;

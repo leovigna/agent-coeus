@@ -11,6 +11,15 @@ export const updateOrganizationInputSchema = {
     isMfaRequired: z.boolean().optional().describe("Is MFA required?"),
 };
 
+/**
+ * Update an organization's details.
+ *
+ * @param {string} id - The ID of the organization.
+ * @param {string} [name] - The updated name.
+ * @param {string} [description] - The updated description.
+ * @param {Record<string, unknown>} [customData] - Custom data.
+ * @param {boolean} [isMfaRequired] - Is MFA required?
+ */
 export async function updateOrganization(client: LogToClient, params: z.objectOutputType<typeof updateOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     const { id, ...body } = params;
     const { subject } = authInfo;

@@ -10,6 +10,14 @@ export const createOrganizationInputSchema = {
     isMfaRequired: z.boolean().optional(),
 };
 
+/**
+ * Create a new organization.
+ *
+ * @param {string} name - The name of the organization.
+ * @param {string} [description] - The description of the organization.
+ * @param {Record<string, unknown>} [customData] - Arbitrary custom data.
+ * @param {boolean} [isMfaRequired] - Whether MFA is required for the organization.
+ */
 export async function createOrganization(client: LogToClient, params: z.objectOutputType<typeof createOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     const { subject, scopes } = authInfo;
 

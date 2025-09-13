@@ -5,6 +5,9 @@ import { LogToClient } from "../LogToClient.js";
 
 export const listOrganizationsInputSchema = {};
 
+/**
+ * List all organizations the current user belongs to.
+ */
 export async function listOrganizations(client: LogToClient, _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
     if (!hasRequiredScopes(authInfo?.scopes ?? [], ["list:orgs"])) {
         throw new Error("Missing required scope: list:orgs");
