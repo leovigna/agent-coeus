@@ -1,2 +1,2 @@
 export * from "./tools/index.js";
-export * from "./LogToClientProvider.js";
+export * from "./LogToClient.js";

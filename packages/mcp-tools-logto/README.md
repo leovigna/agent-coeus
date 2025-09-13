@@ -12,3 +12,10 @@ The purpose of this package is to keep the implementation of tools modular:
 - [zod](https://www.npmjs.com/package/zod)
 - [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
 - [@logto/api](https://www.npmjs.com/package/@logto/api)
+
+## LogTo Setup
+
+https://docs.logto.io/authorization/role-based-access-control#default-api-resource-behavior
+
+- JWT/refresh: profile email offline_access list:orgs create:org
+- Org Token: urn:logto:scope:organization

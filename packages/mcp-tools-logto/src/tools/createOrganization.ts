@@ -1,9 +1,8 @@
+import { Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
 
-import { AuthInfo } from "../AuthInfo.js";
-import { LogToClientProvider, resolveLogToClient } from "../LogToClientProvider.js";
-import { Tool } from "../Tool.js";
+import { LogToClient } from "../LogToClient.js";
 
 const inputSchema = {
     name: z.string().min(1).max(128).describe("The name of the organization."),
@@ -12,13 +11,11 @@ const inputSchema = {
     isMfaRequired: z.boolean().optional(),
 };
 
-function getCallback(provider: LogToClientProvider): ToolCallback<typeof inputSchema> {
-    return async (params, { authInfo }) => {
-        const client = await resolveLogToClient(provider, authInfo! as AuthInfo);
-
+function getCallback(client: LogToClient): ToolCallback<typeof inputSchema> {
+    return async (params) => {
         const { name, description, customData, isMfaRequired } = params;
 
-        const response = await client.apiClient.POST("/api/organizations", {
+        const response = await client.POST("/api/organizations", {
             body: {
                 name,
                 description,
@@ -36,7 +33,7 @@ function getCallback(provider: LogToClientProvider): ToolCallback<typeof inputSc
     };
 }
 
-export function getCreateOrganizationTool(provider: LogToClientProvider) {
+export function getCreateOrganizationTool(client: LogToClient) {
     return {
         name: "create_organization",
         config: {
@@ -44,6 +41,6 @@ export function getCreateOrganizationTool(provider: LogToClientProvider) {
             description: "Create a new organization.",
             inputSchema,
         },
-        cb: getCallback(provider),
+        cb: getCallback(client),
     } as const satisfies Tool<typeof inputSchema, ZodRawShape>;
 }

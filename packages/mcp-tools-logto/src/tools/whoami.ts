@@ -1,14 +1,13 @@
+import { AuthInfo, Tool } from "@coeus-agent/mcp-tools-base";
 import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ZodRawShape } from "zod";
 
-import { AuthInfo } from "../AuthInfo.js";
-import { LogToClientProvider } from "../LogToClientProvider.js";
-import { Tool } from "../Tool.js";
+import { LogToClient } from "../LogToClient.js";
 
 const inputSchema = {};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getCallback(_: LogToClientProvider): ToolCallback<typeof inputSchema> {
+function getCallback(_: LogToClient): ToolCallback<typeof inputSchema> {
     return (_, { authInfo }) => {
         const auth = authInfo as unknown as AuthInfo | undefined; // forced casting here due to extending type
 
@@ -21,7 +20,7 @@ function getCallback(_: LogToClientProvider): ToolCallback<typeof inputSchema> {
     };
 }
 
-export function getWhoAmITool(provider: LogToClientProvider) {
+export function getWhoAmITool(provider: LogToClient) {
     return {
         name: "whoami",
         config: {

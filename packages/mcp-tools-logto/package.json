@@ -51,6 +51,9 @@
     "tsc:trace": "tsc --generateTrace lib/trace && analyze-trace lib/trace",
     "tsc:watch": "tsc -w"
   },
+  "dependencies": {
+    "@coeus-agent/mcp-tools-base": "workspace:*"
+  },
   "peerDependencies": {
     "@logto/api": "^1.31.0",
     "@modelcontextprotocol/sdk": "^1.17.4",
