@@ -19,16 +19,13 @@ function getLogToClient() {
 }
 
 /**
- * Creates a basic CRUD resource on LogTo with the following scopes
- * - create:resource
- * - read:resource
- * - update:resource
- * - delete:resource
+ * Create an API Resource
  *
  * @param client
- * @param data name, indicatoer (eg. https://api.yourapp.com/<name>/)
+ * @param data name, indicator (eg. https://api.yourapp.com/<name>/)
+ * @returns resource
  */
-async function getOrCreateCRUDResource(client: LogToClient, { name, indicator }: { name: string; indicator: string }, scopeNames = ["create", "read", "update", "delete"]) {
+async function getOrCreateApiResource(client: LogToClient, { name, indicator }: { name: string; indicator: string }) {
     // Get or create resource
     let resource = (await client.GET("/api/resources")).data!.find(r => r.name === name);
     resource ??= (await client.POST("/api/resources", {
@@ -37,30 +34,40 @@ async function getOrCreateCRUDResource(client: LogToClient, { name, indicator }:
             indicator,
         },
     })).data!;
+
+    return resource;
+}
+
+/**
+ * Get or create API resource scopes
+ * @param client
+ * @param resourceId
+ * @param scopes
+ * @returns resource scopes
+ */
+async function getOrCreateApiResourceScopes(client: LogToClient, resourceId: string, scopes: string[]) {
     // Get resource scopes
     const resourceScopes = (await client.GET("/api/resources/{resourceId}/scopes", {
-        params: { path: { resourceId: resource.id } },
+        params: { path: { resourceId } },
     })).data!;
-    // Get or create resource scope
-    for (const scopeName of scopeNames) {
-        let scope = resourceScopes.find(s => s.name === `${scopeName}:${resource.name}`);
+
+    for (const scopeName of scopes) {
+        let scope = resourceScopes.find(s => s.name === scopeName);
+
         scope ??= (await client.POST("/api/resources/{resourceId}/scopes", {
-            params: { path: { resourceId: resource.id } },
+            params: { path: { resourceId } },
             body: {
-                name: `${scopeName}:${resource.name}`,
-                description: `${scopeName} ${resource.name}`,
+                name: scopeName,
+                description: scopeName.replace(":", " "),
             },
         })).data!;
     }
 
     const resourceScopesUpdated = (await client.GET("/api/resources/{resourceId}/scopes", {
-        params: { path: { resourceId: resource.id } },
+        params: { path: { resourceId } },
     })).data!;
 
-    return {
-        resource,
-        resourceScopes: resourceScopesUpdated,
-    };
+    return resourceScopesUpdated;
 }
 
 /**
@@ -163,12 +170,22 @@ async function setResourceScopesToOrganizationRole(client: LogToClient, roleId: 
 
     const missingScopeIds = resourceScopeIds.filter(id => !existingScopeIds.includes(id));
     if (missingScopeIds.length > 0) {
-        await client.POST("/api/organization-roles/{id}/resource-scopes", {
-            params: { path: { id: roleId } },
-            body: {
-                scopeIds: missingScopeIds,
-            },
-        });
+        try {
+            await client.POST("/api/organization-roles/{id}/resource-scopes", {
+                params: { path: { id: roleId } },
+                body: {
+                    scopeIds: missingScopeIds,
+                },
+            });
+        }
+        catch (error) {
+            if (error instanceof SyntaxError) {
+                // Ignore SyntaxError from Logto API (API returns 201 "Created")
+            }
+            else {
+                throw error;
+            }
+        }
     }
 
     const resourceScopes = (await client.GET("/api/organization-roles/{id}/resource-scopes", {
@@ -212,22 +229,39 @@ async function getLogToData(client: LogToClient) {
  * @param client LogTo client
  */
 async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) {
-    // Create org resource with CRUD scopes
-    const orgResource = await getOrCreateCRUDResource(client, {
-        name: "org",
-        indicator: new URL("/org/", indicatorBaseUrl).toString(),
+    // Create MCP API resource with CRUD scopes
+    const mcpResource = await getOrCreateApiResource(client, {
+        name: "mcp",
+        indicator: new URL("/mcp/", indicatorBaseUrl).toString(),
     });
-    // Org resource scopes
-    const createOrgScope = orgResource.resourceScopes.find(s => s.name === "create:org")!;
-    const readOrgScope = orgResource.resourceScopes.find(s => s.name === "read:org")!;
-    const updateOrgScope = orgResource.resourceScopes.find(s => s.name === "update:org")!;
-    const deleteOrgScope = orgResource.resourceScopes.find(s => s.name === "delete:org")!;
+    // Make default resource (to get JWT with this audience)
+    await client.PATCH("/api/resources/{id}/is-default", {
+        params: { path: { id: mcpResource.id } },
+        body: {
+            isDefault: true,
+        },
+    });
+
+    // Resource scopes
+    const resourceScopes = await getOrCreateApiResourceScopes(client, mcpResource.id, ["list:orgs", "create:org", "read:org", "update:org", "delete:org"]);
+    const listOrgsScope = resourceScopes.find(s => s.name === "list:orgs")!;
+    const createOrgScope = resourceScopes.find(s => s.name === "create:org")!;
+    const readOrgScope = resourceScopes.find(s => s.name === "read:org")!;
+    const updateOrgScope = resourceScopes.find(s => s.name === "update:org")!;
+    const deleteOrgScope = resourceScopes.find(s => s.name === "delete:org")!;
 
     // User role (Note: Go to console to set this as default role)
     const roles = await getOrCreateRoles(client, ["user"]);
     const userRole = roles.find(r => r.name === "user")!;
+    // Make default role (to get this role assigned to new users)
+    await client.PATCH("/api/roles/{id}", {
+        params: { path: { id: userRole.id } },
+        body: {
+            isDefault: true,
+        },
+    });
     // User role gets CREATE org scope
-    const userResourceScopes = await setResourceScopesToRole(client, userRole.id, [createOrgScope.id]);
+    const userResourceScopes = await setResourceScopesToRole(client, userRole.id, [createOrgScope.id, listOrgsScope.id]);
 
     // Owner/Admin/Member organization roles
     const orgRoles = await getOrCreateOrganizationRoles(client);
@@ -243,7 +277,7 @@ async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) {
     const memberResourceScopes = await setResourceScopesToOrganizationRole(client, memberRole.id, [readOrgScope.id]);
 
     return {
-        orgResource,
+        mcpResource,
         userRole,
         userResourceScopes,
         orgRoles,

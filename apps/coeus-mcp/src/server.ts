@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 
+import { AuthInfo } from "@coeus-agent/mcp-tools-zep";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
@@ -52,12 +53,18 @@ export function getMcpServer() {
     // TODO: Add status resource for underlying zep.js connection
 
     // Auth Tools
-    server.tool("whoami", ({ authInfo }) => ({
-        content: [
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            { type: "text", text: JSON.stringify((authInfo as any)?.claims ?? { error: "Not authenticated" }) },
-        ],
-    }));
+    server.tool("whoami", ({ authInfo }) => {
+        if (!authInfo) return { content: [{ type: "text", text: "Not authenticated" }] };
+        const auth = authInfo as unknown as AuthInfo;
+        console.debug(auth);
+
+        return ({
+            content: [
+
+                { type: "text", text: JSON.stringify({ subject: auth.subject }) },
+            ],
+        });
+    });
 
     // OpenAI Deep Research Tools
     // TODO: Implement these later
@@ -75,6 +82,69 @@ export function getMcpServer() {
     server.registerTool(clearGraphTool.name, clearGraphTool.config, clearGraphTool.cb);
     return server;
 }
+
+/**
+ * Verify JWT token
+ * @param params clientId, jwksUri, issuer
+ * @returns (token) => Promise<AuthInfo>
+ */
+/*
+export function getVerifyJwtToken({ clientId, jwksUri, issuer }: { clientId: string; jwksUri: string; issuer: string }): (token: string) => Promise<AuthInfo> {
+    const jwks = createRemoteJWKSet(new URL(jwksUri));
+
+    return async function (token: string): Promise<AuthInfo> {
+        console.debug({ token, jwksUri, issuer });
+        const { payload } = await jwtVerify(token, jwks, {
+            issuer: issuer,
+        });
+        const scopes = (payload.scope as string)?.split(" ") ?? [];
+
+        return {
+            token,
+            issuer,
+            clientId,
+            scopes,
+            expiresAt: payload.exp,
+            subject: payload.sub,
+            audience: payload.aud,
+        };
+
+        // MCPAuth Error causes issues with mcp inspector
+        // throw new MCPAuthTokenVerificationError("token_verification_failed");
+    };
+}
+*/
+
+/**
+ * Verify opaque access token by calling the userinfo endpoint
+ * @param params clientId, userInfoEndpoint, issuer
+ * @returns (token) => Promise<AuthInfo>
+ */
+/*
+export function getVerifyAccessToken({ clientId, userInfoEndpoint, issuer }: { clientId: string; userInfoEndpoint: string; issuer: string }): (token: string) => Promise<AuthInfo> {
+    return async function (token: string): Promise<AuthInfo> {
+        const response = await fetch(userInfoEndpoint, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error("Token verification failed");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const userInfo = await response.json();
+
+        return {
+            token,
+            issuer,
+            clientId,
+            scopes: [],
+            expiresAt: 0,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            subject: userInfo.sub,
+            audience: "",
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            claims: userInfo,
+        };
+    };
+}
+*/
 
 export async function getExpressApp({ mcpServer, mcpTransport }: { mcpServer: McpServer; mcpTransport: StreamableHTTPServerTransport }): Promise<Application> {
     // Connect transport
@@ -99,33 +169,29 @@ export async function getExpressApp({ mcpServer, mcpTransport }: { mcpServer: Mc
 
     // CORS Middleware
     app.use(cors({ origin: "*" }));
+    // Fetch OIDC config
+    const oidcConfig = await fetchServerConfig(OIDC_ISSUER_URL.toString(), { type: "oidc" });
+    // const { jwksUri, issuer } = oidcConfig.metadata;
     // MCP Auth Middleware
     const mcpAuth = new MCPAuth({
-        server: await fetchServerConfig(OIDC_ISSUER_URL.toString(), { type: "oidc" }),
+        server: oidcConfig,
     });
     // Delegated Authorization Server
     app.use(mcpAuth.delegatedRouter()); // .well-known/oauth-authorization-server (OAuth 2.0 Metadata Endpoint)
 
-    // Bearer Auth Handler
-    const verifyToken = async (token: string) => {
-        const { userinfoEndpoint, issuer } = mcpAuth.config.server.metadata;
-        const response = await fetch(userinfoEndpoint!, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error("Token verification failed");
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const userInfo = await response.json();
-        return {
-            token,
-            issuer,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            subject: userInfo.sub,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            claims: userInfo,
-        };
-    };
+    // Bearer Access Token verification
+    // const verifyAccessToken = getVerifyAccessToken({ clientId: OIDC_CLIENT_ID!, userInfoEndpoint: userinfoEndpoint!, issuer });
+    // app.use("/auth", mcpAuth.bearerAuth(verifyAccessToken));
+
+    // JWT Token verification
+
+    // https://mcp-auth.dev/docs/0.1.1/configure-server/bearer-auth#configure-bearer-auth-with-custom-verification
+    // const verifyJwtToken = getVerifyJwtToken({ clientId: OIDC_CLIENT_ID!, jwksUri: jwksUri!, issuer });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    app.use("/auth", mcpAuth.bearerAuth(verifyToken));
+    app.use("/auth", mcpAuth.bearerAuth("jwt"));
+
+    // https://mcp-auth.dev/docs/0.1.1/configure-server/bearer-auth#configure-bearer-auth-with-jwt-mode
+    // app.use("/auth", mcpAuth.bearerAuth("jwt")); // Built-in JWT verification
 
     // Parse JSON
     app.use(express.json());
