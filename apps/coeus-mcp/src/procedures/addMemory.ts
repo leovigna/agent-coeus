@@ -1,10 +1,16 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
+import { createAddMemoryProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { addMemoryTool } from "../tools/index.js";
+import { zepClient } from "../clients/zep-client.js";
 import { publicProcedure } from "../trpc.js";
 
+export const addMemoryProcedure = publicProcedure.concat(createAddMemoryProcedure(zepClient))
+    .output(z.any())
+    .mutation(({ ctx: { episode } }) => {
+        return episode;
+    });
+
+/*
 export const addMemoryProcedure = publicProcedure
     .meta({
         openapi: {
@@ -23,3 +29,4 @@ export const addMemoryProcedure = publicProcedure
         const result = await addMemoryTool.cb(input, extra);
         return result;
     });
+*/

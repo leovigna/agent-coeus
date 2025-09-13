@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
@@ -70,7 +70,7 @@ export function getMcpServer() {
     server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb);
     server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
     // Zep Tools
-    server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb);
+    server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb as unknown as ToolCallback<typeof addMemoryTool.config.inputSchema>);
     server.registerTool(searchMemoryNodesTool.name, searchMemoryNodesTool.config, searchMemoryNodesTool.cb);
     server.registerTool(searchMemoryFactsTool.name, searchMemoryFactsTool.config, searchMemoryFactsTool.cb);
     server.registerTool(deleteEntityEdgeTool.name, deleteEntityEdgeTool.config, deleteEntityEdgeTool.cb);
