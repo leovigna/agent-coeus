@@ -71,13 +71,13 @@ export function getMcpServer() {
     server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
     // Zep Tools
     server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb as unknown as ToolCallback<typeof addMemoryTool.config.inputSchema>);
-    server.registerTool(searchMemoryNodesTool.name, searchMemoryNodesTool.config, searchMemoryNodesTool.cb);
-    server.registerTool(searchMemoryFactsTool.name, searchMemoryFactsTool.config, searchMemoryFactsTool.cb);
-    server.registerTool(deleteEntityEdgeTool.name, deleteEntityEdgeTool.config, deleteEntityEdgeTool.cb);
-    server.registerTool(deleteEpisodeTool.name, deleteEpisodeTool.config, deleteEpisodeTool.cb);
-    server.registerTool(getEntityEdgeTool.name, getEntityEdgeTool.config, getEntityEdgeTool.cb);
-    server.registerTool(getEpisodesTool.name, getEpisodesTool.config, getEpisodesTool.cb);
-    server.registerTool(clearGraphTool.name, clearGraphTool.config, clearGraphTool.cb);
+    server.registerTool(searchMemoryNodesTool.name, searchMemoryNodesTool.config, searchMemoryNodesTool.cb as unknown as ToolCallback<typeof searchMemoryNodesTool.config.inputSchema>);
+    server.registerTool(searchMemoryFactsTool.name, searchMemoryFactsTool.config, searchMemoryFactsTool.cb as unknown as ToolCallback<typeof searchMemoryFactsTool.config.inputSchema>);
+    server.registerTool(deleteEntityEdgeTool.name, deleteEntityEdgeTool.config, deleteEntityEdgeTool.cb as unknown as ToolCallback<typeof deleteEntityEdgeTool.config.inputSchema>);
+    server.registerTool(deleteEpisodeTool.name, deleteEpisodeTool.config, deleteEpisodeTool.cb as unknown as ToolCallback<typeof deleteEpisodeTool.config.inputSchema>);
+    server.registerTool(getEntityEdgeTool.name, getEntityEdgeTool.config, getEntityEdgeTool.cb as unknown as ToolCallback<typeof getEntityEdgeTool.config.inputSchema>);
+    server.registerTool(getEpisodesTool.name, getEpisodesTool.config, getEpisodesTool.cb as unknown as ToolCallback<typeof getEpisodesTool.config.inputSchema>);
+    server.registerTool(clearGraphTool.name, clearGraphTool.config, clearGraphTool.cb as unknown as ToolCallback<typeof clearGraphTool.config.inputSchema>);
     return server;
 }
 

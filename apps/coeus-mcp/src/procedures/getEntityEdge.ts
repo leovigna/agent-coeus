@@ -1,25 +1,11 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
+import { createGetEntityEdgeProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { getEntityEdgeTool } from "../tools/index.js";
+import { zepClient } from "../clients/zep-client.js";
 import { publicProcedure } from "../trpc.js";
 
-export const getEntityEdgeProcedure = publicProcedure
-    .meta({
-        openapi: {
-            method: "POST",
-            path: `/${getEntityEdgeTool.name}`,
-            tags: ["tools"],
-            summary: getEntityEdgeTool.config.title,
-            description: getEntityEdgeTool.config.description,
-        },
-    })
-    .input(z.object(getEntityEdgeTool.config.inputSchema))
-    .output(CallToolResultSchema)
-    .mutation(async ({ input, ctx }) => {
-        const authInfo = ctx.authInfo;
-        const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await getEntityEdgeTool.cb(input, extra);
+export const getEntityEdgeProcedure = publicProcedure.concat(createGetEntityEdgeProcedure(zepClient))
+    .output(z.any())
+    .query(({ ctx: { result } }) => {
         return result;
     });

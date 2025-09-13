@@ -1,25 +1,11 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
+import { createSearchMemoryFactsProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { searchMemoryFactsTool } from "../tools/index.js";
+import { zepClient } from "../clients/zep-client.js";
 import { publicProcedure } from "../trpc.js";
 
-export const searchMemoryFactsProcedure = publicProcedure
-    .meta({
-        openapi: {
-            method: "POST",
-            path: `/${searchMemoryFactsTool.name}`,
-            tags: ["tools"],
-            summary: searchMemoryFactsTool.config.title,
-            description: searchMemoryFactsTool.config.description,
-        },
-    })
-    .input(z.object(searchMemoryFactsTool.config.inputSchema))
-    .output(CallToolResultSchema)
-    .mutation(async ({ input, ctx }) => {
-        const authInfo = ctx.authInfo;
-        const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await searchMemoryFactsTool.cb(input, extra);
+export const searchMemoryFactsProcedure = publicProcedure.concat(createSearchMemoryFactsProcedure(zepClient))
+    .output(z.any())
+    .query(({ ctx: { result } }) => {
         return result;
     });

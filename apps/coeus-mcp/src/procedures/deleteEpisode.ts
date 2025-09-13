@@ -1,25 +1,11 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
+import { createDeleteEpisodeProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { deleteEpisodeTool } from "../tools/index.js";
+import { zepClient } from "../clients/zep-client.js";
 import { publicProcedure } from "../trpc.js";
 
-export const deleteEpisodeProcedure = publicProcedure
-    .meta({
-        openapi: {
-            method: "POST",
-            path: `/${deleteEpisodeTool.name}`,
-            tags: ["tools"],
-            summary: deleteEpisodeTool.config.title,
-            description: deleteEpisodeTool.config.description,
-        },
-    })
-    .input(z.object(deleteEpisodeTool.config.inputSchema))
-    .output(CallToolResultSchema)
-    .mutation(async ({ input, ctx }) => {
-        const authInfo = ctx.authInfo;
-        const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await deleteEpisodeTool.cb(input, extra);
+export const deleteEpisodeProcedure = publicProcedure.concat(createDeleteEpisodeProcedure(zepClient))
+    .output(z.any())
+    .mutation(({ ctx: { result } }) => {
         return result;
     });

@@ -1,25 +1,11 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
-import { CallToolResultSchema, Notification, Request } from "@modelcontextprotocol/sdk/types.js";
+import { createGetEpisodesProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { getEpisodesTool } from "../tools/index.js";
+import { zepClient } from "../clients/zep-client.js";
 import { publicProcedure } from "../trpc.js";
 
-export const getEpisodesProcedure = publicProcedure
-    .meta({
-        openapi: {
-            method: "POST",
-            path: `/${getEpisodesTool.name}`,
-            tags: ["tools"],
-            summary: getEpisodesTool.config.title,
-            description: getEpisodesTool.config.description,
-        },
-    })
-    .input(z.object(getEpisodesTool.config.inputSchema))
-    .output(CallToolResultSchema)
-    .mutation(async ({ input, ctx }) => {
-        const authInfo = ctx.authInfo;
-        const extra = { authInfo } as unknown as RequestHandlerExtra<Request, Notification>;
-        const result = await getEpisodesTool.cb(input, extra);
+export const getEpisodesProcedure = publicProcedure.concat(createGetEpisodesProcedure(zepClient))
+    .output(z.any())
+    .query(({ ctx: { result } }) => {
         return result;
     });
