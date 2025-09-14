@@ -96,33 +96,22 @@ export function get{{ToolName}}Tool(clientOrProvider: Client | ClientProvider) {
 
 **Template:**
 ```typescript
-import { AuthInfo } from "@coeus-agent/mcp-tools-base";
-import { initTRPC } from "@trpc/server";
-import { partial } from "lodash-es";
+import { toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
 import { OpenApiMeta } from "trpc-to-openapi";
-import { z } from "zod";
 import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
-// Note: The provider import path will need to be adjusted.
-import { Client } from "../Client.js";
 
-export function create{{ToolName}}Procedure(clientOrProvider: Client | ClientProvider, tags = ["tools"]) {
-    const {{toolName}}WithProvider = partial({{toolName}}, clientOrProvider);
-    const t = initTRPC.context<{ authInfo: AuthInfo }>().meta<OpenApiMeta>().create();
+const {{toolName}}ProcedureMeta = {
+    openapi: {
+        // TODO: Adjust method and path as needed (e.g., GET vs POST)
+        method: "POST",
+        path: `/${{{toolName}}Metadata.name}`,
+        tags: ["tools"],
+        summary: {{toolName}}Metadata.config.title,
+        description: {{toolName}}Metadata.config.description,
+    },
+} as OpenApiMeta;
 
-    return t.procedure.meta({
-        openapi: {
-            // TODO: Adjust method and path as needed (e.g., GET vs POST)
-            method: "POST",
-            path: `/${{{toolName}}Metadata.name}`,
-            tags,
-            summary: {{toolName}}Metadata.config.title,
-        },
-    }).input(z.object({{toolName}}Metadata.config.inputSchema))
-      .use(async ({ input, ctx, next }) => {
-          const result = await {{toolName}}WithProvider(input, { authInfo: ctx.authInfo });
-          return next({ ctx: { result } });
-      });
-}
+export const create{{ToolName}}Procedure = toProcedurePluginFn({{toolName}}Metadata.config.inputSchema, {{toolName}}, {{toolName}}ProcedureMeta);
 ```
 
 ---
