@@ -110,24 +110,16 @@ This layer adapts the SDK function for consumption by the MCP server.
 
 *Example: `tools/getWidget.ts`*
 ```typescript
-import type { Tool } from "@coeus-agent/mcp-tools-base";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { toCallToolResultFn, Tool } from "@coeus-agent/mcp-tools-base";
 import { partial } from "lodash-es";
 import { ZodRawShape } from "zod";
 import { getWidget, getWidgetMetadata } from "../sdk/getWidget.js";
 import { WidgetClientProvider } from "../WidgetClientProvider.js";
 
-async function getWidgetToolCallback(...params: Parameters<typeof getWidget>) {
-    const result = await getWidget(...params);
-    return {
-        content: [{ type: "text", text: JSON.stringify(result) }],
-    } satisfies CallToolResult;
-}
-
 export function getGetWidgetTool(provider: WidgetClientProvider) {
     return {
         ...getWidgetMetadata,
-        cb: partial(getWidgetToolCallback, provider),
+        cb: partial(toCallToolResultFn(getWidget), provider),
     } as const satisfies Tool<typeof getWidgetMetadata.config.inputSchema, ZodRawShape>;
 }
 ```

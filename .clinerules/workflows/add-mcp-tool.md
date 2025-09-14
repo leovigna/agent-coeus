@@ -73,25 +73,17 @@ export const {{toolName}}Metadata = {
 
 **Template:**
 ```typescript
-import type { Tool } from "@coeus-agent/mcp-tools-base";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { toCallToolResultFn, Tool } from "@coeus-agent/mcp-tools-base";
 import { partial } from "lodash-es";
 import { ZodRawShape } from "zod";
 import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
-// Note: The provider import path will need to be adjusted.
+// Note: The provider/client import path will need to be adjusted.
 import { Client } from "../Client.js";
-
-async function {{toolName}}ToolCallback(...params: Parameters<typeof {{toolName}}>) {
-    const result = await {{toolName}}(...params);
-    return {
-        content: [{ type: "text", text: JSON.stringify(result) }],
-    } satisfies CallToolResult;
-}
 
 export function get{{ToolName}}Tool(clientOrProvider: Client | ClientProvider) {
     return {
         ...{{toolName}}Metadata,
-        cb: partial({{toolName}}ToolCallback, clientOrProvider),
+        cb: partial(toCallToolResultFn({{toolName}}), clientOrProvider),
     } as const satisfies Tool<typeof {{toolName}}Metadata.config.inputSchema, ZodRawShape>;
 }
 ```
