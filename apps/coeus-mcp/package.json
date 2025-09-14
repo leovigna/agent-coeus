@@ -66,6 +66,7 @@
     "http-proxy-middleware": "^3.0.5",
     "mcp-auth": "^0.1.1",
     "morgan": "^1.10.1",
+    "openapi-fetch": "^0.14.0",
     "swagger-ui-express": "^5.0.1",
     "trpc-to-openapi": "^2.4.0",
     "zod": "^3.22.4",
