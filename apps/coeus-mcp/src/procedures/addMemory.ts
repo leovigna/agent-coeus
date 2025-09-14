@@ -6,8 +6,8 @@ import { publicProcedure } from "../trpc.js";
 
 export const addMemoryProcedure = publicProcedure.concat(createAddMemoryProcedure(zepClient))
     .output(z.any())
-    .mutation(({ ctx: { episode } }) => {
-        return episode;
+    .mutation(({ ctx: { result } }) => {
+        return result;
     });
 
 /*
