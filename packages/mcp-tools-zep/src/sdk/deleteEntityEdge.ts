@@ -1,4 +1,5 @@
 import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import type { Zep } from "@getzep/zep-cloud";
 import { z, ZodRawShape } from "zod";
 
 import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
@@ -19,7 +20,7 @@ export const deleteEntityEdgeInputSchema = {
  * await deleteEntityEdge(provider, { uuid: "some-uuid-string" }, { authInfo });
  * ```
  */
-export async function deleteEntityEdge(provider: ZepClientProvider, params: z.objectOutputType<typeof deleteEntityEdgeInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function deleteEntityEdge(provider: ZepClientProvider, params: z.objectOutputType<typeof deleteEntityEdgeInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.SuccessResponse> {
     const zepClient = await resolveZepClient(provider, authInfo);
     const { uuid } = params;
 

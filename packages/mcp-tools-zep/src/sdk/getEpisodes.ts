@@ -1,4 +1,5 @@
 import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import type { Zep } from "@getzep/zep-cloud";
 import { z, ZodRawShape } from "zod";
 
 import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
@@ -19,7 +20,7 @@ export const getEpisodesInputSchema = {
  * await getEpisodes(provider, { group_id: "some-group-id", last_n: 5 }, { authInfo });
  * ```
  */
-export async function getEpisodes(provider: ZepClientProvider, params: z.objectOutputType<typeof getEpisodesInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function getEpisodes(provider: ZepClientProvider, params: z.objectOutputType<typeof getEpisodesInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.EpisodeResponse> {
     const zepClient = await resolveZepClient(provider, authInfo);
 
     const { subject } = authInfo;

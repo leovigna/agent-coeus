@@ -76,7 +76,7 @@ export const addMemoryInputSchema = {
  *  - Entities will be created from appropriate JSON properties
  *  - Relationships between entities will be established based on the JSON structure
  */
-export async function addMemory(provider: ZepClientProvider, params: z.objectOutputType<typeof addMemoryInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+export async function addMemory(provider: ZepClientProvider, params: z.objectOutputType<typeof addMemoryInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.Episode> {
     const zepClient = await resolveZepClient(provider, authInfo);
 
     const { subject } = authInfo;

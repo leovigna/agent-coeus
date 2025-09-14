@@ -20,7 +20,7 @@ export const updateOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Custom data.
  * @param {boolean} [isMfaRequired] - Is MFA required?
  */
-export async function updateOrganization(client: LogToClient, params: z.objectOutputType<typeof updateOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function updateOrganization(client: LogToClient, params: z.objectOutputType<typeof updateOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
     const { id, ...body } = params;
     const { subject } = authInfo;
 

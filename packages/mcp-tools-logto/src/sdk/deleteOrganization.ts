@@ -12,7 +12,7 @@ export const deleteOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function deleteOrganization(client: LogToClient, params: z.objectOutputType<typeof deleteOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function deleteOrganization(client: LogToClient, params: z.objectOutputType<typeof deleteOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
     const { id } = params;
     const { subject } = authInfo;
 

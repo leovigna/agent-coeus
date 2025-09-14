@@ -1,4 +1,5 @@
 import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import type { Zep } from "@getzep/zep-cloud";
 import { z, ZodRawShape } from "zod";
 
 import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
@@ -23,7 +24,7 @@ export const searchMemoryFactsInputSchema = {
  * await searchMemoryFacts(provider, { query: "what is acme corp" }, { authInfo });
  * ```
  */
-export async function searchMemoryFacts(provider: ZepClientProvider, params: z.objectOutputType<typeof searchMemoryFactsInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function searchMemoryFacts(provider: ZepClientProvider, params: z.objectOutputType<typeof searchMemoryFactsInputSchema, z.ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.GraphSearchResults> {
     const zepClient = await resolveZepClient(provider, authInfo);
 
     const { subject } = authInfo;

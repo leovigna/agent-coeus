@@ -18,7 +18,7 @@ export const createOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Arbitrary custom data.
  * @param {boolean} [isMfaRequired] - Whether MFA is required for the organization.
  */
-export async function createOrganization(client: LogToClient, params: z.objectOutputType<typeof createOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function createOrganization(client: LogToClient, params: z.objectOutputType<typeof createOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
     const { subject, scopes } = authInfo;
 
     if (!hasRequiredScopes(scopes, ["create:org"])) {

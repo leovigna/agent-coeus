@@ -12,7 +12,7 @@ export const getOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function getOrganization(client: LogToClient, params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
+export async function getOrganization(client: LogToClient, params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
     const { id } = params;
     const { subject } = authInfo;
 
