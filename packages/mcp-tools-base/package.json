@@ -51,6 +51,9 @@
     "tsc:trace": "tsc --generateTrace lib/trace && analyze-trace lib/trace",
     "tsc:watch": "tsc -w"
   },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
     "@trpc/server": "^11.5.1",

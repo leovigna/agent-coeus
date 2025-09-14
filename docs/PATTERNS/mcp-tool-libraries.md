@@ -135,31 +135,21 @@ This layer adapts the SDK function into a modular tRPC procedure for the OpenAPI
 
 *Example: `procedures/getWidget.ts`*
 ```typescript
-import { AuthInfo } from "@coeus-agent/mcp-tools-base";
-import { initTRPC } from "@trpc/server";
-import { partial } from "lodash-es";
+import { toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
 import { OpenApiMeta } from "trpc-to-openapi";
-import { z } from "zod";
 import { getWidget, getWidgetMetadata } from "../sdk/getWidget.js";
-import { WidgetClientProvider } from "../WidgetClientProvider.js";
 
-export function createGetWidgetProcedure(provider: WidgetClientProvider, tags = ["tools", "widgets"]) {
-    const getWidgetWithProvider = partial(getWidget, provider);
-    const t = initTRPC.context<{ authInfo: AuthInfo }>().meta<OpenApiMeta>().create();
+const getWidgetProcedureMeta = {
+    openapi: {
+        method: "GET",
+        path: `/${getWidgetMetadata.name}/{widgetId}`,
+        tags: ["tools", "widgets"],
+        summary: getWidgetMetadata.config.title,
+        description: getWidgetMetadata.config.description,
+    },
+} as OpenApiMeta;
 
-    return t.procedure.meta({
-        openapi: {
-            method: "GET",
-            path: `/${getWidgetMetadata.name}/{widgetId}`,
-            tags,
-            summary: getWidgetMetadata.config.title,
-        },
-    }).input(z.object(getWidgetMetadata.config.inputSchema))
-      .use(async ({ input, ctx, next }) => {
-          const result = await getWidgetWithProvider(input, { authInfo: ctx.authInfo });
-          return next({ ctx: { result } });
-      });
-}
+export const createGetWidgetProcedure = toProcedurePluginFn(getWidgetMetadata.config.inputSchema, getWidget, getWidgetProcedureMeta);
 ```
 
 ### **Final Step: Update Barrel Files**

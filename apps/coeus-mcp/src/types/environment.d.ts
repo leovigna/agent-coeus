@@ -8,6 +8,7 @@ declare global {
             LOGTO_TENANT_ID?: string;
             LOGTO_M2M_CLIENT_ID?: string;
             LOGTO_M2M_CLIENT_SECRET?: string;
+            LOGTO_API_INDICATOR_BASE_URL?: string;
         }
     }
 }
