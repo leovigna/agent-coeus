@@ -6,7 +6,7 @@ import { OpenApiMeta } from "trpc-to-openapi";
 
 import { addMemory, addMemoryMetadata } from "../sdk/addMemory.js";
 
-const createAddMemoryProcedureMeta = {
+const addMemoryProcedureMeta = {
     openapi: {
         method: "POST",
         path: `/${addMemoryMetadata.name}`,
@@ -16,4 +16,4 @@ const createAddMemoryProcedureMeta = {
     },
 } as OpenApiMeta;
 
-export const createAddMemoryProcedure = toProcedurePluginFn(addMemoryMetadata.config.inputSchema, addMemory, createAddMemoryProcedureMeta);
+export const createAddMemoryProcedure = toProcedurePluginFn(addMemoryMetadata.config.inputSchema, addMemory, addMemoryProcedureMeta);

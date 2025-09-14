@@ -1,3 +1,5 @@
-import { createManagementApi } from "@logto/api/management";
+import type { Client } from "openapi-fetch";
 
-export type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
+import type { paths } from "./logto.js";
+
+export type LogToClient = Client<paths>;
