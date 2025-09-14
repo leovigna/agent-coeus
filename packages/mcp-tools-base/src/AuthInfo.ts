@@ -1,12 +1,44 @@
+import { createError, FORBIDDEN } from "http-errors-enhanced";
+
+function includesAllOf(values: string[], target: string[]): boolean {
+    return target.every(element => values.includes(element));
+}
+
+function includesOneOf(values: string[], target: string[]): boolean {
+    return target.some(element => values.includes(element));
+}
+
 /**
- * Simple util checks if all scopes are included
+ * Simple util checks if all OAuth scopes are included
  * @param userScopes
  * @param requiredScopes
  * @returns true if auth scopes fulfill requirement
  */
-export const hasRequiredScopes = (userScopes: string[], requiredScopes: string[]): boolean => {
-    return requiredScopes.every(scope => userScopes.includes(scope));
-};
+export function hasRequiredScopes(userScopes: string[], requiredScopes: string[]): boolean {
+    return includesAllOf(userScopes, requiredScopes);
+}
+
+export function checkRequiredScopes(userScopes: string[], requiredScopes: string[]): void {
+    if (!hasRequiredScopes(userScopes, requiredScopes)) {
+        throw createError(FORBIDDEN, `Missing required scopes: ${requiredScopes.join(" ")}`); // 403 if has insufficient permissions
+    }
+}
+
+/**
+ * Simple util checks if one user roles are included
+ * @param userRoles
+ * @param validRoles
+ * @returns true if user roles fulfill requirement
+ */
+export function hasRequiredRole(userRoles: string[], validRoles: string[]): boolean {
+    return includesOneOf(userRoles, validRoles);
+}
+
+export function checkRequiredRole(userRoles: string[], validRoles: string[]): void {
+    if (!hasRequiredRole(userRoles, validRoles)) {
+        throw createError(FORBIDDEN, `Missing required roles: ${validRoles.join(" ")}`); // 403 if has insufficient permissions
+    }
+}
 
 /**
      *

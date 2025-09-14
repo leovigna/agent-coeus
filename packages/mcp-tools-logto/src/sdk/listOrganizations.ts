@@ -1,4 +1,5 @@
-import { AuthInfo, hasRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
@@ -9,20 +10,21 @@ export const listOrganizationsInputSchema = {};
  * List all organizations the current user belongs to.
  */
 export async function listOrganizations(client: LogToClient, _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
-    if (!hasRequiredScopes(authInfo?.scopes ?? [], ["list:orgs"])) {
-        throw new Error("Missing required scope: list:orgs");
-    }
+    const { subject, scopes } = authInfo;
+    const userId = subject!;
+    checkRequiredScopes(scopes, ["list:orgs"]); // 403 if auth has insufficient scopes
 
-    const { subject } = authInfo;
-    const response = await client.GET("/api/users/{userId}/organizations", {
+    const orgsResponse = await client.GET("/api/users/{userId}/organizations", {
         params: {
             path: {
-                userId: subject!,
+                userId,
             },
         },
     });
+    if (!orgsResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    return response.data!;
+    const orgs = orgsResponse.data!;
+    return orgs;
 }
 
 export const listOrganizationsMetadata = {

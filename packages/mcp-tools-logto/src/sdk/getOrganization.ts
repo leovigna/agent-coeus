@@ -1,8 +1,10 @@
-import { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
-import { createError, FORBIDDEN, NOT_FOUND } from "http-errors-enhanced";
+import { AuthInfo, checkRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
+
+import { checkUserOrganizationRole } from "./checkRequiredRole.js";
 
 export const getOrganizationInputSchema = {
     id: z.string().describe("The ID of the organization."),
@@ -14,31 +16,22 @@ export const getOrganizationInputSchema = {
  * @param {string} id - The ID of the organization.
  */
 export async function getOrganization(client: LogToClient, params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+    const { subject, scopes } = authInfo;
+    const userId = subject!;
+    checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes
+
     const { id } = params;
-    const { subject } = authInfo;
+    await checkUserOrganizationRole(client, { orgId: id, userId }, ["owner", "admin", "member"]);
 
-    const response = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
-        params: {
-            path: {
-                id,
-                userId: subject!,
-            },
-        },
-    }));
-    if (!response.response.ok) throw createError(NOT_FOUND); // 404 if user not part of organization
-
-    const roles = response.data!;
-    if (roles.some((r: { name: string }) => r.name === "owner" || r.name === "admin" || r.name === "member") === false) {
-        throw createError(FORBIDDEN); // 403 if has insufficient permissions
-    }
-
-    const org = (await client.GET("/api/organizations/{id}", {
+    const orgResponse = await client.GET("/api/organizations/{id}", {
         params: {
             path: {
                 id,
             },
         },
-    })).data!;
+    });
+    if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+    const org = orgResponse.data!;
 
     return org;
 }

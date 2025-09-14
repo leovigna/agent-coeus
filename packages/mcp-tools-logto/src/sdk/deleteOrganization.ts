@@ -1,7 +1,10 @@
-import { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
+
+import { checkUserOrganizationRole } from "./checkRequiredRole.js";
 
 export const deleteOrganizationInputSchema = {
     id: z.string().describe("The ID of the organization."),
@@ -13,33 +16,21 @@ export const deleteOrganizationInputSchema = {
  * @param {string} id - The ID of the organization.
  */
 export async function deleteOrganization(client: LogToClient, params: z.objectOutputType<typeof deleteOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+    const { subject, scopes } = authInfo;
+    const userId = subject!;
+    checkRequiredScopes(scopes, ["delete:org"]); // 403 if auth has insufficient scopes
+
     const { id } = params;
-    const { subject } = authInfo;
+    await checkUserOrganizationRole(client, { orgId: id, userId }, ["owner"]);
 
-    const roles = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
-        params: {
-            path: {
-                id,
-                userId: subject!,
-            },
-        },
-    })).data!;
-
-    if (roles.some((r: { name: string }) => r.name === "owner") === false) {
-        throw new Error("User is not authorized to delete this organization.");
-    }
-
-    const response = await client.DELETE("/api/organizations/{id}", {
+    const deleteResponse = await client.DELETE("/api/organizations/{id}", {
         params: {
             path: {
                 id,
             },
         },
     });
-
-    if (response.error) {
-        throw new Error(JSON.stringify(response.error));
-    }
+    if (!deleteResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
     return { success: true, message: "Organization deleted successfully." };
 }

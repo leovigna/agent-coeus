@@ -1,4 +1,5 @@
-import { AuthInfo, hasRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
@@ -20,45 +21,50 @@ export const createOrganizationInputSchema = {
  */
 export async function createOrganization(client: LogToClient, params: z.objectOutputType<typeof createOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
     const { subject, scopes } = authInfo;
-
-    if (!hasRequiredScopes(scopes, ["create:org"])) {
-        throw new Error("Missing required scope: create:org");
-    }
+    const userId = subject!;
+    checkRequiredScopes(scopes, ["create:org"]); // 403 if auth has insufficient scopes
 
     const { name, description, customData, isMfaRequired } = params;
 
-    const org = (await client.POST("/api/organizations", {
+    const orgResponse = await client.POST("/api/organizations", {
         body: {
             name,
             description,
             custom_data: customData,
             is_mfa_required: isMfaRequired,
         },
-    })).data!;
+    });
+    if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
+    const org = orgResponse.data!;
+
+    // TODO: Get these at start time as these are static
     const orgRoles = (await client.GET("/api/organization-roles")).data!;
     const memberRole = orgRoles.find(r => r.name === "member")!;
     const ownerRole = orgRoles.find(r => r.name === "owner")!;
 
-    await client.POST("/api/organizations/{id}/users", {
+    const r1 = await client.POST("/api/organizations/{id}/users", {
         params: { path: { id: org.id } },
-        body: { userIds: [subject!] },
+        body: { userIds: [userId] },
         parseAs: "stream",
     });
+    if (!r1.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    await client.POST("/api/organizations/{id}/users/{userId}/roles", {
-        params: { path: { id: org.id, userId: subject! } },
+    const r2 = await client.POST("/api/organizations/{id}/users/{userId}/roles", {
+        params: { path: { id: org.id, userId } },
         body: { organizationRoleIds: [ownerRole.id] },
         parseAs: "stream",
     });
+    if (!r2.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    await client.POST("/api/organizations/{id}/jit/roles", {
+    const r3 = await client.POST("/api/organizations/{id}/jit/roles", {
         params: { path: { id: org.id } },
         body: { organizationRoleIds: [memberRole.id] },
         parseAs: "stream",
     });
+    if (!r3.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    return org;
+    return orgResponse;
 }
 
 export const createOrganizationMetadata = {

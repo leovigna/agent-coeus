@@ -1,7 +1,10 @@
-import { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
+
+import { checkUserOrganizationRole } from "./checkRequiredRole.js";
 
 export const updateOrganizationInputSchema = {
     id: z.string().describe("The ID of the organization."),
@@ -21,23 +24,14 @@ export const updateOrganizationInputSchema = {
  * @param {boolean} [isMfaRequired] - Is MFA required?
  */
 export async function updateOrganization(client: LogToClient, params: z.objectOutputType<typeof updateOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+    const { subject, scopes } = authInfo;
+    const userId = subject!;
+    checkRequiredScopes(scopes, ["write:org"]); // 403 if auth has insufficient scopes
+
     const { id, ...body } = params;
-    const { subject } = authInfo;
+    await checkUserOrganizationRole(client, { orgId: id, userId }, ["owner", "admin"]);
 
-    const roles = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
-        params: {
-            path: {
-                id,
-                userId: subject!,
-            },
-        },
-    })).data!;
-
-    if (roles.some((r: { name: string }) => r.name === "owner" || r.name === "admin") === false) {
-        throw new Error("User is not authorized to update this organization.");
-    }
-
-    const response = await client.PATCH("/api/organizations/{id}", {
+    const orgResponse = await client.PATCH("/api/organizations/{id}", {
         params: {
             path: {
                 id,
@@ -45,12 +39,13 @@ export async function updateOrganization(client: LogToClient, params: z.objectOu
         },
         body: body as never, // The client type expects a specific body type, but the fields are optional
     });
+    if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    if (response.error) {
-        throw new Error(JSON.stringify(response.error));
+    if (orgResponse.error) {
+        throw new Error(JSON.stringify(orgResponse.error));
     }
 
-    return response.data!;
+    return orgResponse.data!;
 }
 
 export const updateOrganizationMetadata = {

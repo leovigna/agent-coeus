@@ -57,6 +57,7 @@
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
     "@trpc/server": "^11.5.1",
+    "http-errors-enhanced": "^3.0.2",
     "trpc-to-openapi": "^2.4.0",
     "zod": "^3.22.4"
   },
