@@ -1,4 +1,5 @@
 import { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { createError, FORBIDDEN, NOT_FOUND } from "http-errors-enhanced";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../LogToClient.js";
@@ -16,17 +17,19 @@ export async function getOrganization(client: LogToClient, params: z.objectOutpu
     const { id } = params;
     const { subject } = authInfo;
 
-    const roles = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
+    const response = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
         params: {
             path: {
                 id,
                 userId: subject!,
             },
         },
-    })).data!;
+    }));
+    if (!response.response.ok) throw createError(NOT_FOUND); // 404 if user not part of organization
 
+    const roles = response.data!;
     if (roles.some((r: { name: string }) => r.name === "owner" || r.name === "admin" || r.name === "member") === false) {
-        throw new Error("User is not authorized to access this organization.");
+        throw createError(FORBIDDEN); // 403 if has insufficient permissions
     }
 
     const org = (await client.GET("/api/organizations/{id}", {

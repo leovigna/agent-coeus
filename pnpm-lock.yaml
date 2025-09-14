@@ -80,6 +80,9 @@ importers:
       morgan:
         specifier: ^1.10.1
         version: 1.10.1
+      openapi-fetch:
+        specifier: ^0.14.0
+        version: 0.14.0
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@5.1.0)
@@ -282,6 +285,9 @@ importers:
       '@trpc/server':
         specifier: ^11.5.1
         version: 11.5.1(typescript@5.8.3)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       trpc-to-openapi:
         specifier: ^2.4.0
         version: 2.4.0(@trpc/server@11.5.1(typescript@5.8.3))(zod-openapi@4.2.4(zod@3.24.3))(zod@3.24.3)
@@ -343,6 +349,9 @@ importers:
       '@trpc/server':
         specifier: ^11.5.1
         version: 11.5.1(typescript@5.8.3)
+      http-errors-enhanced:
+        specifier: ^3.0.2
+        version: 3.0.2
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -416,6 +425,9 @@ importers:
       '@trpc/server':
         specifier: ^11.5.1
         version: 11.5.1(typescript@5.8.3)
+      http-errors-enhanced:
+        specifier: ^3.0.2
+        version: 3.0.2
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3743,6 +3755,10 @@ packages:
   http-call@5.3.0:
     resolution: {integrity: sha512-ahwimsC23ICE4kPl9xTBjKB4inbRaeLyZeRunC/1Jy/Z6X8tv22MEAjK+KBOMSVLaqXPTTmd8638waVIKLGx2w==}
     engines: {node: '>=8.0.0'}
+
+  http-errors-enhanced@3.0.2:
+    resolution: {integrity: sha512-Pl8CVX7eu46fYSfEGCnOGD8aZkd/2dtr9214BpNRDiU1THT7vsu+T87SDQZgxjOGmsNXaTZe1sqIo/oZgJIfow==}
+    engines: {node: '>= 20.18.0'}
 
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
@@ -9555,6 +9571,8 @@ snapshots:
       tunnel-agent: 0.6.0
     transitivePeerDependencies:
       - supports-color
+
+  http-errors-enhanced@3.0.2: {}
 
   http-errors@2.0.0:
     dependencies:
