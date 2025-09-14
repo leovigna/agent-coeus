@@ -64,7 +64,7 @@ export async function createOrganization(client: LogToClient, params: z.objectOu
     });
     if (!r3.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 
-    return orgResponse;
+    return org;
 }
 
 export const createOrganizationMetadata = {

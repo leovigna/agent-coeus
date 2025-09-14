@@ -31,8 +31,6 @@ export async function deleteOrganization(client: LogToClient, params: z.objectOu
         },
     });
     if (!deleteResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
-
-    return { success: true, message: "Organization deleted successfully." };
 }
 
 export const deleteOrganizationMetadata = {

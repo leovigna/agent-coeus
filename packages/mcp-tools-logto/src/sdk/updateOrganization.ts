@@ -40,12 +40,9 @@ export async function updateOrganization(client: LogToClient, params: z.objectOu
         body: body as never, // The client type expects a specific body type, but the fields are optional
     });
     if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+    const org = orgResponse.data!;
 
-    if (orgResponse.error) {
-        throw new Error(JSON.stringify(orgResponse.error));
-    }
-
-    return orgResponse.data!;
+    return org;
 }
 
 export const updateOrganizationMetadata = {
