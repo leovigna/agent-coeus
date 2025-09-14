@@ -1,6 +1,4 @@
-import { readFileSync } from "fs";
-
-import { McpServer, ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
@@ -12,25 +10,7 @@ import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 import { OIDC_BASE_URL, OIDC_CLIENT_ID } from "./envvars.js";
 import { openApiDocument } from "./openapi.js";
 import { appRouter } from "./procedures/index.js";
-import {
-    addMemoryTool,
-    clearGraphTool,
-    createOrganizationTool,
-    deleteEntityEdgeTool,
-    deleteEpisodeTool,
-    deleteOrganizationTool,
-    getEntityEdgeTool,
-    getEpisodesTool,
-    getOrganizationTool,
-    listOrganizationsTool,
-    searchMemoryFactsTool,
-    searchMemoryNodesTool,
-    updateOrganizationTool,
-    whoAmITool,
-} from "./tools/index.js";
 import { createContext } from "./trpc.js";
-
-const instructions = readFileSync("./MCP_INSTRUCTIONS.md", "utf-8");
 
 if (!OIDC_CLIENT_ID) {
     throw new Error("OIDC_CLIENT_ID is not set");
@@ -45,41 +25,6 @@ const OIDC_ISSUER_URL = new URL("oidc", OIDC_BASE_URL);
 // const OIDC_AUTHORIZATION_URL = new URL("oidc/auth", OIDC_BASE_URL);
 const OIDC_TOKEN_URL = new URL("oidc/token", OIDC_BASE_URL);
 // const OIDC_REVOCATION_URL = join(OIDC_BASE_URL, "oidc/revoke");
-
-export function getMcpServer() {
-    const server = new McpServer({
-        name: "coeus-mcp",
-        version: "1.0.0",
-    }, { instructions });
-
-    // TODO: Throwing errors?
-    // TODO: Add models for episodes/memory etc..
-    // TODO: Connect Zep.js
-    // TODO: Add status resource for underlying zep.js connection
-
-    // OpenAI Deep Research Tools
-    // TODO: Implement these later
-    // server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
-    // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
-
-    // Logto Tools
-    server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb as unknown as ToolCallback<typeof getOrganizationTool.config.inputSchema>);
-    server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb as unknown as ToolCallback<typeof createOrganizationTool.config.inputSchema>);
-    server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb as unknown as ToolCallback<typeof listOrganizationsTool.config.inputSchema>);
-    server.registerTool(updateOrganizationTool.name, updateOrganizationTool.config, updateOrganizationTool.cb as unknown as ToolCallback<typeof updateOrganizationTool.config.inputSchema>);
-    server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb as unknown as ToolCallback<typeof deleteOrganizationTool.config.inputSchema>);
-    server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
-    // Zep Tools
-    server.registerTool(addMemoryTool.name, addMemoryTool.config, addMemoryTool.cb as unknown as ToolCallback<typeof addMemoryTool.config.inputSchema>);
-    server.registerTool(searchMemoryNodesTool.name, searchMemoryNodesTool.config, searchMemoryNodesTool.cb as unknown as ToolCallback<typeof searchMemoryNodesTool.config.inputSchema>);
-    server.registerTool(searchMemoryFactsTool.name, searchMemoryFactsTool.config, searchMemoryFactsTool.cb as unknown as ToolCallback<typeof searchMemoryFactsTool.config.inputSchema>);
-    server.registerTool(deleteEntityEdgeTool.name, deleteEntityEdgeTool.config, deleteEntityEdgeTool.cb as unknown as ToolCallback<typeof deleteEntityEdgeTool.config.inputSchema>);
-    server.registerTool(deleteEpisodeTool.name, deleteEpisodeTool.config, deleteEpisodeTool.cb as unknown as ToolCallback<typeof deleteEpisodeTool.config.inputSchema>);
-    server.registerTool(getEntityEdgeTool.name, getEntityEdgeTool.config, getEntityEdgeTool.cb as unknown as ToolCallback<typeof getEntityEdgeTool.config.inputSchema>);
-    server.registerTool(getEpisodesTool.name, getEpisodesTool.config, getEpisodesTool.cb as unknown as ToolCallback<typeof getEpisodesTool.config.inputSchema>);
-    server.registerTool(clearGraphTool.name, clearGraphTool.config, clearGraphTool.cb as unknown as ToolCallback<typeof clearGraphTool.config.inputSchema>);
-    return server;
-}
 
 /**
  * Verify JWT token
