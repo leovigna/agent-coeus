@@ -195,6 +195,14 @@
 
 **Future Action:** When refactoring or moving code, I will treat comments as an integral part of the implementation. I will ensure that all associated comments, including TSDoc blocks, inline comments, and `TODO` notes, are moved along with the code to its new location.
 
+### Avoid TypeScript Shortcuts and Hacks
+
+**Incident:** On multiple occasions, I used TypeScript shortcuts like `Promise<unknown>`, `any`, or considered using `@ts-ignore` to suppress compiler errors that I introduced.
+
+**Correction:** The user provided a general principle: do not use shortcuts or hacks (`unknown`, `any`, `@ts-ignore`, etc.) to solve TypeScript errors. These shortcuts undermine the type safety benefits of TypeScript.
+
+**Future Action:** I will always attempt to solve TypeScript errors with proper, type-safe solutions first. I will define explicit interfaces, import types from libraries, or correctly trace the data flow to resolve type mismatches. Shortcuts should only be considered as an absolute last resort and only with explicit user approval after providing a clear justification (e.g., documented library incompatibility). This rule should be balanced with the learning about only focusing on relevant TypeScript errors introduced by my changes.
+
 ### Do Not Delete Commented-Out or Unused Code
 
 **Incident:** I deleted commented-out code and unused variables, assuming they were no longer needed.
