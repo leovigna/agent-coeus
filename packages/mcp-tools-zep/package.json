@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@coeus-agent/mcp-tools-base": "workspace:*",
+    "@coeus-agent/mcp-tools-logto": "workspace:*",
     "http-errors-enhanced": "^3.0.2",
     "lodash-es": "^4.17.21"
   },

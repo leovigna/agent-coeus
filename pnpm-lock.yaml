@@ -422,6 +422,9 @@ importers:
       '@coeus-agent/mcp-tools-base':
         specifier: workspace:*
         version: link:../mcp-tools-base
+      '@coeus-agent/mcp-tools-logto':
+        specifier: workspace:*
+        version: link:../mcp-tools-logto
       '@getzep/zep-cloud':
         specifier: ^3.4.1
         version: 3.4.1
