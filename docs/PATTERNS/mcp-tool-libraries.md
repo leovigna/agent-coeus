@@ -4,7 +4,7 @@ This document outlines the standard patterns for creating new MCP tool libraries
 
 The process is divided into two main parts:
 1.  **Creating the Library**: The initial setup of a new `mcp-tools-*` package.
-2.  **Adding a Tool**: The layered pattern for adding a new tool within an existing library.
+2.  **Adding a Tool**: The consolidated pattern for adding a new tool within an existing library.
 
 ---
 
@@ -33,7 +33,7 @@ In the `src` directory:
 
 ### **Step 3: Add Core Dependencies**
 
-Add the following dependencies to `package.json`. These are required for the three-layer tool architecture.
+Add the following dependencies to `package.json`.
 
 ```json
 "dependencies": {
@@ -50,7 +50,7 @@ Add the following dependencies to `package.json`. These are required for the thr
   "@types/lodash-es": "^4.17.12"
 }
 ```
-*Note: Add any service-specific SDKs (e.g., `@getzep/zep-cloud`, `stripe`) as `peerDependencies` as well.*
+*Note: Add any service-specific SDKs (e.g., `stripe`) as `peerDependencies` as well.*
 
 ### **Step 4: Install Dependencies**
 
@@ -60,98 +60,78 @@ Run `pnpm install` from the root of the monorepo to link the new package and ins
 
 ## **Part 2: Adding a New Tool to a Library**
 
-Once the library is created, it must be populated with tools that follow a strict three-layer architecture. This pattern separates core business logic from its exposure mechanism. The required directory structure within `src/` is:
-*   `src/sdk/`: Core business logic.
-*   `src/tools/`: Adapters for the MCP server.
-*   `src/procedures/`: Adapters for the tRPC/OpenAPI server.
+Each tool is defined in a single file that contains its core logic (SDK), its MCP tool definition, and its tRPC procedure definition. This consolidated approach simplifies the structure and reduces boilerplate.
 
-### **Layer 1: The SDK (`src/sdk/`)**
+Files are organized by feature within the `src/sdk/` directory.
 
-This layer contains the pure, framework-agnostic business logic.
+*Example file location:* `src/sdk/organization/createOrganization.ts`
 
-*   **`[toolName].ts`**:
-    *   Exports an `inputSchema` using Zod for validation.
-    *   Exports a `metadata` object containing the tool's `name`, `title`, `description`, and `inputSchema`.
-    *   Exports the main async SDK function. Its signature is `(provider, params, { authInfo })`.
+### **The Consolidated Tool File**
 
-*Example: `sdk/getWidget.ts`*
+Each `[toolName].ts` file must export the following:
+1.  `inputSchema`: A Zod schema for the tool's input.
+2.  `[toolName]`: The core async SDK function containing the business logic.
+3.  `[toolName]ToolMetadata`: A metadata object for the MCP tool.
+4.  `get[ToolName]Tool`: A factory function that creates the MCP tool.
+5.  `[toolName]ProcedureMetadata`: A metadata object for the tRPC procedure.
+6.  `create[ToolName]Procedure`: A factory function that creates the tRPC procedure plugin.
+
+*Example: `sdk/organization/createOrganization.ts`*
 ```typescript
-import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import { partial } from "lodash-es";
+import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
-import { WidgetClient, widgetClientProvider } from "../WidgetClientProvider.js";
+import type { LogToClient } from "../../LogToClient.js";
 
-export const getWidgetInputSchema = {
-    widgetId: z.string().describe("The unique ID of the widget."),
+// 1. Input Schema
+export const createOrganizationInputSchema = {
+    name: z.string().min(1).max(128).describe("The name of the organization."),
+    description: z.string().max(256).optional(),
 };
 
-export async function getWidget(provider: WidgetClientProvider, params: z.objectOutputType<typeof getWidgetInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
-    const widgetClient = await widgetClientProvider(authInfo);
-    const { widgetId } = params;
-    return await widgetClient.fetchWidget(widgetId);
+// 2. SDK Function
+export async function createOrganization(client: LogToClient, params: z.objectOutputType<typeof createOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+    checkRequiredScopes(authInfo.scopes, ["create:org"]);
+    // ... business logic ...
+    const orgResponse = await client.POST("/api/organizations", { body: params });
+    if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR);
+    return orgResponse.data!;
 }
 
-export const getWidgetMetadata = {
-    name: "get_widget",
+// 3. MCP Tool Metadata
+export const createOrganizationToolMetadata = {
+    name: "logto_create_organization",
     config: {
-        title: "Get Widget",
-        description: "Retrieves a specific widget by its ID.",
-        inputSchema: getWidgetInputSchema,
+        title: "Create Organization",
+        description: "Create a new organization.",
+        inputSchema: createOrganizationInputSchema,
     },
-} as const satisfies ToolMetadata<typeof getWidgetInputSchema, ZodRawShape>;
-```
+} as const satisfies ToolMetadata<typeof createOrganizationInputSchema, ZodRawShape>;
 
-### **Layer 2: The MCP Tool Adapter (`src/tools/`)**
-
-This layer adapts the SDK function for consumption by the MCP server.
-
-*   **`[toolName].ts`**:
-    *   Creates a `...ToolCallback` function that calls the SDK function and formats the output into a `CallToolResult`.
-    *   Exports a `get...Tool` factory function that uses `lodash/partial` to inject the client provider and bundles the metadata with the callback.
-
-*Example: `tools/getWidget.ts`*
-```typescript
-import { toCallToolResultFn, Tool } from "@coeus-agent/mcp-tools-base";
-import { partial } from "lodash-es";
-import { ZodRawShape } from "zod";
-import { getWidget, getWidgetMetadata } from "../sdk/getWidget.js";
-import { WidgetClientProvider } from "../WidgetClientProvider.js";
-
-export function getGetWidgetTool(provider: WidgetClientProvider) {
+// 4. MCP Tool Factory
+export function getCreateOrganizationTool(client: LogToClient) {
     return {
-        ...getWidgetMetadata,
-        cb: partial(toCallToolResultFn(getWidget), provider),
-    } as const satisfies Tool<typeof getWidgetMetadata.config.inputSchema, ZodRawShape>;
+        ...createOrganizationToolMetadata,
+        cb: partial(toCallToolResultFn(createOrganization), client),
+    } as const satisfies Tool<typeof createOrganizationInputSchema, ZodRawShape>;
 }
-```
 
-### **Layer 3: The tRPC Procedure Plugin (`src/procedures/`)**
-
-This layer adapts the SDK function into a modular tRPC procedure for the OpenAPI server.
-
-*   **`[toolName].ts`**:
-    *   Exports a `create...Procedure` factory function that accepts the client provider.
-    *   This function defines a tRPC procedure with appropriate OpenAPI metadata (`method: 'GET'`, `path`, etc.).
-    *   It uses a middleware (`.use()`) to call the SDK function and attach the result to the tRPC context (`ctx`).
-
-*Example: `procedures/getWidget.ts`*
-```typescript
-import { toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
-import { OpenApiMeta } from "trpc-to-openapi";
-import { getWidget, getWidgetMetadata } from "../sdk/getWidget.js";
-
-const getWidgetProcedureMeta = {
+// 5. tRPC Procedure Metadata
+export const createOrganizationProcedureMetadata = {
     openapi: {
-        method: "GET",
-        path: `/${getWidgetMetadata.name}/{widgetId}`,
-        tags: ["tools", "widgets"],
-        summary: getWidgetMetadata.config.title,
-        description: getWidgetMetadata.config.description,
+        method: "POST",
+        path: `/${createOrganizationToolMetadata.name}`,
+        tags: ["tools", "logto"],
+        summary: createOrganizationToolMetadata.config.title,
     },
 } as OpenApiMeta;
 
-export const createGetWidgetProcedure = toProcedurePluginFn(getWidgetMetadata.config.inputSchema, getWidget, getWidgetProcedureMeta);
+// 6. tRPC Procedure Factory
+export const createCreateOrganizationProcedure = toProcedurePluginFn(createOrganizationInputSchema, createOrganization, createOrganizationProcedureMetadata);
 ```
 
 ### **Final Step: Update Barrel Files**
 
-Ensure the new modules are exported from the `sdk/index.ts`, `tools/index.ts`, and `procedures/index.ts` files.
+Ensure the new modules are exported from the relevant `index.ts` files (e.g., `sdk/organization/index.ts` and `sdk/index.ts`).

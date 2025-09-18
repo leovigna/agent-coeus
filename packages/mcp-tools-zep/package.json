@@ -32,6 +32,41 @@
       "types": "./_types/index.d.ts",
       "require": "./_cjs/lib/index.js",
       "import": "./_esm/lib/index.js"
+    },
+    "./sdk": {
+      "types": "./_types/sdk/index.d.ts",
+      "require": "./_cjs/lib/sdk/index.js",
+      "import": "./_esm/lib/sdk/index.js"
+    },
+    "./sdk/edge": {
+      "types": "./_types/sdk/edge/index.d.ts",
+      "require": "./_cjs/lib/sdk/edge/index.js",
+      "import": "./_esm/lib/sdk/edge/index.js"
+    },
+    "./sdk/edge/*": {
+      "types": "./_types/sdk/edge/*.d.ts",
+      "require": "./_cjs/lib/sdk/edge/*.js",
+      "import": "./_esm/lib/sdk/edge/*.js"
+    },
+    "./sdk/episode": {
+      "types": "./_types/sdk/episode/index.d.ts",
+      "require": "./_cjs/lib/sdk/episode/index.js",
+      "import": "./_esm/lib/sdk/episode/index.js"
+    },
+    "./sdk/episode/*": {
+      "types": "./_types/sdk/episode/*.d.ts",
+      "require": "./_cjs/lib/sdk/episode/*.js",
+      "import": "./_esm/lib/sdk/episode/*.js"
+    },
+    "./sdk/graph": {
+      "types": "./_types/sdk/graph/index.d.ts",
+      "require": "./_cjs/lib/sdk/graph/index.js",
+      "import": "./_esm/lib/sdk/graph/index.js"
+    },
+    "./sdk/graph/*": {
+      "types": "./_types/sdk/graph/*.d.ts",
+      "require": "./_cjs/lib/sdk/graph/*.js",
+      "import": "./_esm/lib/sdk/graph/*.js"
     }
   },
   "scripts": {
@@ -55,7 +90,8 @@
     "@coeus-agent/mcp-tools-base": "workspace:*",
     "@coeus-agent/mcp-tools-logto": "workspace:*",
     "http-errors-enhanced": "^3.0.2",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "uuid": "^13.0.0"
   },
   "peerDependencies": {
     "@getzep/zep-cloud": "^3.4.1",

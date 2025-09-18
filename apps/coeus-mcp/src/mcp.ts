@@ -1,4 +1,4 @@
-import { getCreateOrganizationTool, getDeleteOrganizationTool, getGetOrganizationTool, getListOrganizationsTool, getUpdateOrganizationTool, getWhoAmITool, LogToClient } from "@coeus-agent/mcp-tools-logto";
+import { getCreateOrganizationTool, getDeleteOrganizationTool, getGetOrganizationTool, getListOrganizationsTool, getUpdateOrganizationTool, LogToClient } from "@coeus-agent/mcp-tools-logto";
 import { getAddMemoryTool, getClearGraphTool, getDeleteEntityEdgeTool, getDeleteEpisodeTool, getGetEntityEdgeTool, getGetEpisodesTool, getSearchMemoryFactsTool, getSearchMemoryNodesTool, ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import { McpServer, ToolCallback } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -23,14 +23,14 @@ export function registerMcpTools(server: McpServer, clients: {
     const getOrganizationTool = getGetOrganizationTool(logToClient);
     const listOrganizationsTool = getListOrganizationsTool(logToClient);
     const updateOrganizationTool = getUpdateOrganizationTool(logToClient);
-    const whoAmITool = getWhoAmITool(logToClient);
+    // const whoAmITool = getWhoAmITool(logToClient);
 
     server.registerTool(getOrganizationTool.name, getOrganizationTool.config, getOrganizationTool.cb as unknown as ToolCallback<typeof getOrganizationTool.config.inputSchema>);
     server.registerTool(createOrganizationTool.name, createOrganizationTool.config, createOrganizationTool.cb as unknown as ToolCallback<typeof createOrganizationTool.config.inputSchema>);
     server.registerTool(listOrganizationsTool.name, listOrganizationsTool.config, listOrganizationsTool.cb as unknown as ToolCallback<typeof listOrganizationsTool.config.inputSchema>);
     server.registerTool(updateOrganizationTool.name, updateOrganizationTool.config, updateOrganizationTool.cb as unknown as ToolCallback<typeof updateOrganizationTool.config.inputSchema>);
     server.registerTool(deleteOrganizationTool.name, deleteOrganizationTool.config, deleteOrganizationTool.cb as unknown as ToolCallback<typeof deleteOrganizationTool.config.inputSchema>);
-    server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
+    // server.registerTool(whoAmITool.name, whoAmITool.config, whoAmITool.cb);
 
     // Zep Tools
     const addMemoryTool = getAddMemoryTool(zepClient);

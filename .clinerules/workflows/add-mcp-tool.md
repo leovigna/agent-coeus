@@ -1,126 +1,92 @@
 # Cline Workflow: Add New MCP Tool
 
-This workflow automates the creation of a new tool within an existing MCP tool library, following the established three-layer architecture.
+This workflow automates the creation of a new tool within an existing MCP tool library, following the established consolidated pattern.
 
 ## Prerequisites
 
-- An existing MCP tool library (e.g., `packages/mcp-tools-zep`).
-- The library's client provider (e.g., `ZepClientProvider`) must be available.
+- An existing MCP tool library (e.g., `packages/mcp-tools-logto`).
 
 ---
 
 ### **Step 1: Gather Information**
 
 1.  **Ask the user for the target library.**
-    -   Example: `packages/mcp-tools-zep`
-2.  **Ask the user for the new tool's name (in camelCase).**
-    -   Example: `getSpecialWidget`
-3.  **Ask the user for the tool's description.**
-    -   Example: "Retrieves a special widget and its configuration."
-4.  **Ask the user for the Zod input schema.**
-    -   Provide an example: `{ widgetId: z.string().describe("The ID of the widget.") }`
-5.  **Determine the core client interaction logic.**
+    -   Example: `packages/mcp-tools-logto`
+2.  **Ask the user for the feature group (e.g., organization, user).**
+    -   Example: `organization`
+3.  **Ask the user for the new tool's name (in camelCase).**
+    -   Example: `getOrganizationDetails`
+4.  **Ask the user for the tool's description.**
+    -   Example: "Retrieves the detailed profile of a specific organization."
+5.  **Ask the user for the Zod input schema.**
+    -   Provide an example: `{ organizationId: z.string().describe("The ID of the organization.") }`
+6.  **Determine the core client interaction logic.**
     -   **CRITICAL:** Do not guess the implementation.
-    -   **Action:** Ask the user: "What is the exact client method call to implement this tool's logic? For example, `client.widgets.get(widgetId)`."
-    -   **Alternative Action:** If other tools exist in the library, read their SDK files to identify common usage patterns before asking the user.
+    -   **Action:** Ask the user for the exact client method call(s).
+    -   **Alternative Action:** Read existing SDK files in the same feature group to identify patterns.
 
 ---
 
-### **Step 2: Generate SDK Layer**
+### **Step 2: Generate Consolidated Tool File**
 
-**File to create:** `[target-library]/src/sdk/[toolName].ts`
+**File to create:** `[target-library]/src/sdk/[feature]/[toolName].ts`
 
 **Template:**
 ```typescript
-import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import { partial } from "lodash-es";
+import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
-// Note: The provider/client import path will need to be adjusted based on the library.
-import { Client } from "../Client.js";
+// Note: The client import path will need to be adjusted.
+import type { Client } from "../../Client.js";
 
+// 1. Input Schema
 export const {{toolName}}InputSchema = {
     // {{zodSchema}}
 };
 
-// CHOOSE ONE PATTERN:
-// Pattern A: Static Client (e.g., LogTo)
-export async function {{toolName}}(client: Client, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
-    // Business logic uses 'client' directly
-
-// Pattern B: Dynamic Client Provider (e.g., Zep)
-export async function {{toolName}}(provider: ClientProvider, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<unknown> {
-    const client = await provider(authInfo);
-    // const { ... } = params; // Deconstruct params here
-
-    // !!! IMPLEMENTATION LOGIC GOES HERE !!!
-    // Example: return await client.widgets.get(params.widgetId);
+// 2. SDK Function
+export async function {{toolName}}(client: Client, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+    // ... business logic ...
 }
 
-export const {{toolName}}Metadata = {
-    name: "{{snake_case_tool_name}}",
+// 3. MCP Tool Metadata
+export const {{toolName}}ToolMetadata = {
+    name: "logto_{{snake_case_tool_name}}",
     config: {
         title: "{{Title Case Tool Name}}",
         description: "{{description}}",
         inputSchema: {{toolName}}InputSchema,
     },
 } as const satisfies ToolMetadata<typeof {{toolName}}InputSchema, ZodRawShape>;
-```
 
----
-
-### **Step 3: Generate MCP Tool Adapter Layer**
-
-**File to create:** `[target-library]/src/tools/[toolName].ts`
-
-**Template:**
-```typescript
-import { toCallToolResultFn, Tool } from "@coeus-agent/mcp-tools-base";
-import { partial } from "lodash-es";
-import { ZodRawShape } from "zod";
-import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
-// Note: The provider/client import path will need to be adjusted.
-import { Client } from "../Client.js";
-
-export function get{{ToolName}}Tool(clientOrProvider: Client | ClientProvider) {
+// 4. MCP Tool Factory
+export function get{{ToolName}}Tool(client: Client) {
     return {
-        ...{{toolName}}Metadata,
-        cb: partial(toCallToolResultFn({{toolName}}), clientOrProvider),
-    } as const satisfies Tool<typeof {{toolName}}Metadata.config.inputSchema, ZodRawShape>;
+        ...{{toolName}}ToolMetadata,
+        cb: partial(toCallToolResultFn({{toolName}}), client),
+    } as const satisfies Tool<typeof {{toolName}}InputSchema, ZodRawShape>;
 }
-```
 
----
-
-### **Step 4: Generate tRPC Procedure Plugin Layer**
-
-**File to create:** `[target-library]/src/procedures/[toolName].ts`
-
-**Template:**
-```typescript
-import { toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
-import { OpenApiMeta } from "trpc-to-openapi";
-import { {{toolName}}, {{toolName}}Metadata } from "../sdk/{{toolName}}.js";
-
-const {{toolName}}ProcedureMeta = {
+// 5. tRPC Procedure Metadata
+export const {{toolName}}ProcedureMetadata = {
     openapi: {
-        // TODO: Adjust method and path as needed (e.g., GET vs POST)
+        // TODO: Adjust method and path
         method: "POST",
-        path: `/${{{toolName}}Metadata.name}`,
-        tags: ["tools"],
-        summary: {{toolName}}Metadata.config.title,
-        description: {{toolName}}Metadata.config.description,
+        path: `/${{{toolName}}ToolMetadata.name}`,
+        tags: ["tools", "logto"],
+        summary: {{toolName}}ToolMetadata.config.title,
     },
 } as OpenApiMeta;
 
-export const create{{ToolName}}Procedure = toProcedurePluginFn({{toolName}}Metadata.config.inputSchema, {{toolName}}, {{toolName}}ProcedureMeta);
+// 6. tRPC Procedure Factory
+export const create{{ToolName}}Procedure = toProcedurePluginFn({{toolName}}InputSchema, {{toolName}}, {{toolName}}ProcedureMetadata);
 ```
 
 ---
 
-### **Step 5: Update Barrel Files and Rebuild**
+### **Step 3: Update Barrel Files and Rebuild**
 
-1.  **Append exports** to `sdk/index.ts`, `tools/index.ts`, and `procedures/index.ts`.
-    -   `export * from "./{{toolName}}.js";`
+1.  **Append exports** to the relevant `index.ts` files.
 2.  **Run the build command** for the target library.
-    -   `pnpm --filter [target-library-name] build`
-
-This workflow provides a structured and repeatable process for extending our MCP tool libraries.
