@@ -1,15 +1,11 @@
 import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import { checkRequiredScopes } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
-import type { z, ZodTypeAny } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-export const getUserInputSchema = {};
-
-export async function getUser(
+export async function getMe(
     client: LogToClient,
-    _: z.objectOutputType<typeof getUserInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { scopes } = authInfo;

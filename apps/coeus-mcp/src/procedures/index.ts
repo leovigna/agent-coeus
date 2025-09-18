@@ -1,24 +1,32 @@
 import { router } from "../trpc.js";
 
-import { addMemoryProcedure } from "./addMemory.js";
-import { clearGraphProcedure } from "./clearGraph.js";
-import { createOrganizationProcedure } from "./createOrganization.js";
-import { deleteEntityEdgeProcedure } from "./deleteEntityEdge.js";
-import { deleteEpisodeProcedure } from "./deleteEpisode.js";
-import { deleteOrganizationProcedure } from "./deleteOrganization.js";
-import { getEntityEdgeProcedure } from "./getEntityEdge.js";
-import { getEpisodesProcedure } from "./getEpisodes.js";
-import { getOrganizationProcedure } from "./getOrganization.js";
-import { listOrganizationsProcedure } from "./listOrganizations.js";
-import { searchMemoryFactsProcedure } from "./searchMemoryFacts.js";
-import { searchMemoryNodesProcedure } from "./searchMemoryNodes.js";
-import { updateOrganizationProcedure } from "./updateOrganization.js";
+import {
+    deleteEntityEdgeProcedure,
+    getEntityEdgeProcedure,
+} from "./edge/index.js";
+import {
+    deleteEpisodeProcedure,
+    getEpisodesProcedure,
+} from "./episode/index.js";
+import {
+    addMemoryProcedure,
+    deleteGraphProcedure,
+    searchMemoryFactsProcedure,
+    searchMemoryNodesProcedure,
+} from "./graph/index.js";
+import {
+    createOrganizationProcedure,
+    deleteOrganizationProcedure,
+    getOrganizationProcedure,
+    listOrganizationsProcedure,
+    updateOrganizationProcedure,
+} from "./organization/index.js";
 import { whoamiProcedure } from "./whoami.js";
 
 export const appRouter = router({
     // Zep
     add_memory: addMemoryProcedure,
-    clear_graph: clearGraphProcedure,
+    clear_graph: deleteGraphProcedure,
     delete_entity_edge: deleteEntityEdgeProcedure,
     delete_episode: deleteEpisodeProcedure,
     get_entity_edge: getEntityEdgeProcedure,

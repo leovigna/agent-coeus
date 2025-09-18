@@ -1,8 +1,8 @@
 import { createGetEpisodesProcedure } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
-import { zepClient } from "../clients/zep-client.js";
-import { publicProcedure } from "../trpc.js";
+import { zepClient } from "../../clients/zep-client.js";
+import { publicProcedure } from "../../trpc.js";
 
 export const getEpisodesProcedure = publicProcedure
     .concat(createGetEpisodesProcedure(zepClient))
