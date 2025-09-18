@@ -1,11 +1,13 @@
 import {
     type AuthInfo,
+    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
-import { Zep } from "@getzep/zep-cloud";
+import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
+import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape, type ZodTypeAny } from "zod";
@@ -13,17 +15,21 @@ import { z, type ZodRawShape, type ZodTypeAny } from "zod";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
-export const addMemoryInputSchema = {
+import { getGraph } from "./getGraph.js";
+
+// TODO: Implement
+export const addDataBatchInputSchema = {
+    orgId: z
+        .string()
+        .optional()
+        .describe(
+            "The ID of the organization. If not provided, uses the user's current org.",
+        ),
+    graphUUID: z.string().optional().describe("The ID of the graph"),
     name: z.string().describe("Name of the episode"),
     episode_body: z
         .string()
         .describe("The content of the episode to persist to memory."),
-    group_id: z
-        .string()
-        .optional()
-        .describe(
-            "A unique ID for this graph. If not provided, uses the default group_id from auth sub.",
-        ),
     source: z
         .enum(["text", "json", "message"])
         .default("text")
@@ -70,7 +76,7 @@ export const addMemoryInputSchema = {
  *         company: { name: "Acme Technologies" },
  *         products: [
  *             { id: "P001", name: "CloudSync"},
- *             { id: "P002", name: "DataMiner"}
+ *             { id: "P002", name: "DataBatchMiner"}
  *         ],
  *     }),
  *     source: "json",
@@ -97,70 +103,80 @@ export const addMemoryInputSchema = {
  *  - Complex nested structures are supported (arrays, nested objects, mixed data types), but keep nesting to a minimum
  *  - Entities will be created from appropriate JSON properties
  *  - Relationships between entities will be established based on the JSON structure
+ *
+ * https://help.getzep.com/sdk-reference/graph/add-batch
  */
-export async function addMemory(
-    provider: ZepClientProvider,
-    params: z.objectOutputType<typeof addMemoryInputSchema, ZodTypeAny>,
+export async function addDataBatch(
+    ctx: {
+        logToClient: LogToClient;
+        zepClientProvider: ZepClientProvider;
+    },
+    params: z.objectOutputType<typeof addDataBatchInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.Episode> {
-    const zepClient = await resolveZepClient(provider, authInfo);
+    const { scopes } = authInfo;
+    checkRequiredScopes(scopes, ["write:graph"]); // 403 if auth has insufficient scopes
 
-    const { subject } = authInfo;
-    // TODO: Add group_id parameter, for now scoped to sub (group_id ignored)
-    const group_id = subject!;
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+
     const { episode_body, source, source_description } = params;
 
-    try {
-        await zepClient.graph.get(group_id);
-    } catch (error) {
-        if (error instanceof Zep.NotFoundError) {
-            await zepClient.graph.create({ graphId: group_id });
-        } else {
-            throw error;
-        }
-    }
+    const { orgId, graphUUID } = params;
 
+    // Ensure graph exists
+    const graph = await getGraph(
+        {
+            logToClient: ctx.logToClient,
+            zepClientProvider: zepClient,
+        },
+        { orgId, graphUUID },
+        { authInfo },
+    );
+    // Add episode to graph
     const episode = await zepClient.graph.add({
         data: episode_body,
         type: source,
         sourceDescription: source_description,
-        graphId: group_id,
+        graphId: graph.graphId!,
     });
     return episode;
 }
 
-export const addMemoryToolMetadata = {
-    name: "zep_add_memory",
+export const addDataBatchToolMetadata = {
+    name: "zep_add_data_batch",
     config: {
-        title: "Add Memory",
+        title: "Add DataBatch",
         description:
             "Add an episode to memory. This is the primary way to add information to the graph.",
-        inputSchema: addMemoryInputSchema,
+        inputSchema: addDataBatchInputSchema,
     },
-} as const satisfies ToolMetadata<typeof addMemoryInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<typeof addDataBatchInputSchema, ZodRawShape>;
 
 // MCP Tool
-export function getAddMemoryTool(provider: ZepClientProvider) {
+export function getAddDataBatchTool(ctx: {
+    logToClient: LogToClient;
+    zepClientProvider: ZepClientProvider;
+}) {
     return {
-        ...addMemoryToolMetadata,
-        name: addMemoryToolMetadata.name,
-        cb: partial(toCallToolResultFn(addMemory), provider),
-    } as const satisfies Tool<typeof addMemoryInputSchema, ZodRawShape>;
+        ...addDataBatchToolMetadata,
+        name: addDataBatchToolMetadata.name,
+        cb: partial(toCallToolResultFn(addDataBatch), ctx),
+    } as const satisfies Tool<typeof addDataBatchInputSchema, ZodRawShape>;
 }
 
 // TRPC Procedure
-export const addMemoryProcedureMetadata = {
+export const addDataBatchProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: `/${addMemoryToolMetadata.name}`,
+        path: `/${addDataBatchToolMetadata.name}`,
         tags: ["tools", "zep"],
-        summary: addMemoryToolMetadata.config.title,
-        description: addMemoryToolMetadata.config.description,
+        summary: addDataBatchToolMetadata.config.title,
+        description: addDataBatchToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createAddMemoryProcedure = toProcedurePluginFn(
-    addMemoryInputSchema,
-    addMemory,
-    addMemoryProcedureMetadata,
+export const createAddDataBatchProcedure = toProcedurePluginFn(
+    addDataBatchInputSchema,
+    addDataBatch,
+    addDataBatchProcedureMetadata,
 );

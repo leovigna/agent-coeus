@@ -11,7 +11,7 @@ import {
     checkOrganizationUserRoles,
     getMeOrgId,
 } from "@coeus-agent/mcp-tools-logto";
-import type { Zep } from "@getzep/zep-cloud";
+import { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
@@ -30,6 +30,7 @@ export const getGraphInputSchema = {
     graphUUID: z.string().optional().describe("The ID of the graph"),
 };
 
+// https://help.getzep.com/sdk-reference/graph/get
 export async function getGraph(
     ctx: {
         logToClient: LogToClient;
@@ -44,8 +45,8 @@ export async function getGraph(
 
     const { logToClient, zepClientProvider } = ctx;
 
-    const { graphUUID } = params;
     const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
+    const graphUUID = params.graphUUID ?? "default";
 
     // Check user has access to org
     await checkOrganizationUserRoles(
@@ -56,6 +57,21 @@ export async function getGraph(
 
     const zepClient = await resolveZepClient(zepClientProvider, authInfo);
     const graphId = `${orgId}:${userId}:${graphUUID}`; // unique graphId
+
+    try {
+        await zepClient.graph.get(graphId);
+    } catch (error) {
+        if (error instanceof Zep.NotFoundError) {
+            if (graphUUID === "default") {
+                // Create default graph if it doesn't exist
+                await zepClient.graph.create({ graphId });
+            } else {
+                throw error;
+            }
+        } else {
+            throw error;
+        }
+    }
 
     const graph = await zepClient.graph.get(graphId);
     return graph;

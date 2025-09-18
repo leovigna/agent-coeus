@@ -30,6 +30,7 @@ export const deleteGraphInputSchema = {
     graphUUID: z.string().optional().describe("The ID of the graph"),
 };
 
+// https://help.getzep.com/sdk-reference/graph/delete
 export async function deleteGraph(
     ctx: {
         logToClient: LogToClient;
@@ -44,8 +45,8 @@ export async function deleteGraph(
 
     const { logToClient, zepClientProvider } = ctx;
 
-    const { graphUUID } = params;
     const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
+    const graphUUID = params.graphUUID ?? "default";
 
     // Check user has access to org
     await checkOrganizationUserRoles(

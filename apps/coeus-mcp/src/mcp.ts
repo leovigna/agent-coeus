@@ -8,7 +8,8 @@ import {
 } from "@coeus-agent/mcp-tools-logto";
 import type { ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import {
-    getAddMemoryTool,
+    getAddDataBatchTool,
+    getAddDataTool,
     getCreateGraphTool,
     getDeleteEntityEdgeTool,
     getDeleteEpisodeTool,
@@ -50,7 +51,8 @@ export function registerMcpTools(
         getCreateGraphTool({ logToClient, zepClientProvider: zepClient }),
         getSearchMemoryNodesTool(zepClient),
         getSearchMemoryFactsTool(zepClient),
-        getAddMemoryTool(zepClient),
+        getAddDataTool({ logToClient, zepClientProvider: zepClient }),
+        getAddDataBatchTool({ logToClient, zepClientProvider: zepClient }),
         getDeleteGraphTool({ logToClient, zepClientProvider: zepClient }),
         // zep/edge
         getGetEntityEdgeTool(zepClient),

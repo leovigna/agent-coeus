@@ -30,6 +30,7 @@ export const createGraphInputSchema = {
     name: z.string().optional().describe("Name of the graph"),
 };
 
+// https://help.getzep.com/sdk-reference/graph/create
 export async function createGraph(
     ctx: {
         logToClient: LogToClient;

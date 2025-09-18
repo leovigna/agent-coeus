@@ -9,7 +9,8 @@ import {
     getEpisodesProcedure,
 } from "./episode/index.js";
 import {
-    addMemoryProcedure,
+    addDataBatchProcedure,
+    addDataProcedure,
     deleteGraphProcedure,
     searchMemoryFactsProcedure,
     searchMemoryNodesProcedure,
@@ -25,7 +26,8 @@ import { whoamiProcedure } from "./whoami.js";
 
 export const appRouter = router({
     // Zep
-    add_memory: addMemoryProcedure,
+    add_data: addDataProcedure,
+    add_data_batch: addDataBatchProcedure,
     clear_graph: deleteGraphProcedure,
     delete_entity_edge: deleteEntityEdgeProcedure,
     delete_episode: deleteEpisodeProcedure,
