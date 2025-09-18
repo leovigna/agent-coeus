@@ -1,17 +1,40 @@
-import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
-import { resolveZepClient, ZepClientProvider } from "../../ZepClientProvider.js";
+import {
+    resolveZepClient,
+    ZepClientProvider,
+} from "../../ZepClientProvider.js";
 
 export const searchMemoryNodesInputSchema = {
     query: z.string().describe("The search query"),
-    group_ids: z.array(z.string()).optional().describe("Optional list of group IDs to filter results. If not provided, uses the default group_id from auth sub."),
-    max_nodes: z.number().default(10).describe("Maximum number of nodes to return"),
-    center_node_uuid: z.string().optional().describe("Optional UUID of a node to center the search around"),
-    entity: z.string().optional().describe("Optional single entity type to filter results"),
+    group_ids: z
+        .array(z.string())
+        .optional()
+        .describe(
+            "Optional list of group IDs to filter results. If not provided, uses the default group_id from auth sub.",
+        ),
+    max_nodes: z
+        .number()
+        .default(10)
+        .describe("Maximum number of nodes to return"),
+    center_node_uuid: z
+        .string()
+        .optional()
+        .describe("Optional UUID of a node to center the search around"),
+    entity: z
+        .string()
+        .optional()
+        .describe("Optional single entity type to filter results"),
 };
 
 /**
@@ -28,7 +51,11 @@ export const searchMemoryNodesInputSchema = {
  * await searchMemoryNodes(provider, { query: "customer preferences" }, { authInfo });
  * ```
  */
-export async function searchMemoryNodes(provider: ZepClientProvider, params: z.objectOutputType<typeof searchMemoryNodesInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.GraphSearchResults> {
+export async function searchMemoryNodes(
+    provider: ZepClientProvider,
+    params: z.objectOutputType<typeof searchMemoryNodesInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+): Promise<Zep.GraphSearchResults> {
     const zepClient = await resolveZepClient(provider, authInfo);
 
     const { subject } = authInfo;
@@ -56,7 +83,10 @@ export const searchMemoryNodesToolMetadata = {
         description: "Searches the graph memory for relevant node summaries.",
         inputSchema: searchMemoryNodesInputSchema,
     },
-} as const satisfies ToolMetadata<typeof searchMemoryNodesInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<
+    typeof searchMemoryNodesInputSchema,
+    ZodRawShape
+>;
 
 // MCP Tool
 export function getSearchMemoryNodesTool(provider: ZepClientProvider) {
@@ -78,4 +108,8 @@ export const searchMemoryNodesProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createSearchMemoryNodesProcedure = toProcedurePluginFn(searchMemoryNodesInputSchema, searchMemoryNodes, searchMemoryNodesProcedureMetadata);
+export const createSearchMemoryNodesProcedure = toProcedurePluginFn(
+    searchMemoryNodesInputSchema,
+    searchMemoryNodes,
+    searchMemoryNodesProcedureMetadata,
+);

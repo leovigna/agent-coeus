@@ -4,7 +4,8 @@ import { z } from "zod";
 import { logToClient } from "../clients/logto-client.js";
 import { publicProcedure } from "../trpc.js";
 
-export const updateOrganizationProcedure = publicProcedure.concat(createUpdateOrganizationProcedure(logToClient))
+export const updateOrganizationProcedure = publicProcedure
+    .concat(createUpdateOrganizationProcedure(logToClient))
     .output(z.any())
     .mutation(({ ctx: { result } }) => {
         return result;

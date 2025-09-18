@@ -1,10 +1,19 @@
-import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
-import { resolveZepClient, ZepClientProvider } from "../../ZepClientProvider.js";
+import {
+    resolveZepClient,
+    ZepClientProvider,
+} from "../../ZepClientProvider.js";
 
 export const deleteEntityEdgeInputSchema = {
     uuid: z.string().describe("UUID of the entity edge to delete"),
@@ -22,7 +31,11 @@ export const deleteEntityEdgeInputSchema = {
  * await deleteEntityEdge(provider, { uuid: "some-uuid-string" }, { authInfo });
  * ```
  */
-export async function deleteEntityEdge(provider: ZepClientProvider, params: z.objectOutputType<typeof deleteEntityEdgeInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.SuccessResponse> {
+export async function deleteEntityEdge(
+    provider: ZepClientProvider,
+    params: z.objectOutputType<typeof deleteEntityEdgeInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+): Promise<Zep.SuccessResponse> {
     const zepClient = await resolveZepClient(provider, authInfo);
     const { uuid } = params;
 
@@ -38,7 +51,10 @@ export const deleteEntityEdgeToolMetadata = {
         description: "Deletes a specific edge between entities in the graph.",
         inputSchema: deleteEntityEdgeInputSchema,
     },
-} as const satisfies ToolMetadata<typeof deleteEntityEdgeInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<
+    typeof deleteEntityEdgeInputSchema,
+    ZodRawShape
+>;
 
 // MCP Tool
 export function getDeleteEntityEdgeTool(provider: ZepClientProvider) {
@@ -60,4 +76,8 @@ export const deleteEntityEdgeProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createDeleteEntityEdgeProcedure = toProcedurePluginFn(deleteEntityEdgeInputSchema, deleteEntityEdge, deleteEntityEdgeProcedureMetadata);
+export const createDeleteEntityEdgeProcedure = toProcedurePluginFn(
+    deleteEntityEdgeInputSchema,
+    deleteEntityEdge,
+    deleteEntityEdgeProcedureMetadata,
+);

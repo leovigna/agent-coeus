@@ -10,21 +10,28 @@ import { LogToClient } from "../../LogToClient.js";
  * @param param1
  * @returns user roles
  */
-export async function getOrganizationUserRoles(client: LogToClient, { orgId }: { orgId: string }, { authInfo }: { authInfo: AuthInfo }) {
+export async function getOrganizationUserRoles(
+    client: LogToClient,
+    { orgId }: { orgId: string },
+    { authInfo }: { authInfo: AuthInfo },
+) {
     const { subject, scopes } = authInfo;
     const userId = subject!;
     checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes
 
-    const rolesResponse = (await client.GET("/api/organizations/{id}/users/{userId}/roles", {
-        params: {
-            path: {
-                id: orgId,
-                userId,
+    const rolesResponse = await client.GET(
+        "/api/organizations/{id}/users/{userId}/roles",
+        {
+            params: {
+                path: {
+                    id: orgId,
+                    userId,
+                },
             },
         },
-    }));
+    );
     if (!rolesResponse.response.ok) throw createError(NOT_FOUND); // 404 if user not part of organization
 
-    const roles = rolesResponse.data!.map(r => r.name);
+    const roles = rolesResponse.data!.map((r) => r.name);
     return roles;
 }

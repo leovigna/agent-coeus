@@ -1,4 +1,11 @@
-import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    checkRequiredScopes,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
@@ -11,7 +18,11 @@ export const listOrganizationsInputSchema = {};
 /**
  * List all organizations the current user belongs to.
  */
-export async function listOrganizations(client: LogToClient, _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+export async function listOrganizations(
+    client: LogToClient,
+    _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+) {
     const { subject, scopes } = authInfo;
     const userId = subject!;
     checkRequiredScopes(scopes, ["list:orgs"]); // 403 if auth has insufficient scopes
@@ -36,7 +47,10 @@ export const listOrganizationsToolMetadata = {
         description: "List all organizations the current user belongs to.",
         inputSchema: listOrganizationsInputSchema,
     },
-} as const satisfies ToolMetadata<typeof listOrganizationsInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<
+    typeof listOrganizationsInputSchema,
+    ZodRawShape
+>;
 
 // MCP Tool
 export function getListOrganizationsTool(client: LogToClient) {
@@ -58,4 +72,8 @@ export const listOrganizationsProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createListOrganizationsProcedure = toProcedurePluginFn(listOrganizationsInputSchema, listOrganizations, listOrganizationsProcedureMetadata);
+export const createListOrganizationsProcedure = toProcedurePluginFn(
+    listOrganizationsInputSchema,
+    listOrganizations,
+    listOrganizationsProcedureMetadata,
+);

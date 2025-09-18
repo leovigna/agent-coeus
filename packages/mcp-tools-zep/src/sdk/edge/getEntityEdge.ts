@@ -1,10 +1,19 @@
-import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
-import { resolveZepClient, ZepClientProvider } from "../../ZepClientProvider.js";
+import {
+    resolveZepClient,
+    ZepClientProvider,
+} from "../../ZepClientProvider.js";
 
 export const getEntityEdgeInputSchema = {
     uuid: z.string().describe("UUID of the entity edge to retrieve"),
@@ -20,7 +29,11 @@ export const getEntityEdgeInputSchema = {
  * await getEntityEdge(provider, { uuid: "some-uuid-string" }, { authInfo });
  * ```
  */
-export async function getEntityEdge(provider: ZepClientProvider, params: z.objectOutputType<typeof getEntityEdgeInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.EntityEdge> {
+export async function getEntityEdge(
+    provider: ZepClientProvider,
+    params: z.objectOutputType<typeof getEntityEdgeInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+): Promise<Zep.EntityEdge> {
     const zepClient = await resolveZepClient(provider, authInfo);
     const { uuid } = params;
 
@@ -33,7 +46,8 @@ export const getEntityEdgeToolMetadata = {
     name: "zep_get_entity_edge",
     config: {
         title: "Get Entity Edge",
-        description: "Gets a specific edge between entities in the graph by its UUID.",
+        description:
+            "Gets a specific edge between entities in the graph by its UUID.",
         inputSchema: getEntityEdgeInputSchema,
     },
 } as const satisfies ToolMetadata<typeof getEntityEdgeInputSchema, ZodRawShape>;
@@ -58,4 +72,8 @@ export const getEntityEdgeProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createGetEntityEdgeProcedure = toProcedurePluginFn(getEntityEdgeInputSchema, getEntityEdge, getEntityEdgeProcedureMetadata);
+export const createGetEntityEdgeProcedure = toProcedurePluginFn(
+    getEntityEdgeInputSchema,
+    getEntityEdge,
+    getEntityEdgeProcedureMetadata,
+);

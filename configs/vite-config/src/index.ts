@@ -14,7 +14,10 @@ const nodePolyfillsFix = (options?: PolyfillOptions): Plugin => {
         ...nodePolyfills(options),
         // @ts-expect-error typescript error not important
         resolveId(source: string) {
-            const m = /^vite-plugin-node-polyfills\/shims\/(buffer|global|process)$/.exec(source);
+            const m =
+                /^vite-plugin-node-polyfills\/shims\/(buffer|global|process)$/.exec(
+                    source,
+                );
             if (m) {
                 return `node_modules/vite-plugin-node-polyfills/shims/${m[1]}/dist/index.cjs`;
             }
@@ -55,10 +58,13 @@ const pluginsReact = [
     nodePolyfillsFix(),
 ];
 
-if (NGROK_AUTH_TOKEN) pluginsReact.push(ngrok({
-    domain: NGROK_DOMAIN,
-    authtoken: NGROK_AUTH_TOKEN,
-}));
+if (NGROK_AUTH_TOKEN)
+    pluginsReact.push(
+        ngrok({
+            domain: NGROK_DOMAIN,
+            authtoken: NGROK_AUTH_TOKEN,
+        }),
+    );
 
 export const viteReactConfig = defineConfig({
     plugins: pluginsReact,

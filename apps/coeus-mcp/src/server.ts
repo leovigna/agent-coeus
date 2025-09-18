@@ -89,7 +89,13 @@ export function getVerifyAccessToken({ clientId, userInfoEndpoint, issuer }: { c
 }
 */
 
-export async function getExpressApp({ mcpServer, mcpTransport }: { mcpServer: McpServer; mcpTransport: StreamableHTTPServerTransport }): Promise<Application> {
+export async function getExpressApp({
+    mcpServer,
+    mcpTransport,
+}: {
+    mcpServer: McpServer;
+    mcpTransport: StreamableHTTPServerTransport;
+}): Promise<Application> {
     // Connect transport
     // TODO: Can this be done later? this could make the getExpressApp function sync
     await mcpServer.connect(mcpTransport);
@@ -113,7 +119,9 @@ export async function getExpressApp({ mcpServer, mcpTransport }: { mcpServer: Mc
     // CORS Middleware
     app.use(cors({ origin: "*" }));
     // Fetch OIDC config
-    const oidcConfig = await fetchServerConfig(OIDC_ISSUER_URL.toString(), { type: "oidc" });
+    const oidcConfig = await fetchServerConfig(OIDC_ISSUER_URL.toString(), {
+        type: "oidc",
+    });
     // const { jwksUri, issuer } = oidcConfig.metadata;
     // MCP Auth Middleware
     const mcpAuth = new MCPAuth({
@@ -140,7 +148,10 @@ export async function getExpressApp({ mcpServer, mcpTransport }: { mcpServer: Mc
     app.use(express.json());
     // Protected endpoints
     // OpenAPI Middleware
-    app.use("/auth/api", createOpenApiExpressMiddleware({ router: appRouter, createContext }));
+    app.use(
+        "/auth/api",
+        createOpenApiExpressMiddleware({ router: appRouter, createContext }),
+    );
     // MCP JSON-RPC Endpoint
     app.post("/auth/mcp", async (req, res) => {
         await mcpTransport.handleRequest(req, res, req.body);

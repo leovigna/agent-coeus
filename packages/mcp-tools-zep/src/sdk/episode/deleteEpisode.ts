@@ -1,10 +1,19 @@
-import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
-import { resolveZepClient, ZepClientProvider } from "../../ZepClientProvider.js";
+import {
+    resolveZepClient,
+    ZepClientProvider,
+} from "../../ZepClientProvider.js";
 
 export const deleteEpisodeInputSchema = {
     uuid: z.string().describe("UUID of the episode to delete"),
@@ -22,7 +31,11 @@ export const deleteEpisodeInputSchema = {
  * await deleteEpisode(provider, { uuid: "some-uuid-string" }, { authInfo });
  * ```
  */
-export async function deleteEpisode(provider: ZepClientProvider, params: z.objectOutputType<typeof deleteEpisodeInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.SuccessResponse> {
+export async function deleteEpisode(
+    provider: ZepClientProvider,
+    params: z.objectOutputType<typeof deleteEpisodeInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+): Promise<Zep.SuccessResponse> {
     const zepClient = await resolveZepClient(provider, authInfo);
     const { uuid } = params;
 
@@ -60,4 +73,8 @@ export const deleteEpisodeProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createDeleteEpisodeProcedure = toProcedurePluginFn(deleteEpisodeInputSchema, deleteEpisode, deleteEpisodeProcedureMetadata);
+export const createDeleteEpisodeProcedure = toProcedurePluginFn(
+    deleteEpisodeInputSchema,
+    deleteEpisode,
+    deleteEpisodeProcedureMetadata,
+);

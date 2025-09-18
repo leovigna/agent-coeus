@@ -3,7 +3,12 @@
 import { createManagementApi } from "@logto/api/management";
 
 // @ts-ignore unused
-import { LOGTO_API_INDICATOR_BASE_URL, LOGTO_M2M_CLIENT_ID, LOGTO_M2M_CLIENT_SECRET, LOGTO_TENANT_ID } from "../envvars.js";
+import {
+    LOGTO_API_INDICATOR_BASE_URL,
+    LOGTO_M2M_CLIENT_ID,
+    LOGTO_M2M_CLIENT_SECRET,
+    LOGTO_TENANT_ID,
+} from "../envvars.js";
 
 type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
 
@@ -11,7 +16,8 @@ type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
 function getLogToClient() {
     if (!LOGTO_TENANT_ID) throw new Error("LOGTO_TENANT_ID is not set");
     if (!LOGTO_M2M_CLIENT_ID) throw new Error("LOGTO_M2M_CLIENT_ID is not set");
-    if (!LOGTO_M2M_CLIENT_SECRET) throw new Error("LOGTO_M2M_CLIENT_SECRET is not set");
+    if (!LOGTO_M2M_CLIENT_SECRET)
+        throw new Error("LOGTO_M2M_CLIENT_SECRET is not set");
 
     const managementApi = createManagementApi(LOGTO_TENANT_ID, {
         clientId: LOGTO_M2M_CLIENT_ID,
@@ -29,15 +35,22 @@ function getLogToClient() {
  * @param data name, indicator (eg. https://api.yourapp.com/<name>/)
  * @returns resource
  */
-export async function getOrCreateApiResource(client: LogToClient, { name, indicator }: { name: string; indicator: string }) {
+export async function getOrCreateApiResource(
+    client: LogToClient,
+    { name, indicator }: { name: string; indicator: string },
+) {
     // Get or create resource
-    let resource = (await client.GET("/api/resources")).data!.find(r => r.name === name);
-    resource ??= (await client.POST("/api/resources", {
-        body: {
-            name,
-            indicator,
-        },
-    })).data!;
+    let resource = (await client.GET("/api/resources")).data!.find(
+        (r) => r.name === name,
+    );
+    resource ??= (
+        await client.POST("/api/resources", {
+            body: {
+                name,
+                indicator,
+            },
+        })
+    ).data!;
 
     return resource;
 }
@@ -49,27 +62,37 @@ export async function getOrCreateApiResource(client: LogToClient, { name, indica
  * @param scopes
  * @returns resource scopes
  */
-async function getOrCreateApiResourceScopes(client: LogToClient, resourceId: string, scopes: string[]) {
+async function getOrCreateApiResourceScopes(
+    client: LogToClient,
+    resourceId: string,
+    scopes: string[],
+) {
     // Get resource scopes
-    const resourceScopes = (await client.GET("/api/resources/{resourceId}/scopes", {
-        params: { path: { resourceId } },
-    })).data!;
+    const resourceScopes = (
+        await client.GET("/api/resources/{resourceId}/scopes", {
+            params: { path: { resourceId } },
+        })
+    ).data!;
 
     for (const scopeName of scopes) {
-        let scope = resourceScopes.find(s => s.name === scopeName);
+        let scope = resourceScopes.find((s) => s.name === scopeName);
 
-        scope ??= (await client.POST("/api/resources/{resourceId}/scopes", {
-            params: { path: { resourceId } },
-            body: {
-                name: scopeName,
-                description: scopeName.replace(":", " "),
-            },
-        })).data!;
+        scope ??= (
+            await client.POST("/api/resources/{resourceId}/scopes", {
+                params: { path: { resourceId } },
+                body: {
+                    name: scopeName,
+                    description: scopeName.replace(":", " "),
+                },
+            })
+        ).data!;
     }
 
-    const resourceScopesUpdated = (await client.GET("/api/resources/{resourceId}/scopes", {
-        params: { path: { resourceId } },
-    })).data!;
+    const resourceScopesUpdated = (
+        await client.GET("/api/resources/{resourceId}/scopes", {
+            params: { path: { resourceId } },
+        })
+    ).data!;
 
     return resourceScopesUpdated;
 }
@@ -80,12 +103,15 @@ async function getOrCreateApiResourceScopes(client: LogToClient, resourceId: str
  * @param roleNames
  * @returns roles
  */
-export async function getOrCreateRoles(client: LogToClient, roleNames: string[]) {
+export async function getOrCreateRoles(
+    client: LogToClient,
+    roleNames: string[],
+) {
     // Get or create roles
     const existingRoles = (await client.GET("/api/roles")).data!;
 
     for (const roleName of roleNames) {
-        const role = existingRoles.find(r => r.name === roleName);
+        const role = existingRoles.find((r) => r.name === roleName);
         if (!role) {
             await client.POST("/api/roles", {
                 body: {
@@ -107,12 +133,15 @@ export async function getOrCreateRoles(client: LogToClient, roleNames: string[])
  * @param roleNames
  * @returns organization roles
  */
-export async function getOrCreateOrganizationRoles(client: LogToClient, roleNames = ["owner", "admin", "member"]) {
+export async function getOrCreateOrganizationRoles(
+    client: LogToClient,
+    roleNames = ["owner", "admin", "member"],
+) {
     // Get or create organization roles
     const existingRoles = (await client.GET("/api/organization-roles")).data!;
 
     for (const roleName of roleNames) {
-        const role = existingRoles.find(r => r.name === roleName);
+        const role = existingRoles.find((r) => r.name === roleName);
         if (!role) {
             await client.POST("/api/organization-roles", {
                 body: {
@@ -126,7 +155,8 @@ export async function getOrCreateOrganizationRoles(client: LogToClient, roleName
         }
     }
 
-    const organizationRoles = (await client.GET("/api/organization-roles")).data!;
+    const organizationRoles = (await client.GET("/api/organization-roles"))
+        .data!;
     return organizationRoles;
 }
 
@@ -137,13 +167,21 @@ export async function getOrCreateOrganizationRoles(client: LogToClient, roleName
  * @param resourceScopeIds
  * @returns
  */
-export async function setResourceScopesToRole(client: LogToClient, roleId: string, resourceScopeIds: string[]) {
-    const existingResourceScopes = (await client.GET("/api/roles/{id}/scopes", {
-        params: { path: { id: roleId } },
-    })).data!;
-    const existingScopeIds = existingResourceScopes.map(s => s.id);
+export async function setResourceScopesToRole(
+    client: LogToClient,
+    roleId: string,
+    resourceScopeIds: string[],
+) {
+    const existingResourceScopes = (
+        await client.GET("/api/roles/{id}/scopes", {
+            params: { path: { id: roleId } },
+        })
+    ).data!;
+    const existingScopeIds = existingResourceScopes.map((s) => s.id);
 
-    const missingScopeIds = resourceScopeIds.filter(id => !existingScopeIds.includes(id));
+    const missingScopeIds = resourceScopeIds.filter(
+        (id) => !existingScopeIds.includes(id),
+    );
     if (missingScopeIds.length > 0) {
         await client.POST("/api/roles/{id}/scopes", {
             params: { path: { id: roleId } },
@@ -153,9 +191,11 @@ export async function setResourceScopesToRole(client: LogToClient, roleId: strin
         });
     }
 
-    const resourceScopes = (await client.GET("/api/roles/{id}/scopes", {
-        params: { path: { id: roleId } },
-    })).data!;
+    const resourceScopes = (
+        await client.GET("/api/roles/{id}/scopes", {
+            params: { path: { id: roleId } },
+        })
+    ).data!;
     return resourceScopes;
 }
 
@@ -166,13 +206,21 @@ export async function setResourceScopesToRole(client: LogToClient, roleId: strin
  * @param resourceScopeIds
  * @returns
  */
-async function setResourceScopesToOrganizationRole(client: LogToClient, roleId: string, resourceScopeIds: string[]) {
-    const existingResourceScopes = (await client.GET("/api/organization-roles/{id}/resource-scopes", {
-        params: { path: { id: roleId } },
-    })).data!;
-    const existingScopeIds = existingResourceScopes.map(s => s.id);
+async function setResourceScopesToOrganizationRole(
+    client: LogToClient,
+    roleId: string,
+    resourceScopeIds: string[],
+) {
+    const existingResourceScopes = (
+        await client.GET("/api/organization-roles/{id}/resource-scopes", {
+            params: { path: { id: roleId } },
+        })
+    ).data!;
+    const existingScopeIds = existingResourceScopes.map((s) => s.id);
 
-    const missingScopeIds = resourceScopeIds.filter(id => !existingScopeIds.includes(id));
+    const missingScopeIds = resourceScopeIds.filter(
+        (id) => !existingScopeIds.includes(id),
+    );
     if (missingScopeIds.length > 0) {
         await client.POST("/api/organization-roles/{id}/resource-scopes", {
             headers: { "Content-Type": "text/plain" },
@@ -184,9 +232,11 @@ async function setResourceScopesToOrganizationRole(client: LogToClient, roleId: 
         });
     }
 
-    const resourceScopes = (await client.GET("/api/organization-roles/{id}/resource-scopes", {
-        params: { path: { id: roleId } },
-    })).data!;
+    const resourceScopes = (
+        await client.GET("/api/organization-roles/{id}/resource-scopes", {
+            params: { path: { id: roleId } },
+        })
+    ).data!;
     return resourceScopes;
 }
 
@@ -221,10 +271,13 @@ async function setResourceScopesToOrganizationRole(client: LogToClient, roleId: 
     */
 
 /**
-     * Setup LogTo with standard SaaS resources, scopes, and roles
-     * @param client LogTo client
-     */
-export async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) {
+ * Setup LogTo with standard SaaS resources, scopes, and roles
+ * @param client LogTo client
+ */
+export async function setupLogTo(
+    client: LogToClient,
+    indicatorBaseUrl: string,
+) {
     // Create MCP API resource with CRUD scopes
     const mcpResource = await getOrCreateApiResource(client, {
         name: "mcp",
@@ -239,16 +292,20 @@ export async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) 
     });
 
     // Resource scopes
-    const resourceScopes = await getOrCreateApiResourceScopes(client, mcpResource.id, ["list:orgs", "create:org", "read:org", "update:org", "delete:org"]);
-    const listOrgsScope = resourceScopes.find(s => s.name === "list:orgs")!;
-    const createOrgScope = resourceScopes.find(s => s.name === "create:org")!;
-    const readOrgScope = resourceScopes.find(s => s.name === "read:org")!;
-    const updateOrgScope = resourceScopes.find(s => s.name === "update:org")!;
-    const deleteOrgScope = resourceScopes.find(s => s.name === "delete:org")!;
+    const resourceScopes = await getOrCreateApiResourceScopes(
+        client,
+        mcpResource.id,
+        ["list:orgs", "create:org", "read:org", "update:org", "delete:org"],
+    );
+    const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
+    const createOrgScope = resourceScopes.find((s) => s.name === "create:org")!;
+    const readOrgScope = resourceScopes.find((s) => s.name === "read:org")!;
+    const updateOrgScope = resourceScopes.find((s) => s.name === "update:org")!;
+    const deleteOrgScope = resourceScopes.find((s) => s.name === "delete:org")!;
 
     // User role (Note: Go to console to set this as default role)
     const roles = await getOrCreateRoles(client, ["user"]);
-    const userRole = roles.find(r => r.name === "user")!;
+    const userRole = roles.find((r) => r.name === "user")!;
     // Make default role (to get this role assigned to new users)
     await client.PATCH("/api/roles/{id}", {
         params: { path: { id: userRole.id } },
@@ -257,20 +314,36 @@ export async function setupLogTo(client: LogToClient, indicatorBaseUrl: string) 
         },
     });
     // User role gets CREATE org scope
-    const userResourceScopes = await setResourceScopesToRole(client, userRole.id, [createOrgScope.id, listOrgsScope.id]);
+    const userResourceScopes = await setResourceScopesToRole(
+        client,
+        userRole.id,
+        [createOrgScope.id, listOrgsScope.id],
+    );
 
     // Owner/Admin/Member organization roles
     const orgRoles = await getOrCreateOrganizationRoles(client);
 
     // Owner roles get READ/UPDATE/DELETE org scopes
-    const ownerRole = orgRoles.find(r => r.name === "owner")!;
-    const ownerResourceScopes = await setResourceScopesToOrganizationRole(client, ownerRole.id, [readOrgScope.id, updateOrgScope.id, deleteOrgScope.id]);
+    const ownerRole = orgRoles.find((r) => r.name === "owner")!;
+    const ownerResourceScopes = await setResourceScopesToOrganizationRole(
+        client,
+        ownerRole.id,
+        [readOrgScope.id, updateOrgScope.id, deleteOrgScope.id],
+    );
     // Admin roles get READ/UPDATE org scopes
-    const adminRole = orgRoles.find(r => r.name === "admin")!;
-    const adminResourceScopes = await setResourceScopesToOrganizationRole(client, adminRole.id, [readOrgScope.id, updateOrgScope.id]);
+    const adminRole = orgRoles.find((r) => r.name === "admin")!;
+    const adminResourceScopes = await setResourceScopesToOrganizationRole(
+        client,
+        adminRole.id,
+        [readOrgScope.id, updateOrgScope.id],
+    );
     // Member roles get READ org scopes
-    const memberRole = orgRoles.find(r => r.name === "member")!;
-    const memberResourceScopes = await setResourceScopesToOrganizationRole(client, memberRole.id, [readOrgScope.id]);
+    const memberRole = orgRoles.find((r) => r.name === "member")!;
+    const memberResourceScopes = await setResourceScopesToOrganizationRole(
+        client,
+        memberRole.id,
+        [readOrgScope.id],
+    );
 
     return {
         mcpResource,
@@ -295,13 +368,10 @@ export async function deleteAllOrgs(client: LogToClient) {
 async function main() {
     // if (!LOGTO_API_INDICATOR_BASE_URL) throw new Error("LOGTO_API_INDICATOR_BASE_URL is not set");
     // const indicatorBaseUrl = new URL(LOGTO_API_INDICATOR_BASE_URL);
-
     // const client = getLogToClient();
-
     // const result = await setupLogTo(client, indicatorBaseUrl.toString());
     // console.debug(result);
     // await deleteAllOrgs(client);
-
     // Global role gets CREATE org scope
     // const globalRoles = (await client.GET("/api/roles")).data!;
     // const globalAdminRole = globalRoles.find(r => r.name === "admin")!;

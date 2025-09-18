@@ -25,7 +25,10 @@ export const router = t.router;
  * NOTE: This is only called in the express server when a request is made.
  * When testing you need to create to create a context and pass it to a procedure call
  */
-export const createContext = ({ req, res }: CreateExpressContextOptions): Context => {
+export const createContext = ({
+    req,
+    res,
+}: CreateExpressContextOptions): Context => {
     return {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         req,

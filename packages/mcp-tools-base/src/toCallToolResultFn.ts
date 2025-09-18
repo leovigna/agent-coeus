@@ -6,7 +6,9 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
  * @returns A function that takes the same parameters as `fn` and returns a CallToolResult.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function toCallToolResultFn<T extends (...args: any[]) => Promise<any>>(fn: T) {
+export function toCallToolResultFn<T extends (...args: any[]) => Promise<any>>(
+    fn: T,
+) {
     return async (...params: Parameters<T>) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const result = await fn(...params);

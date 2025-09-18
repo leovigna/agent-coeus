@@ -4,10 +4,13 @@ import { z, ZodTypeAny } from "zod";
 
 import { LogToClient } from "../../LogToClient.js";
 
-export const getUserInputSchema = {
-};
+export const getUserInputSchema = {};
 
-export async function getUser(client: LogToClient, _: z.objectOutputType<typeof getUserInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+export async function getUser(
+    client: LogToClient,
+    _: z.objectOutputType<typeof getUserInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+) {
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
     checkRequiredScopes(scopes, ["profile"]); // 403 if auth has insufficient scopes

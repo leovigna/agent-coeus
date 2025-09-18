@@ -7,6 +7,8 @@ import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
 import reactX from "eslint-plugin-react-x"
 import reactDom from "eslint-plugin-react-dom"
+// Note: Remove this line if you don't want to use Prettier integration (useful for printWidth enforcement)
+import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 
 const importRulesConfig = {
     rules: {
@@ -45,12 +47,16 @@ const tsConfigs = tseslint.config(
     tseslint.configs.stylistic,
     // https://typescript-eslint.io/users/what-about-formatting
     // https://eslint.style/guide/config-presets
+    // Note: Most of these are disabled due to ESLint plugin
     stylistic.configs.customize({
         indent: 4,
         quotes: "double",
         semi: true,
         jsx: true,
-    })
+    }),
+    // https://github.com/prettier/eslint-plugin-prettier
+    // Useful for printWidth enforcement
+    eslintPluginPrettier
 )
 
 const tsTypecheckedConfigs = tseslint.config(
@@ -61,12 +67,16 @@ const tsTypecheckedConfigs = tseslint.config(
     tseslint.configs.stylisticTypeChecked,
     // https://typescript-eslint.io/users/what-about-formatting
     // https://eslint.style/guide/config-presets
+    // Note: Most of these are disabled due to ESLint plugin
     stylistic.configs.customize({
         indent: 4,
         quotes: "double",
         semi: true,
         jsx: true,
-    })
+    }),
+    // https://github.com/prettier/eslint-plugin-prettier
+    // Useful for printWidth enforcement
+    eslintPluginPrettier
 )
 
 export const configs = [

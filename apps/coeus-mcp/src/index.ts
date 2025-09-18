@@ -10,10 +10,12 @@ import { getExpressApp } from "./server.js";
 async function main() {
     // MCP Server
     const instructions = readFileSync("./MCP_INSTRUCTIONS.md", "utf-8");
-    const mcpServer = new McpServer({
-        name: "coeus-mcp",
-        version: "1.0.0",
-    }, { instructions },
+    const mcpServer = new McpServer(
+        {
+            name: "coeus-mcp",
+            version: "1.0.0",
+        },
+        { instructions },
     );
     registerMcpTools(mcpServer, { logToClient, zepClient });
     const mcpTransport = new StreamableHTTPServerTransport({

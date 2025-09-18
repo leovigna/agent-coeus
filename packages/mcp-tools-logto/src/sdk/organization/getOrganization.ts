@@ -1,4 +1,11 @@
-import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    AuthInfo,
+    checkRequiredScopes,
+    toCallToolResultFn,
+    Tool,
+    ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
@@ -17,12 +24,20 @@ export const getOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function getOrganization(client: LogToClient, params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
+export async function getOrganization(
+    client: LogToClient,
+    params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+) {
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes
 
     const { id } = params;
-    await checkOrganizationUserRoles(client, { orgId: id, validRoles: ["owner", "admin", "member"] }, { authInfo }); // 404 if not part of org, 403 if has insufficient role
+    await checkOrganizationUserRoles(
+        client,
+        { orgId: id, validRoles: ["owner", "admin", "member"] },
+        { authInfo },
+    ); // 404 if not part of org, 403 if has insufficient role
 
     const orgResponse = await client.GET("/api/organizations/{id}", {
         params: {
@@ -44,7 +59,10 @@ export const getOrganizationToolMetadata = {
         description: "Get an organization by its ID.",
         inputSchema: getOrganizationInputSchema,
     },
-} as const satisfies ToolMetadata<typeof getOrganizationInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<
+    typeof getOrganizationInputSchema,
+    ZodRawShape
+>;
 
 // MCP Tool
 export function getGetOrganizationTool(client: LogToClient) {
@@ -66,4 +84,8 @@ export const getOrganizationProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createGetOrganizationProcedure = toProcedurePluginFn(getOrganizationInputSchema, getOrganization, getOrganizationProcedureMetadata);
+export const createGetOrganizationProcedure = toProcedurePluginFn(
+    getOrganizationInputSchema,
+    getOrganization,
+    getOrganizationProcedureMetadata,
+);

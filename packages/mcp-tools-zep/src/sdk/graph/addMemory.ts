@@ -1,17 +1,39 @@
-import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
+import {
+    type AuthInfo,
+    toCallToolResultFn,
+    type Tool,
+    type ToolMetadata,
+    toProcedurePluginFn,
+} from "@coeus-agent/mcp-tools-base";
 import { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodRawShape, ZodTypeAny } from "zod";
+import { z, type ZodRawShape, type ZodTypeAny } from "zod";
 
-import { resolveZepClient, ZepClientProvider } from "../../ZepClientProvider.js";
+import {
+    resolveZepClient,
+    ZepClientProvider,
+} from "../../ZepClientProvider.js";
 
 export const addMemoryInputSchema = {
     name: z.string().describe("Name of the episode"),
-    episode_body: z.string().describe("The content of the episode to persist to memory."),
-    group_id: z.string().optional().describe("A unique ID for this graph. If not provided, uses the default group_id from auth sub."),
-    source: z.enum(["text", "json", "message"]).default("text").describe("Source type"),
-    source_description: z.string().default("").describe("Description of the source"),
+    episode_body: z
+        .string()
+        .describe("The content of the episode to persist to memory."),
+    group_id: z
+        .string()
+        .optional()
+        .describe(
+            "A unique ID for this graph. If not provided, uses the default group_id from auth sub.",
+        ),
+    source: z
+        .enum(["text", "json", "message"])
+        .default("text")
+        .describe("Source type"),
+    source_description: z
+        .string()
+        .default("")
+        .describe("Description of the source"),
     uuid: z.string().optional().describe("Optional UUID for the episode"),
 };
 
@@ -78,7 +100,11 @@ export const addMemoryInputSchema = {
  *  - Entities will be created from appropriate JSON properties
  *  - Relationships between entities will be established based on the JSON structure
  */
-export async function addMemory(provider: ZepClientProvider, params: z.objectOutputType<typeof addMemoryInputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }): Promise<Zep.Episode> {
+export async function addMemory(
+    provider: ZepClientProvider,
+    params: z.objectOutputType<typeof addMemoryInputSchema, ZodTypeAny>,
+    { authInfo }: { authInfo: AuthInfo },
+): Promise<Zep.Episode> {
     const zepClient = await resolveZepClient(provider, authInfo);
 
     const { subject } = authInfo;
@@ -88,12 +114,10 @@ export async function addMemory(provider: ZepClientProvider, params: z.objectOut
 
     try {
         await zepClient.graph.get(group_id);
-    }
-    catch (error) {
+    } catch (error) {
         if (error instanceof Zep.NotFoundError) {
             await zepClient.graph.create({ graphId: group_id });
-        }
-        else {
+        } else {
             throw error;
         }
     }
@@ -111,7 +135,8 @@ export const addMemoryToolMetadata = {
     name: "zep_add_memory",
     config: {
         title: "Add Memory",
-        description: "Add an episode to memory. This is the primary way to add information to the graph.",
+        description:
+            "Add an episode to memory. This is the primary way to add information to the graph.",
         inputSchema: addMemoryInputSchema,
     },
 } as const satisfies ToolMetadata<typeof addMemoryInputSchema, ZodRawShape>;
@@ -136,4 +161,8 @@ export const addMemoryProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createAddMemoryProcedure = toProcedurePluginFn(addMemoryInputSchema, addMemory, addMemoryProcedureMetadata);
+export const createAddMemoryProcedure = toProcedurePluginFn(
+    addMemoryInputSchema,
+    addMemory,
+    addMemoryProcedureMetadata,
+);

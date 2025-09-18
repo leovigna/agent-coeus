@@ -15,8 +15,14 @@ const openApiDocument = generateOpenApiDocument(appRouter, {
 });
 
 openApiDocument.servers = [
-    { url: "http://localhost:3000/auth/api", description: "Local development server" },
-    { url: "https://neat-perfectly-buck.ngrok-free.app/auth/api", description: "Local development proxy" },
+    {
+        url: "http://localhost:3000/auth/api",
+        description: "Local development server",
+    },
+    {
+        url: "https://neat-perfectly-buck.ngrok-free.app/auth/api",
+        description: "Local development proxy",
+    },
 ];
 
 export { openApiDocument };

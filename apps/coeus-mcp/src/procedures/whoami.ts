@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
@@ -18,8 +20,14 @@ export const whoamiProcedure = publicProcedure
         const authInfo = ctx.authInfo;
         return {
             content: [
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                { type: "text", text: JSON.stringify((authInfo as any)?.claims ?? { error: "Not authenticated" }) },
+                {
+                    type: "text",
+                    text: JSON.stringify(
+                        (authInfo as any)?.claims ?? {
+                            error: "Not authenticated",
+                        },
+                    ),
+                },
             ],
         };
     });
