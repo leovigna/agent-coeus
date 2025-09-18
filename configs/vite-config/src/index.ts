@@ -5,7 +5,8 @@ import react from "@vitejs/plugin-react-swc";
 import { defineConfig, loadEnv } from "vite";
 import CheckerPlugin from "vite-plugin-checker";
 import { ngrok } from "vite-plugin-ngrok";
-import { nodePolyfills, PolyfillOptions } from "vite-plugin-node-polyfills";
+import type { PolyfillOptions } from "vite-plugin-node-polyfills";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import SVGRPlugin from "vite-plugin-svgr";
 
 // Plugin issue v0.17+ https://github.com/davidmyersdev/vite-plugin-node-polyfills/issues/81#issuecomment-2325104572

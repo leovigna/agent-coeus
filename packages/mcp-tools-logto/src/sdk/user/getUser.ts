@@ -1,8 +1,9 @@
-import { AuthInfo, checkRequiredScopes } from "@coeus-agent/mcp-tools-base";
+import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import { checkRequiredScopes } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
-import { z, ZodTypeAny } from "zod";
+import type { z, ZodTypeAny } from "zod";
 
-import { LogToClient } from "../../LogToClient.js";
+import type { LogToClient } from "../../LogToClient.js";
 
 export const getUserInputSchema = {};
 

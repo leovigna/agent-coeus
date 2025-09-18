@@ -1,5 +1,5 @@
-import { AuthInfo } from "@coeus-agent/mcp-tools-base";
-import { ZepClient } from "@getzep/zep-cloud";
+import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import type { ZepClient } from "@getzep/zep-cloud";
 
 export type ZepClientProvider =
     | ZepClient

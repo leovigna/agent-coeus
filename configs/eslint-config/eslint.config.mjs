@@ -12,6 +12,7 @@ import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 
 const importRulesConfig = {
     rules: {
+        "@typescript-eslint/consistent-type-imports": "error",
         "import/extensions": ["warn", "ignorePackages", { json: "always" }],
         "import/no-named-as-default": "off",
         "import/no-commonjs": "error",

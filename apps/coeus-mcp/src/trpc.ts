@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { initTRPC } from "@trpc/server";
-import { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import { OpenApiMeta } from "trpc-to-openapi";
+import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
+import type { OpenApiMeta } from "trpc-to-openapi";
 
 import { requestMiddleware } from "./middleware/requestMiddleware.js";
 

@@ -4,10 +4,10 @@ import {
     type ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
+import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
     createOrganization,
     getUserCustomData,
-    LogToClient,
 } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
@@ -15,11 +15,9 @@ import type { OpenApiMeta } from "trpc-to-openapi";
 import { v7 } from "uuid";
 import { z, type ZodRawShape } from "zod";
 
-import { UserCustomData } from "../../UserCustomData.js";
-import {
-    resolveZepClient,
-    ZepClientProvider,
-} from "../../ZepClientProvider.js";
+import type { UserCustomData } from "../../UserCustomData.js";
+import type { ZepClientProvider } from "../../ZepClientProvider.js";
+import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const createGraphInputSchema = {
     orgId: z

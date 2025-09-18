@@ -1,6 +1,7 @@
-import { AuthInfo, checkRequiredRole } from "@coeus-agent/mcp-tools-base";
+import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import { checkRequiredRole } from "@coeus-agent/mcp-tools-base";
 
-import { LogToClient } from "../../LogToClient.js";
+import type { LogToClient } from "../../LogToClient.js";
 
 import { getOrganizationUserRoles } from "./getOrganizationUserRoles.js";
 

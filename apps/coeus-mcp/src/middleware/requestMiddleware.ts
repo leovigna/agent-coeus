@@ -1,4 +1,4 @@
-import { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import { initTRPC } from "@trpc/server";
 
 export interface RequestMiddlewareCtxOut {

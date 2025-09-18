@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { initTRPC } from "@trpc/server";
 import { partial } from "lodash-es";
-import { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodTypeAny } from "zod";
+import type { OpenApiMeta } from "trpc-to-openapi";
+import type { ZodTypeAny } from "zod";
+import { z } from "zod";
 
-import { AuthInfo } from "./AuthInfo.js";
+import type { AuthInfo } from "./AuthInfo.js";
 /**
  * Converts a function that returns a Promise into a function that returns a trpc plugin.
  * @param fn

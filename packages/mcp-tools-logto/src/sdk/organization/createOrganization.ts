@@ -1,15 +1,14 @@
+import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    AuthInfo,
     checkRequiredScopes,
     toCallToolResultFn,
-    Tool,
-    ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodRawShape, ZodTypeAny } from "zod";
+import type { ZodRawShape, ZodTypeAny } from "zod";
+import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 

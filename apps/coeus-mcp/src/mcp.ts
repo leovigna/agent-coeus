@@ -1,11 +1,12 @@
+import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
     getCreateOrganizationTool,
     getDeleteOrganizationTool,
     getGetOrganizationTool,
     getListOrganizationsTool,
     getUpdateOrganizationTool,
-    LogToClient,
 } from "@coeus-agent/mcp-tools-logto";
+import type { ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import {
     getAddMemoryTool,
     getClearGraphTool,
@@ -15,9 +16,8 @@ import {
     getGetEpisodesTool,
     getSearchMemoryFactsTool,
     getSearchMemoryNodesTool,
-    ZepClientProvider,
 } from "@coeus-agent/mcp-tools-zep";
-import {
+import type {
     McpServer,
     ToolCallback,
 } from "@modelcontextprotocol/sdk/server/mcp.js";

@@ -1,7 +1,8 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import cors from "cors";
-import express, { Application, Request, Response } from "express";
+import type { Application, Request, Response } from "express";
+import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { fetchServerConfig, MCPAuth } from "mcp-auth";
 import * as swaggerUi from "swagger-ui-express";

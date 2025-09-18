@@ -2,9 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createManagementApi } from "@logto/api/management";
 
-// @ts-ignore unused
 import {
-    LOGTO_API_INDICATOR_BASE_URL,
     LOGTO_M2M_CLIENT_ID,
     LOGTO_M2M_CLIENT_SECRET,
     LOGTO_TENANT_ID,

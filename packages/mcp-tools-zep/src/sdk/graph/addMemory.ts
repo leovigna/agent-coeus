@@ -10,10 +10,8 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape, type ZodTypeAny } from "zod";
 
-import {
-    resolveZepClient,
-    ZepClientProvider,
-} from "../../ZepClientProvider.js";
+import type { ZepClientProvider } from "../../ZepClientProvider.js";
+import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const addMemoryInputSchema = {
     name: z.string().describe("Name of the episode"),

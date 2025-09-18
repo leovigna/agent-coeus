@@ -1,14 +1,15 @@
-import { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import type { AuthInfo, ToolMetadata } from "@coeus-agent/mcp-tools-base";
+import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
     createOrganization,
     getUserCustomData,
-    LogToClient,
 } from "@coeus-agent/mcp-tools-logto";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
-import { ZodRawShape } from "zod";
+import type { ZodRawShape } from "zod";
 
-import { UserCustomData } from "../UserCustomData.js";
-import { resolveZepClient, ZepClientProvider } from "../ZepClientProvider.js";
+import type { UserCustomData } from "../UserCustomData.js";
+import type { ZepClientProvider } from "../ZepClientProvider.js";
+import { resolveZepClient } from "../ZepClientProvider.js";
 
 export const onboardUserInputSchema = {};
 

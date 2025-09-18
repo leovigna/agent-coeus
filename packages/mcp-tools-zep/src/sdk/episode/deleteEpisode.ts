@@ -1,19 +1,16 @@
+import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    AuthInfo,
     toCallToolResultFn,
-    Tool,
-    ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodRawShape, ZodTypeAny } from "zod";
+import type { ZodRawShape, ZodTypeAny } from "zod";
+import { z } from "zod";
 
-import {
-    resolveZepClient,
-    ZepClientProvider,
-} from "../../ZepClientProvider.js";
+import type { ZepClientProvider } from "../../ZepClientProvider.js";
+import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const deleteEpisodeInputSchema = {
     uuid: z.string().describe("UUID of the episode to delete"),

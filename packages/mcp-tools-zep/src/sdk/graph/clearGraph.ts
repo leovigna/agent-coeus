@@ -7,12 +7,11 @@ import {
 } from "@coeus-agent/mcp-tools-base";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodRawShape } from "zod";
+import type { ZodRawShape } from "zod";
+import { z } from "zod";
 
-import {
-    resolveZepClient,
-    ZepClientProvider,
-} from "../../ZepClientProvider.js";
+import type { ZepClientProvider } from "../../ZepClientProvider.js";
+import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const clearGraphInputSchema = {
     group_id: z

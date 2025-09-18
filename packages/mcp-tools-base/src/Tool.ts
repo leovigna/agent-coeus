@@ -1,4 +1,4 @@
-import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import type {
     CallToolResult,
     ServerNotification,
@@ -7,7 +7,7 @@ import type {
 } from "@modelcontextprotocol/sdk/types.js";
 import type { z, ZodRawShape, ZodTypeAny } from "zod";
 
-import { AuthInfo } from "./AuthInfo.js";
+import type { AuthInfo } from "./AuthInfo.js";
 
 // Overrides MCP SDK types to include AuthInfo in extra param
 export type ToolExtraParams = Omit<

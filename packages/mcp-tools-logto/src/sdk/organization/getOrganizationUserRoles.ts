@@ -1,7 +1,8 @@
-import { AuthInfo, checkRequiredScopes } from "@coeus-agent/mcp-tools-base";
+import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import { checkRequiredScopes } from "@coeus-agent/mcp-tools-base";
 import { createError, NOT_FOUND } from "http-errors-enhanced";
 
-import { LogToClient } from "../../LogToClient.js";
+import type { LogToClient } from "../../LogToClient.js";
 
 /**
  * Fetch organization roles for user

@@ -1,4 +1,4 @@
-import { LogToClient } from "@coeus-agent/mcp-tools-logto";
+import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import { createManagementApi } from "@logto/api/management";
 
 import {

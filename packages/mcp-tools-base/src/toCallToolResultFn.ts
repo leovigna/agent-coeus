@@ -1,4 +1,4 @@
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 /**
  * Converts a function that returns a Promise into a function that returns a CallToolResult.
