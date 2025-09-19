@@ -12,7 +12,7 @@ export async function patchMeCustomData<T extends Record<string, any>>(
 ) {
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
-    checkRequiredScopes(scopes, ["profile"]); // 403 if auth has insufficient scopes
+    checkRequiredScopes(scopes, ["update:user:custom-data"]); // 403 if auth has insufficient scopes
 
     const userCustomDataResponse = await client.PATCH(
         "/api/users/{userId}/custom-data",

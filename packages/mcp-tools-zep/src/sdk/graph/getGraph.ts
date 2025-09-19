@@ -57,6 +57,7 @@ export async function getGraph(
     } catch (error) {
         if (error instanceof Zep.NotFoundError) {
             if (graphUUID === "default") {
+                checkRequiredScopes(scopes, ["create:graph"]); // 403 if auth has insufficient scopes
                 // Create default graph if it doesn't exist
                 await zepClient.graph.create({ graphId });
             } else {

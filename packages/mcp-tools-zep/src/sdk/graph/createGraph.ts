@@ -41,7 +41,7 @@ export async function createGraph(
 ): Promise<Zep.Graph> {
     const { subject, scopes } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["write:graph"]); // 403 if auth has insufficient scopes
+    checkRequiredScopes(scopes, ["create:graph"]); // 403 if auth has insufficient scopes
 
     const { logToClient, zepClientProvider } = ctx;
 

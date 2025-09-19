@@ -10,7 +10,7 @@ export async function getMeCustomData(
 ) {
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
-    checkRequiredScopes(scopes, ["profile"]); // 403 if auth has insufficient scopes
+    checkRequiredScopes(scopes, ["read:user:custom-data"]); // 403 if auth has insufficient scopes
 
     const userCustomDataResponse = await client.GET(
         "/api/users/{userId}/custom-data",

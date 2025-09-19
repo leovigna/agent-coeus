@@ -72,7 +72,7 @@ export function getGetGraphEpisodesTool(ctx: {
 }) {
     return {
         ...getGraphEpisodesToolMetadata,
-        name: `zep_${getGraphEpisodesToolMetadata.name}`,
+        name: getGraphEpisodesToolMetadata.name,
         cb: partial(toCallToolResultFn(getGraphEpisodes), ctx),
     } as const satisfies Tool<typeof getGraphEpisodesInputSchema, ZodRawShape>;
 }

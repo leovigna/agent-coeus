@@ -72,7 +72,7 @@ export function getGetGraphEdgesTool(ctx: {
 }) {
     return {
         ...getGraphEdgesToolMetadata,
-        name: `zep_${getGraphEdgesToolMetadata.name}`,
+        name: getGraphEdgesToolMetadata.name,
         cb: partial(toCallToolResultFn(getGraphEdges), ctx),
     } as const satisfies Tool<typeof getGraphEdgesInputSchema, ZodRawShape>;
 }

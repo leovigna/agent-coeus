@@ -16,6 +16,7 @@ import {
     getGetGraphEpisodesTool,
     getGetGraphTool,
     getListEntityTypesTool,
+    getListGraphsTool,
     getSearchGraphTool,
 } from "@coeus-agent/mcp-tools-zep";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -51,6 +52,7 @@ export function registerMcpTools(
         getGetGraphTool({ logToClient, zepClientProvider: zepClient }),
         getSearchGraphTool({ logToClient, zepClientProvider: zepClient }),
         getListEntityTypesTool({ logToClient, zepClientProvider: zepClient }),
+        getListGraphsTool({ logToClient, zepClientProvider: zepClient }),
         getAddDataTool({ logToClient, zepClientProvider: zepClient }),
         getAddDataBatchTool({ logToClient, zepClientProvider: zepClient }),
         getDeleteGraphTool({ logToClient, zepClientProvider: zepClient }),

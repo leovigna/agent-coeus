@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { createManagementApi } from "@logto/api/management";
 
 import {
+    LOGTO_API_INDICATOR_BASE_URL,
     LOGTO_M2M_CLIENT_ID,
     LOGTO_M2M_CLIENT_SECRET,
     LOGTO_TENANT_ID,
@@ -80,7 +81,7 @@ async function getOrCreateApiResourceScopes(
                 params: { path: { resourceId } },
                 body: {
                     name: scopeName,
-                    description: scopeName.replace(":", " "),
+                    description: scopeName.split(":").join(" "),
                 },
             })
         ).data!;
@@ -186,6 +187,7 @@ export async function setResourceScopesToRole(
             body: {
                 scopeIds: missingScopeIds,
             },
+            parseAs: "stream",
         });
     }
 
@@ -221,7 +223,6 @@ async function setResourceScopesToOrganizationRole(
     );
     if (missingScopeIds.length > 0) {
         await client.POST("/api/organization-roles/{id}/resource-scopes", {
-            headers: { "Content-Type": "text/plain" },
             params: { path: { id: roleId } },
             body: {
                 scopeIds: missingScopeIds,
@@ -238,35 +239,16 @@ async function setResourceScopesToOrganizationRole(
     return resourceScopes;
 }
 
-/*
-    async function getLogToData(client: LogToClient) {
-        // Global Roles
-        const roles = (await client.GET("/api/roles")).data!;
-        // Organization Roles
-        const organizationRoles = (await client.GET("/api/organization-roles")).data!;
-        // Resources
-        const resources = (await client.GET("/api/resources")).data!;
-        console.debug({ roles, organizationRoles, resources });
-
-        // Resource scopes (aka permissions)
-        const orgResource = resources.find(r => r.name === "org");
-        if (orgResource) {
-            const orgResourceScopes = (await client.GET("/api/resources/{resourceId}/scopes", {
-                params: { path: { resourceId: orgResource.id } },
-            })).data!;
-            console.debug(orgResourceScopes);
-        }
-
-        // Organization Role scopes (aka permissions)
-        const ownerRole = organizationRoles.find(r => r.name === "owner");
-        if (ownerRole) {
-            const ownerRolePermissions = (await client.GET("/api/organization-roles/{id}/resource-scopes", {
-                params: { path: { id: ownerRole.id } },
-            })).data!;
-            console.debug(ownerRolePermissions);
-        }
-    }
-    */
+// Helper to create standard CRUD scopes
+function getCrudScopes(resourceName: string) {
+    return [
+        `list:${resourceName}s`,
+        `create:${resourceName}`,
+        `read:${resourceName}`,
+        `update:${resourceName}`,
+        `delete:${resourceName}`,
+    ];
+}
 
 /**
  * Setup LogTo with standard SaaS resources, scopes, and roles
@@ -293,13 +275,37 @@ export async function setupLogTo(
     const resourceScopes = await getOrCreateApiResourceScopes(
         client,
         mcpResource.id,
-        ["list:orgs", "create:org", "read:org", "update:org", "delete:org"],
+        [
+            ...getCrudScopes("org"),
+            ...getCrudScopes("graph"),
+            "read:user:custom-data",
+            "update:user:custom-data",
+        ],
     );
     const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
     const createOrgScope = resourceScopes.find((s) => s.name === "create:org")!;
     const readOrgScope = resourceScopes.find((s) => s.name === "read:org")!;
     const updateOrgScope = resourceScopes.find((s) => s.name === "update:org")!;
     const deleteOrgScope = resourceScopes.find((s) => s.name === "delete:org")!;
+    const listGraphsScope = resourceScopes.find(
+        (s) => s.name === "list:graphs",
+    )!;
+    const createGraphScope = resourceScopes.find(
+        (s) => s.name === "create:graph",
+    )!;
+    const readGraphScope = resourceScopes.find((s) => s.name === "read:graph")!;
+    const updateGraphScope = resourceScopes.find(
+        (s) => s.name === "update:graph",
+    )!;
+    const deleteGraphScope = resourceScopes.find(
+        (s) => s.name === "delete:graph",
+    )!;
+    const readUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "read:user:custom-data",
+    )!;
+    const updateUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "update:user:custom-data",
+    )!;
 
     // User role (Note: Go to console to set this as default role)
     const roles = await getOrCreateRoles(client, ["user"]);
@@ -311,36 +317,64 @@ export async function setupLogTo(
             isDefault: true,
         },
     });
-    // User role gets CREATE org scope
+    // User: create:org list:orgs
     const userResourceScopes = await setResourceScopesToRole(
         client,
         userRole.id,
-        [createOrgScope.id, listOrgsScope.id],
+        [
+            createOrgScope.id,
+            listOrgsScope.id,
+            readUserCustomDataScope.id,
+            updateUserCustomDataScope.id,
+        ],
     );
 
     // Owner/Admin/Member organization roles
     const orgRoles = await getOrCreateOrganizationRoles(client);
 
-    // Owner roles get READ/UPDATE/DELETE org scopes
+    // Owner: read:org update:org delete:org list:graphs create:graph read:graph update:graph delete:graph
     const ownerRole = orgRoles.find((r) => r.name === "owner")!;
     const ownerResourceScopes = await setResourceScopesToOrganizationRole(
         client,
         ownerRole.id,
-        [readOrgScope.id, updateOrgScope.id, deleteOrgScope.id],
+        [
+            readOrgScope.id,
+            updateOrgScope.id,
+            deleteOrgScope.id,
+            createGraphScope.id,
+            listGraphsScope.id,
+            readGraphScope.id,
+            updateGraphScope.id,
+            deleteGraphScope.id,
+        ],
     );
-    // Admin roles get READ/UPDATE org scopes
+    // Admin: read:org update:org list:graphs create:graph read:graph update:graph delete:graph
     const adminRole = orgRoles.find((r) => r.name === "admin")!;
     const adminResourceScopes = await setResourceScopesToOrganizationRole(
         client,
         adminRole.id,
-        [readOrgScope.id, updateOrgScope.id],
+        [
+            readOrgScope.id,
+            updateOrgScope.id,
+            listGraphsScope.id,
+            createGraphScope.id,
+            readGraphScope.id,
+            updateGraphScope.id,
+            deleteGraphScope.id,
+        ],
     );
-    // Member roles get READ org scopes
+    // Member: read:org list:graphs create:graph read:graph update:graph
     const memberRole = orgRoles.find((r) => r.name === "member")!;
     const memberResourceScopes = await setResourceScopesToOrganizationRole(
         client,
         memberRole.id,
-        [readOrgScope.id],
+        [
+            readOrgScope.id,
+            listGraphsScope.id,
+            createGraphScope.id,
+            readGraphScope.id,
+            updateGraphScope.id,
+        ],
     );
 
     return {
@@ -364,17 +398,13 @@ export async function deleteAllOrgs(client: LogToClient) {
 }
 
 async function main() {
-    // if (!LOGTO_API_INDICATOR_BASE_URL) throw new Error("LOGTO_API_INDICATOR_BASE_URL is not set");
-    // const indicatorBaseUrl = new URL(LOGTO_API_INDICATOR_BASE_URL);
-    // const client = getLogToClient();
-    // const result = await setupLogTo(client, indicatorBaseUrl.toString());
-    // console.debug(result);
+    if (!LOGTO_API_INDICATOR_BASE_URL)
+        throw new Error("LOGTO_API_INDICATOR_BASE_URL is not set");
+    const indicatorBaseUrl = new URL(LOGTO_API_INDICATOR_BASE_URL);
+    const client = getLogToClient();
+    const result = await setupLogTo(client, indicatorBaseUrl.toString());
+    console.debug(result);
     // await deleteAllOrgs(client);
-    // Global role gets CREATE org scope
-    // const globalRoles = (await client.GET("/api/roles")).data!;
-    // const globalAdminRole = globalRoles.find(r => r.name === "admin")!;
-    // const globalAdminResourceScopes = await setResourceScopesToOrganizationRole(client, globalAdminRole.id, [createOrgScope.id]);
-    // console.debug({ globalRoles });
 }
 
 main().catch((err) => {

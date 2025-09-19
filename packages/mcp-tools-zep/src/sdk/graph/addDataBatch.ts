@@ -32,7 +32,7 @@ export async function addDataBatch(
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.Episode[]> {
     const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["write:graph"]); // 403 if auth has insufficient scopes
+    checkRequiredScopes(scopes, ["update:graph"]); // 403 if auth has insufficient scopes
 
     const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
 

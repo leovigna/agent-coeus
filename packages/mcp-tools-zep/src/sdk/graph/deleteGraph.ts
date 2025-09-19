@@ -45,7 +45,7 @@ export async function deleteGraph(
 ): Promise<Zep.SuccessResponse> {
     const { subject, scopes } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["write:graph"]); // 403 if auth has insufficient scopes
+    checkRequiredScopes(scopes, ["delete:graph"]); // 403 if auth has insufficient scopes
 
     const { logToClient, zepClientProvider } = ctx;
 
