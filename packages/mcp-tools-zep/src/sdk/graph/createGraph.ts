@@ -58,11 +58,10 @@ export async function createGraph(
     const zepClient = await resolveZepClient(zepClientProvider, authInfo);
     const graphId = `${orgId}:${userId}:${v7()}`; // unique graphId
 
-    const graph = await zepClient.graph.create({
+    return zepClient.graph.create({
         graphId,
         name: name,
     });
-    return graph;
 }
 
 // MCP Tool

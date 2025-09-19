@@ -1,2 +1,1 @@
-export * from "./deleteEntityEdge.js";
-export * from "./getEntityEdge.js";
+export * from "./getGraphEdges.js";

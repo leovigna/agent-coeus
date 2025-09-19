@@ -10,34 +10,17 @@ import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, type ZodRawShape, type ZodTypeAny } from "zod";
+import type { z, ZodRawShape, ZodTypeAny } from "zod";
 
+import { episodeDataSchema, graphIdParamsSchema } from "../../schemas/index.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
 import { getGraph } from "./getGraph.js";
 
 export const addDataInputSchema = {
-    orgId: z
-        .string()
-        .optional()
-        .describe(
-            "The ID of the organization. If not provided, uses the user's current org.",
-        ),
-    graphUUID: z.string().optional().describe("The ID of the graph"),
-    name: z.string().describe("Name of the episode"),
-    episode_body: z
-        .string()
-        .describe("The content of the episode to persist to memory."),
-    source: z
-        .enum(["text", "json", "message"])
-        .default("text")
-        .describe("Source type"),
-    source_description: z
-        .string()
-        .default("")
-        .describe("Description of the source"),
-    uuid: z.string().optional().describe("Optional UUID for the episode"),
+    ...graphIdParamsSchema,
+    ...episodeDataSchema,
 };
 
 /**
@@ -118,7 +101,7 @@ export async function addData(
 
     const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
 
-    const { episode_body, source, source_description } = params;
+    const { data, sourceDescription, type } = params;
 
     const { orgId, graphUUID } = params;
 
@@ -132,13 +115,12 @@ export async function addData(
         { authInfo },
     );
     // Add episode to graph
-    const episode = await zepClient.graph.add({
-        data: episode_body,
-        type: source,
-        sourceDescription: source_description,
+    return zepClient.graph.add({
+        data,
+        type,
+        sourceDescription,
         graphId: graph.graphId!,
     });
-    return episode;
 }
 
 export const addDataToolMetadata = {

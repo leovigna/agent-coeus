@@ -25,9 +25,13 @@ export const deleteGraphInputSchema = {
         .string()
         .optional()
         .describe(
-            "The ID of the organization. If not provided, uses the user's current org.",
+            "Organization unique identifier. If not provided, uses the user's current org.",
         ),
-    graphUUID: z.string().optional().describe("The ID of the graph"),
+    graphUUID: z
+        .string()
+        .describe(
+            "Graph unique identifier. If not provided, uses the user's default graph.",
+        ),
 };
 
 // https://help.getzep.com/sdk-reference/graph/delete
@@ -46,7 +50,7 @@ export async function deleteGraph(
     const { logToClient, zepClientProvider } = ctx;
 
     const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
-    const graphUUID = params.graphUUID ?? "default";
+    const graphUUID = params.graphUUID;
 
     // Check user has access to org
     await checkOrganizationUserRoles(

@@ -14,20 +14,14 @@ import {
 import { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, type ZodRawShape } from "zod";
+import type { z, ZodRawShape } from "zod";
 
+import { graphIdParamsSchema } from "../../schemas/index.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
-// TODO: Add graph id schema validation
 export const getGraphInputSchema = {
-    orgId: z
-        .string()
-        .optional()
-        .describe(
-            "The ID of the organization. If not provided, uses the user's current org.",
-        ),
-    graphUUID: z.string().optional().describe("The ID of the graph"),
+    ...graphIdParamsSchema,
 };
 
 // https://help.getzep.com/sdk-reference/graph/get
@@ -73,8 +67,7 @@ export async function getGraph(
         }
     }
 
-    const graph = await zepClient.graph.get(graphId);
-    return graph;
+    return zepClient.graph.get(graphId);
 }
 
 // MCP Tool

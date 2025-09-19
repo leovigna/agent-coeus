@@ -11,13 +11,12 @@ import {
     getAddDataBatchTool,
     getAddDataTool,
     getCreateGraphTool,
-    getDeleteEntityEdgeTool,
-    getDeleteEpisodeTool,
     getDeleteGraphTool,
-    getGetEntityEdgeTool,
-    getGetEpisodesTool,
-    getSearchMemoryFactsTool,
-    getSearchMemoryNodesTool,
+    getGetGraphEdgesTool,
+    getGetGraphEpisodesTool,
+    getGetGraphTool,
+    getListEntityTypesTool,
+    getSearchGraphTool,
 } from "@coeus-agent/mcp-tools-zep";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -49,17 +48,16 @@ export function registerMcpTools(
         getDeleteOrganizationTool(logToClient),
         // zep/graph
         getCreateGraphTool({ logToClient, zepClientProvider: zepClient }),
-        getSearchMemoryNodesTool(zepClient),
-        getSearchMemoryFactsTool(zepClient),
+        getGetGraphTool({ logToClient, zepClientProvider: zepClient }),
+        getSearchGraphTool({ logToClient, zepClientProvider: zepClient }),
+        getListEntityTypesTool({ logToClient, zepClientProvider: zepClient }),
         getAddDataTool({ logToClient, zepClientProvider: zepClient }),
         getAddDataBatchTool({ logToClient, zepClientProvider: zepClient }),
         getDeleteGraphTool({ logToClient, zepClientProvider: zepClient }),
         // zep/edge
-        getGetEntityEdgeTool(zepClient),
-        getDeleteEntityEdgeTool(zepClient),
+        getGetGraphEdgesTool({ logToClient, zepClientProvider: zepClient }),
         // zep/episode
-        getGetEpisodesTool(zepClient),
-        getDeleteEpisodeTool(zepClient),
+        getGetGraphEpisodesTool({ logToClient, zepClientProvider: zepClient }),
     ];
 
     tools.forEach((tool) => {
