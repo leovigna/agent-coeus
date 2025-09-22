@@ -1,9 +1,9 @@
-# COEUS_EPISODE_TEMPLATES.md
+# COEUS_EPISODE_TEMPLATES (v1.01)
 
-## About
-Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="json"`. You may include extra fields. Keep JSON shallow, self‑contained, and ≤ 10,000 chars when stringified.
+Non‑strict JSON Schemas and JSON examples for the **`data`** payload when calling Zep Actions with `type="json"`
+(`zep-addData` for one, `zep-addDataBatch` for many). Keep JSON **≤10,000 chars stringified** per episode, shallow, self‑contained, and unified.
 
-### Document — JSON Schema
+## Document — JSON Schema
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -20,7 +20,6 @@ Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="jso
     "authors": { "type": "array", "items": { "type": "string" } },
     "summary": { "type": "array", "items": { "type": "string" } },
     "key_points": { "type": "array", "items": { "type": "string" } },
-    "quotes": { "type": "array", "items": { "type": "string" } },
     "metrics": { "type": "object", "additionalProperties": true },
     "topics": { "type": "array", "items": { "type": "string" } },
     "tags": { "type": "array", "items": { "type": "string" } },
@@ -50,7 +49,7 @@ Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="jso
 }
 ```
 
-### ResearchSummary — JSON Schema
+## ResearchSummary — JSON Schema
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -105,7 +104,7 @@ Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="jso
 }
 ```
 
-### Lead — JSON Schema
+## Lead — JSON Schema
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -165,7 +164,7 @@ Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="jso
 }
 ```
 
-### Event — JSON Schema
+## Event — JSON Schema
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -207,7 +206,7 @@ Non‑strict JSON Schemas and JSON examples for `episode_body` when `source="jso
 }
 ```
 
-### Update — JSON Schema
+## Update — JSON Schema
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
