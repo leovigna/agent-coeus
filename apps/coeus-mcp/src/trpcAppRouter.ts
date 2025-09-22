@@ -27,6 +27,10 @@ const logToRouter = router({
         .concat(logToPlugin.updateOrganization)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    getMeProfile: publicProcedure
+        .concat(logToPlugin.getMeProfile)
+        .output(z.any())
+        .query(({ ctx: { result } }) => result),
 });
 
 const zepPlugin = createZepPlugin({

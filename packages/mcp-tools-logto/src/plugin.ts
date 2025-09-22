@@ -2,6 +2,7 @@ import type { LogToClient } from "./LogToClient.js";
 import {
     createCreateOrganizationProcedure,
     createDeleteOrganizationProcedure,
+    createGetMeProfileProcedure,
     createGetOrganizationProcedure,
     createListOrganizationsProcedure,
     createUpdateOrganizationProcedure,
@@ -19,6 +20,7 @@ export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
     const updateOrganization = createUpdateOrganizationProcedure(
         ctx.logToClient,
     );
+    const getMeProfile = createGetMeProfileProcedure(ctx.logToClient);
 
     return {
         createOrganization,
@@ -26,5 +28,6 @@ export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
         getOrganization,
         listOrganizations,
         updateOrganization,
+        getMeProfile,
     };
 }

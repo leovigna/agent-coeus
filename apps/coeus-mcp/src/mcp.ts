@@ -2,6 +2,7 @@ import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
     getCreateOrganizationTool,
     getDeleteOrganizationTool,
+    getGetMeProfileTool,
     getGetOrganizationTool,
     getListOrganizationsTool,
     getUpdateOrganizationTool,
@@ -36,6 +37,7 @@ export function registerMcpTools(
         getListOrganizationsTool(logToClient),
         getUpdateOrganizationTool(logToClient),
         getDeleteOrganizationTool(logToClient),
+        getGetMeProfileTool(logToClient),
         // zep/graph
         getCreateGraphTool({ logToClient, zepClientProvider: zepClient }),
         getGetGraphTool({ logToClient, zepClientProvider: zepClient }),

@@ -52,7 +52,7 @@ export async function getOrganization(
 }
 
 export const getOrganizationToolMetadata = {
-    name: "get_organization",
+    name: "logto_get_organization",
     config: {
         title: "Get Organization",
         description: "Get an organization by its ID.",
