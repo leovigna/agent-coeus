@@ -9,9 +9,7 @@ const openApiDocument = generateOpenApiDocument(appRouter, {
     description,
     version: "1.0.0",
     baseUrl: "http://localhost:3000/api",
-    // baseUrl: "https://neat-perfectly-buck.ngrok-free.app/api",
     docsUrl: "https://github.com/leovigna/agent-coeus",
-    tags: ["tools"],
 });
 
 openApiDocument.servers = [

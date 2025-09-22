@@ -77,9 +77,9 @@ export function getListEntityTypesTool(ctx: {
 // TRPC Procedure
 export const getListEntityTypesProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: `/${listEntityTypesToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        method: "GET",
+        path: "/zep/graph/entity-types",
+        tags: ["zep"],
         summary: listEntityTypesToolMetadata.config.title,
         description: listEntityTypesToolMetadata.config.description,
     },

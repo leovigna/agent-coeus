@@ -76,8 +76,8 @@ export function getGetOrganizationTool(client: LogToClient) {
 export const getOrganizationProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: `/${getOrganizationToolMetadata.name}/{id}`,
-        tags: ["tools", "logto"],
+        path: "/logto/organization/{id}",
+        tags: ["logto"],
         summary: getOrganizationToolMetadata.config.title,
         description: getOrganizationToolMetadata.config.description,
     },

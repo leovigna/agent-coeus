@@ -79,8 +79,8 @@ export function getDeleteOrganizationTool(client: LogToClient) {
 export const deleteOrganizationProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: `/${deleteOrganizationToolMetadata.name}/{id}`,
-        tags: ["tools", "logto"],
+        path: "/logto/organization/{id}",
+        tags: ["logto"],
         summary: deleteOrganizationToolMetadata.config.title,
         description: deleteOrganizationToolMetadata.config.description,
     },

@@ -91,9 +91,9 @@ export function getDeleteGraphTool(ctx: {
 // TRPC Procedure
 export const deleteGraphProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: `/${deleteGraphToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        method: "DELETE",
+        path: "/zep/graph",
+        tags: ["zep"],
         summary: deleteGraphToolMetadata.config.title,
         description: deleteGraphToolMetadata.config.description,
     },

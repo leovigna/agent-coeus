@@ -81,8 +81,8 @@ export function getGetGraphEdgesTool(ctx: {
 export const getGraphEdgesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: `/${getGraphEdgesToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        path: "/zep/graph/edge/graph",
+        tags: ["zep"],
         summary: getGraphEdgesToolMetadata.config.title,
         description: getGraphEdgesToolMetadata.config.description,
     },

@@ -100,9 +100,9 @@ export function getListGraphsTool(ctx: {
 // TRPC Procedure
 export const listGraphsProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: `/${listGraphsToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        method: "GET",
+        path: "/zep/graph/list",
+        tags: ["zep"],
         summary: listGraphsToolMetadata.config.title,
         description: listGraphsToolMetadata.config.description,
     },

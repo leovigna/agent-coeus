@@ -149,8 +149,8 @@ export function getAddDataTool(ctx: {
 export const addDataProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: `/${addDataToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        path: "/zep/graph/add-data",
+        tags: ["zep"],
         summary: addDataToolMetadata.config.title,
         description: addDataToolMetadata.config.description,
     },

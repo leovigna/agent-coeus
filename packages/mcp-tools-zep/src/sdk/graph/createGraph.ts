@@ -90,8 +90,8 @@ export function getCreateGraphTool(ctx: {
 export const createGraphProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: `/${createGraphToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        path: "/zep/graph",
+        tags: ["zep"],
         summary: createGraphToolMetadata.config.title,
         description: createGraphToolMetadata.config.description,
     },

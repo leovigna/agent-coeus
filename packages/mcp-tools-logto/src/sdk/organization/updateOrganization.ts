@@ -95,8 +95,8 @@ export function getUpdateOrganizationTool(client: LogToClient) {
 export const updateOrganizationProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: `/${updateOrganizationToolMetadata.name}/{id}`,
-        tags: ["tools", "logto"],
+        path: "/logto/organization/{id}",
+        tags: ["logto"],
         summary: updateOrganizationToolMetadata.config.title,
         description: updateOrganizationToolMetadata.config.description,
     },

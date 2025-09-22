@@ -81,8 +81,8 @@ export function getGetGraphEpisodesTool(ctx: {
 export const getGraphEpisodesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: `/${getGraphEpisodesToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        path: "/zep/graph/episode/graph",
+        tags: ["zep"],
         summary: getGraphEpisodesToolMetadata.config.title,
         description: getGraphEpisodesToolMetadata.config.description,
     },

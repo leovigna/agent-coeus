@@ -82,8 +82,8 @@ export function getAddDataBatchTool(ctx: {
 export const addDataBatchProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: `/${addDataBatchToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        path: "/zep/graph/add-data-batch",
+        tags: ["zep"],
         summary: addDataBatchToolMetadata.config.title,
         description: addDataBatchToolMetadata.config.description,
     },

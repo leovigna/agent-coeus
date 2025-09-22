@@ -96,9 +96,9 @@ export function getGetGraphTool(ctx: {
 // TRPC Procedure
 export const getGraphProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: `/${getGraphToolMetadata.name}`,
-        tags: ["tools", "zep"],
+        method: "GET",
+        path: "/zep/graph",
+        tags: ["zep"],
         summary: getGraphToolMetadata.config.title,
         description: getGraphToolMetadata.config.description,
     },
