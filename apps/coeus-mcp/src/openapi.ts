@@ -21,6 +21,7 @@ openApiDocument.servers = [
         url: "https://neat-perfectly-buck.ngrok-free.app/api",
         description: "Local development proxy",
     },
-];
+]; // set servers to support dual environment setup (local + ngrok)
+openApiDocument.openapi = "3.1.0"; // set OpenAPI version to 3.1.0 (preferred by ChatGPT Actions)
 
 export { openApiDocument };
