@@ -10,7 +10,7 @@ import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 
 import { OIDC_BASE_URL, OIDC_CLIENT_ID } from "./envvars.js";
 import { openApiDocument } from "./openapi.js";
-import { appRouter } from "./procedures/index.js";
+import { appRouter } from "./trpcAppRouter.js";
 import { createContext } from "./trpc.js";
 
 if (!OIDC_CLIENT_ID) {

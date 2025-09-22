@@ -1,6 +1,6 @@
 import { generateOpenApiDocument } from "trpc-to-openapi";
 
-import { appRouter } from "./procedures/index.js";
+import { appRouter } from "./trpcAppRouter.js";
 
 // Generate OpenAPI document
 const description = "OpenAPI compliant REST API for Coeus MCP";
