@@ -11,26 +11,31 @@ import type { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
+import { getMeCustomData } from "./getMeCustomData.js";
+
 export const getMeProfileInputSchema = {};
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function getMeProfile(
-    _: LogToClient,
-    __: z.objectOutputType<typeof getMeProfileInputSchema, ZodTypeAny>,
+    client: LogToClient,
+    _: z.objectOutputType<typeof getMeProfileInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
 
-    return { userId, scopes };
+    const userCustomData = (await getMeCustomData(client, {
+        authInfo,
+    })) as unknown as { currentOrgId?: string };
+
+    return { userId, scopes, currentOrgId: userCustomData.currentOrgId };
 }
 
 // MCP Tool
 export const getMeProfileToolMetadata = {
     name: "logto_get_me_profile",
     config: {
-        title: "Create Organization",
-        description: "Create a new organization.",
+        title: "Get Me Profile",
+        description: "Get the profile of the authenticated user.",
         inputSchema: getMeProfileInputSchema,
     },
 } as const satisfies ToolMetadata<typeof getMeProfileInputSchema, ZodRawShape>;
