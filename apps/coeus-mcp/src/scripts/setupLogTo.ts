@@ -81,7 +81,7 @@ async function getOrCreateApiResourceScopes(
                 params: { path: { resourceId } },
                 body: {
                     name: scopeName,
-                    description: scopeName.split(":").join(" "),
+                    description: scopeName.replaceAll(":", " "),
                 },
             })
         ).data!;

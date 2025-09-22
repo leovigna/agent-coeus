@@ -8,19 +8,19 @@ const openApiDocument = generateOpenApiDocument(appRouter, {
     title: "Coeus MCP OpenAPI",
     description,
     version: "1.0.0",
-    baseUrl: "http://localhost:3000/auth/api",
-    // baseUrl: "https://neat-perfectly-buck.ngrok-free.app/auth/api",
+    baseUrl: "http://localhost:3000/api",
+    // baseUrl: "https://neat-perfectly-buck.ngrok-free.app/api",
     docsUrl: "https://github.com/leovigna/agent-coeus",
     tags: ["tools"],
 });
 
 openApiDocument.servers = [
     {
-        url: "http://localhost:3000/auth/api",
+        url: "http://localhost:3000/api",
         description: "Local development server",
     },
     {
-        url: "https://neat-perfectly-buck.ngrok-free.app/auth/api",
+        url: "https://neat-perfectly-buck.ngrok-free.app/api",
         description: "Local development proxy",
     },
 ];

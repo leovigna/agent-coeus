@@ -27,69 +27,6 @@ const OIDC_ISSUER_URL = new URL("oidc", OIDC_BASE_URL);
 const OIDC_TOKEN_URL = new URL("oidc/token", OIDC_BASE_URL);
 // const OIDC_REVOCATION_URL = join(OIDC_BASE_URL, "oidc/revoke");
 
-/**
- * Verify JWT token
- * @param params clientId, jwksUri, issuer
- * @returns (token) => Promise<AuthInfo>
- */
-/*
-export function getVerifyJwtToken({ clientId, jwksUri, issuer }: { clientId: string; jwksUri: string; issuer: string }): (token: string) => Promise<AuthInfo> {
-    const jwks = createRemoteJWKSet(new URL(jwksUri));
-
-    return async function (token: string): Promise<AuthInfo> {
-        console.debug({ token, jwksUri, issuer });
-        const { payload } = await jwtVerify(token, jwks, {
-            issuer: issuer,
-        });
-        const scopes = (payload.scope as string)?.split(" ") ?? [];
-
-        return {
-            token,
-            issuer,
-            clientId,
-            scopes,
-            expiresAt: payload.exp,
-            subject: payload.sub,
-            audience: payload.aud,
-        };
-
-        // MCPAuth Error causes issues with mcp inspector
-        // throw new MCPAuthTokenVerificationError("token_verification_failed");
-    };
-}
-*/
-
-/**
- * Verify opaque access token by calling the userinfo endpoint
- * @param params clientId, userInfoEndpoint, issuer
- * @returns (token) => Promise<AuthInfo>
- */
-/*
-export function getVerifyAccessToken({ clientId, userInfoEndpoint, issuer }: { clientId: string; userInfoEndpoint: string; issuer: string }): (token: string) => Promise<AuthInfo> {
-    return async function (token: string): Promise<AuthInfo> {
-        const response = await fetch(userInfoEndpoint, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) throw new Error("Token verification failed");
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const userInfo = await response.json();
-
-        return {
-            token,
-            issuer,
-            clientId,
-            scopes: [],
-            expiresAt: 0,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            subject: userInfo.sub,
-            audience: "",
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            claims: userInfo,
-        };
-    };
-}
-*/
-
 export async function getExpressApp({
     mcpServer,
     mcpTransport,
@@ -131,30 +68,22 @@ export async function getExpressApp({
     // Delegated Authorization Server
     app.use(mcpAuth.delegatedRouter()); // .well-known/oauth-authorization-server (OAuth 2.0 Metadata Endpoint)
 
-    // Bearer Access Token verification
-    // const verifyAccessToken = getVerifyAccessToken({ clientId: OIDC_CLIENT_ID!, userInfoEndpoint: userinfoEndpoint!, issuer });
-    // app.use("/auth", mcpAuth.bearerAuth(verifyAccessToken));
-
     // JWT Token verification
-
-    // https://mcp-auth.dev/docs/0.1.1/configure-server/bearer-auth#configure-bearer-auth-with-custom-verification
-    // const verifyJwtToken = getVerifyJwtToken({ clientId: OIDC_CLIENT_ID!, jwksUri: jwksUri!, issuer });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    app.use("/auth", mcpAuth.bearerAuth("jwt"));
-
-    // https://mcp-auth.dev/docs/0.1.1/configure-server/bearer-auth#configure-bearer-auth-with-jwt-mode
-    // app.use("/auth", mcpAuth.bearerAuth("jwt")); // Built-in JWT verification
+    app.use("/api", mcpAuth.bearerAuth("jwt"));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    app.use("/mcp", mcpAuth.bearerAuth("jwt"));
 
     // Parse JSON
     app.use(express.json());
     // Protected endpoints
     // OpenAPI Middleware
     app.use(
-        "/auth/api",
+        "/api",
         createOpenApiExpressMiddleware({ router: appRouter, createContext }),
     );
     // MCP JSON-RPC Endpoint
-    app.post("/auth/mcp", async (req, res) => {
+    app.post("/mcp", async (req, res) => {
         await mcpTransport.handleRequest(req, res, req.body);
     });
 

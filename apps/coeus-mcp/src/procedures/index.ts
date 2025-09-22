@@ -1,3 +1,5 @@
+import { listGraphs } from "@coeus-agent/mcp-tools-zep";
+
 import { router } from "../trpc.js";
 
 import { getGraphEdgesProcedure } from "./edge/index.js";
@@ -9,6 +11,7 @@ import {
     deleteGraphProcedure,
     getGraphProcedure,
     listEntityTypesProcedure,
+    listGraphsProcedure,
     searchGraphProcedure,
 } from "./graph/index.js";
 import {
@@ -31,6 +34,7 @@ export const appRouter = router({
     getGraph: getGraphProcedure,
     searchGraph: searchGraphProcedure,
     listEntityTypes: listEntityTypesProcedure,
+    listGraphs: listGraphsProcedure,
     addData: addDataProcedure,
     addDataBatch: addDataBatchProcedure,
     deleteGraph: deleteGraphProcedure,

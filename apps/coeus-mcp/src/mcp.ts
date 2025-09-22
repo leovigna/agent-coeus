@@ -29,17 +29,6 @@ export function registerMcpTools(
     },
 ) {
     const { logToClient, zepClient } = clients;
-    // TODO: Throwing errors?
-    // TODO: Add models for episodes/memory etc..
-    // TODO: Connect Zep.js
-    // TODO: Add status resource for underlying zep.js connection
-
-    // OpenAI Deep Research Tools
-    // TODO: Implement these later
-    // server.registerTool(searchTool.name, searchTool.config, searchTool.cb);
-    // server.registerTool(fetchTool.name, fetchTool.config, fetchTool.cb);
-
-    // const whoAmITool = getWhoAmITool(logToClient);
     const tools = [
         // logto/organization
         getCreateOrganizationTool(logToClient),
