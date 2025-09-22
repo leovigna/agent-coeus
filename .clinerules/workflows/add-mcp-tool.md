@@ -34,59 +34,31 @@ This workflow automates the creation of a new tool within an existing MCP tool l
 **Template:**
 ```typescript
 import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn } from "@coeus-agent/mcp-tools-base";
-import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
-import { partial } from "lodash-es";
-import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, ZodRawShape, ZodTypeAny } from "zod";
-// Note: The client import path will need to be adjusted.
-import type { Client } from "../../Client.js";
+// ... other imports
 
 // 1. Input Schema
-export const {{toolName}}InputSchema = {
-    // {{zodSchema}}
-};
+export const {{toolName}}InputSchema = { /* ... */ };
 
 // 2. SDK Function
-export async function {{toolName}}(client: Client, params: z.objectOutputType<typeof {{toolName}}InputSchema, ZodTypeAny>, { authInfo }: { authInfo: AuthInfo }) {
-    // ... business logic ...
-}
+export async function {{toolName}}(client: Client, params: ..., { authInfo }: { authInfo: AuthInfo }) { /* ... */ }
 
 // 3. MCP Tool Metadata
-export const {{toolName}}ToolMetadata = {
-    name: "logto_{{snake_case_tool_name}}",
-    config: {
-        title: "{{Title Case Tool Name}}",
-        description: "{{description}}",
-        inputSchema: {{toolName}}InputSchema,
-    },
-} as const satisfies ToolMetadata<typeof {{toolName}}InputSchema, ZodRawShape>;
+export const {{toolName}}ToolMetadata = { /* ... */ };
 
 // 4. MCP Tool Factory
-export function get{{ToolName}}Tool(client: Client) {
-    return {
-        ...{{toolName}}ToolMetadata,
-        cb: partial(toCallToolResultFn({{toolName}}), client),
-    } as const satisfies Tool<typeof {{toolName}}InputSchema, ZodRawShape>;
-}
+export function get{{ToolName}}Tool(client: Client) { /* ... */ }
 
 // 5. tRPC Procedure Metadata
-export const {{toolName}}ProcedureMetadata = {
-    openapi: {
-        // TODO: Adjust method and path
-        method: "POST",
-        path: `/${{{toolName}}ToolMetadata.name}`,
-        tags: ["tools", "logto"],
-        summary: {{toolName}}ToolMetadata.config.title,
-    },
-} as OpenApiMeta;
+export const {{toolName}}ProcedureMetadata = { /* ... */ };
 
 // 6. tRPC Procedure Factory
-export const create{{ToolName}}Procedure = toProcedurePluginFn({{toolName}}InputSchema, {{toolName}}, {{toolName}}ProcedureMetadata);
+export const create{{ToolName}}Procedure = toProcedurePluginFn(...);
 ```
 
 ---
 
-### **Step 3: Update Barrel Files and Rebuild**
+### **Step 3: Update Plugin and Barrel Files**
 
-1.  **Append exports** to the relevant `index.ts` files.
-2.  **Run the build command** for the target library.
+1.  **Update `plugin.ts`:** Add the new `create...Procedure` factory to the `create...Plugin` function.
+2.  **Update Barrel Files:** Append exports for the new tool to the relevant `index.ts` files.
+3.  **Run the build command** for the target library.
