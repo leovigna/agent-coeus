@@ -1,10 +1,10 @@
-import { zepClient } from "../clients/zep-client.js";
+import { zepClientDefault } from "../clients/zep-client.js";
 
 async function main() {
-    const graphs = await zepClient.graph.listAll();
+    const graphs = await zepClientDefault.graph.listAll();
 
     for (const graph of graphs.graphs ?? []) {
-        await zepClient.graph.delete(graph.graphId!);
+        await zepClientDefault.graph.delete(graph.graphId!);
     }
 }
 

@@ -26,6 +26,7 @@ export const createGraphInputSchema = {
         .string()
         .regex(/^[a-zA-Z0-9-_]+$/)
         .describe("Name of the graph, no spaces or special characters."),
+    description: z.string().optional().describe("Graph description."),
 };
 
 // https://help.getzep.com/sdk-reference/graph/create
@@ -50,7 +51,7 @@ export async function createGraph(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, orgId);
     const graphId = `${orgId}:${userId}:${name.toLowerCase()}`; // unique graphId
 
     return zepClient.graph.create({

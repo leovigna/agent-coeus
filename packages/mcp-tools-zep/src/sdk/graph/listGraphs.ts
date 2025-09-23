@@ -55,7 +55,7 @@ export async function listGraphs(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(zepClientProvider, authInfo);
+    const zepClient = await resolveZepClient(zepClientProvider, orgId);
 
     const graphs = await zepClient.graph.listAll();
 

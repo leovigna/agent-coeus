@@ -51,7 +51,7 @@ export async function deleteGraph(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
 
     return zepClient.graph.delete(graphId.graphId);
 }

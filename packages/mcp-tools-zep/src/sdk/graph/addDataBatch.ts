@@ -52,7 +52,7 @@ export async function addDataBatch(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
 
     // Add episodes to graph
     return zepClient.graph.addBatch({

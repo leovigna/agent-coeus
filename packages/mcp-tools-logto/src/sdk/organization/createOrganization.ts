@@ -49,8 +49,9 @@ export async function createOrganization(
         body: {
             name,
             description,
-            custom_data: customData,
-            is_mfa_required: isMfaRequired,
+            // cast to Record<string, never> as customData can have any type
+            customData: customData as unknown as Record<string, never>,
+            isMfaRequired,
         },
     });
     if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed

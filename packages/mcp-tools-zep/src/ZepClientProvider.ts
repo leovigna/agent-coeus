@@ -1,17 +1,16 @@
-import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import type { ZepClient } from "@getzep/zep-cloud";
 
 export type ZepClientProvider =
     | ZepClient
-    | ((authInfo: AuthInfo) => ZepClient)
-    | ((authInfo: AuthInfo) => Promise<ZepClient>);
+    | ((clientId: string) => ZepClient)
+    | ((clientId: string) => Promise<ZepClient>);
 
 export async function resolveZepClient(
     provider: ZepClientProvider,
-    authInfo: AuthInfo,
+    clientId: string,
 ): Promise<ZepClient> {
     if (typeof provider === "function") {
-        const result = provider(authInfo);
+        const result = provider(clientId);
         // Check if the result is a promise
         if (result instanceof Promise) {
             return await result;

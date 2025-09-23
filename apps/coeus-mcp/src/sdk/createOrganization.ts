@@ -18,9 +18,11 @@ import { logToClient } from "../clients/index.js";
 /** Override Create Organization Tools with schema validation **/
 export const createOrganizationInputSchema = {
     ...createOrganizationInputSchemaBase,
-    customData: z.object({
-        zepApiKey: z.string().optional().describe("Custom Zep API Key"),
-    }),
+    customData: z
+        .object({
+            zepApiKey: z.string().optional().describe("Custom Zep API Key"),
+        })
+        .optional(),
 };
 // MCP Tool
 export const createOrganizationToolMetadata = {
