@@ -7,31 +7,20 @@ import {
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import {
-    checkOrganizationUserRoles,
-    getMeOrgId,
-} from "@coeus-agent/mcp-tools-logto";
+import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
+import { createError, FORBIDDEN } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { z, type ZodRawShape } from "zod";
+import type { z, ZodRawShape } from "zod";
 
+import { graphIdSchema } from "../../schemas/index.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
 // TODO: Add graph id schema validation
 export const deleteGraphInputSchema = {
-    orgId: z
-        .string()
-        .optional()
-        .describe(
-            "Organization unique identifier. If not provided, uses the user's current org.",
-        ),
-    graphUUID: z
-        .string()
-        .describe(
-            "Graph unique identifier. If not provided, uses the user's default graph.",
-        ),
+    graphId: graphIdSchema,
 };
 
 // https://help.getzep.com/sdk-reference/graph/delete
@@ -43,27 +32,28 @@ export async function deleteGraph(
     params: z.objectOutputType<typeof deleteGraphInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.SuccessResponse> {
-    const { subject, scopes } = authInfo;
-    const userId = subject!;
+    const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["delete:graph"]); // 403 if auth has insufficient scopes
 
-    const { logToClient, zepClientProvider } = ctx;
+    const { graphId } = params;
 
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
-    const graphUUID = params.graphUUID;
+    if (graphId.userId != authInfo.subject) {
+        throw createError(
+            FORBIDDEN,
+            `graphId userId ${graphId.userId} does not match auth subject ${authInfo.subject}`,
+        ); // 403 if has insufficient permissions
+    }
 
     // Check user has access to org
     await checkOrganizationUserRoles(
-        logToClient,
-        { orgId, validRoles: ["owner", "admin", "member"] },
+        ctx.logToClient,
+        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(zepClientProvider, authInfo);
-    const graphId = `${orgId}:${userId}:${graphUUID}`; // unique graphId
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
 
-    const graph = await zepClient.graph.delete(graphId);
-    return graph;
+    return zepClient.graph.delete(graphId.graphId);
 }
 
 // MCP Tool

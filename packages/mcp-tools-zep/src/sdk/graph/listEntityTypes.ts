@@ -1,24 +1,27 @@
 import {
     type AuthInfo,
+    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
-import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import { getMeOrgId } from "@coeus-agent/mcp-tools-logto";
+import {
+    checkOrganizationUserRoles,
+    type LogToClient,
+} from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
+import { createError, FORBIDDEN } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import type { z, ZodRawShape } from "zod";
 
-import { graphIdParamsSchema } from "../../schemas/index.js";
+import { graphIdSchema } from "../../schemas/index.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
-import { getGraph } from "../index.js";
 
 export const listEntityTypesInputSchema = {
-    ...graphIdParamsSchema,
+    graphId: graphIdSchema,
 };
 
 // https://help.getzep.com/sdk-reference/graph/list-entity-types
@@ -30,24 +33,28 @@ export async function listEntityTypes(
     params: z.objectOutputType<typeof listEntityTypesInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.EntityTypeResponse> {
-    const { logToClient, zepClientProvider } = ctx;
+    const { scopes } = authInfo;
+    checkRequiredScopes(scopes, ["read:graph"]); // 403 if auth has insufficient scopes
 
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
-    const graphUUID = params.graphUUID ?? "default";
+    const { graphId } = params;
 
-    const zepClient = await resolveZepClient(zepClientProvider, authInfo);
+    if (graphId.userId != authInfo.subject) {
+        throw createError(
+            FORBIDDEN,
+            `graphId userId ${graphId.userId} does not match auth subject ${authInfo.subject}`,
+        ); // 403 if has insufficient permissions
+    }
 
-    // Ensure graph exists
-    const graph = await getGraph(
-        {
-            logToClient: ctx.logToClient,
-            zepClientProvider: zepClient,
-        },
-        { orgId, graphUUID },
+    // Check user has access to org
+    await checkOrganizationUserRoles(
+        ctx.logToClient,
+        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
-    );
+    ); // 404 if not part of org, 403 if has insufficient role
 
-    return zepClient.graph.listEntityTypes({ graphId: graph.graphId! });
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+
+    return zepClient.graph.listEntityTypes({ graphId: graphId.graphId });
 }
 
 // MCP Tool

@@ -7,14 +7,10 @@ import {
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import {
-    checkOrganizationUserRoles,
-    getMeOrgId,
-} from "@coeus-agent/mcp-tools-logto";
+import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
-import { v7 } from "uuid";
 import { z, type ZodRawShape } from "zod";
 
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
@@ -23,11 +19,13 @@ import { resolveZepClient } from "../../ZepClientProvider.js";
 export const createGraphInputSchema = {
     orgId: z
         .string()
-        .optional()
         .describe(
             "The ID of the organization. If not provided, uses the user's current org.",
         ),
-    name: z.string().optional().describe("Name of the graph"),
+    name: z
+        .string()
+        .regex(/^[a-zA-Z0-9-_]+$/)
+        .describe("Name of the graph, no spaces or special characters."),
 };
 
 // https://help.getzep.com/sdk-reference/graph/create
@@ -43,24 +41,21 @@ export async function createGraph(
     const userId = subject!;
     checkRequiredScopes(scopes, ["create:graph"]); // 403 if auth has insufficient scopes
 
-    const { logToClient, zepClientProvider } = ctx;
-
-    const { name } = params;
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
+    const { orgId, name } = params;
 
     // Check user has access to org
     await checkOrganizationUserRoles(
-        logToClient,
+        ctx.logToClient,
         { orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(zepClientProvider, authInfo);
-    const graphId = `${orgId}:${userId}:${v7()}`; // unique graphId
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+    const graphId = `${orgId}:${userId}:${name.toLowerCase()}`; // unique graphId
 
     return zepClient.graph.create({
         graphId,
-        name: name,
+        name,
     });
 }
 

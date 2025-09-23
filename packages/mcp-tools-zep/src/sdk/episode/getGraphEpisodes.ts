@@ -1,23 +1,24 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
+    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import { getMeOrgId } from "@coeus-agent/mcp-tools-logto";
+import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
+import { createError, FORBIDDEN } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import type { ZodRawShape, ZodTypeAny } from "zod";
 import { z } from "zod";
 
-import { graphIdParamsSchema } from "../../schemas/index.js";
+import { graphIdSchema } from "../../schemas/GraphIdParams.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
-import { getGraph } from "../graph/getGraph.js";
 
 export const getGraphEpisodesInputSchema = {
-    ...graphIdParamsSchema,
+    graphId: graphIdSchema,
     lastn: z
         .number()
         .optional()
@@ -33,24 +34,28 @@ export async function getGraphEpisodes(
     params: z.objectOutputType<typeof getGraphEpisodesInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.EpisodeResponse> {
-    const { logToClient, zepClientProvider } = ctx;
+    const { scopes } = authInfo;
+    checkRequiredScopes(scopes, ["read:graph"]); // 403 if auth has insufficient scopes
 
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
-    const graphUUID = params.graphUUID ?? "default";
+    const { graphId } = params;
 
-    const zepClient = await resolveZepClient(zepClientProvider, authInfo);
+    if (graphId.userId != authInfo.subject) {
+        throw createError(
+            FORBIDDEN,
+            `graphId userId ${graphId.userId} does not match auth subject ${authInfo.subject}`,
+        ); // 403 if has insufficient permissions
+    }
 
-    // Ensure graph exists
-    const graph = await getGraph(
-        {
-            logToClient: ctx.logToClient,
-            zepClientProvider: zepClient,
-        },
-        { orgId, graphUUID },
+    // Check user has access to org
+    await checkOrganizationUserRoles(
+        ctx.logToClient,
+        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
-    );
+    ); // 404 if not part of org, 403 if has insufficient role
 
-    return zepClient.graph.episode.getByGraphId(graph.graphId!, params);
+    const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
+
+    return zepClient.graph.episode.getByGraphId(graphId.graphId, params);
 }
 
 export const getGraphEpisodesToolMetadata = {

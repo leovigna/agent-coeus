@@ -16,16 +16,12 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
+import { graphIdSchema } from "../../schemas/GraphIdParams.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const listGraphsInputSchema = {
-    orgId: z
-        .string()
-        .optional()
-        .describe(
-            "Organization unique identifier. If not provided, uses the user's current org.",
-        ),
+    orgId: z.string().describe("Organization unique identifier"),
 };
 
 // https://help.getzep.com/sdk-reference/graph/list-all
@@ -64,13 +60,12 @@ export async function listGraphs(
     const graphs = await zepClient.graph.listAll();
 
     const filteredGraphs = (graphs.graphs ?? []).filter((graph) => {
-        const [graphOrgId, graphUserId, graphUUID] = graph.graphId!.split(":");
+        const parseResult = graphIdSchema.safeParse(graph.graphId);
+        if (!parseResult.success) return false;
 
-        return (
-            orgId === graphOrgId &&
-            userId === graphUserId &&
-            graphUUID != undefined
-        );
+        const graphId = parseResult.data;
+
+        return orgId === graphId.orgId && userId === graphId.userId;
     });
 
     return filteredGraphs;

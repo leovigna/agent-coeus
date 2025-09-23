@@ -6,20 +6,22 @@ import {
     type ToolMetadata,
     toProcedurePluginFn,
 } from "@coeus-agent/mcp-tools-base";
-import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
+import {
+    checkOrganizationUserRoles,
+    type LogToClient,
+} from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
+import { createError, FORBIDDEN } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape, type ZodTypeAny } from "zod";
 
-import { episodeDataSchema, graphIdParamsSchema } from "../../schemas/index.js";
+import { episodeDataSchema, graphIdSchema } from "../../schemas/index.js";
 import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
-import { getGraph } from "./getGraph.js";
-
 export const addDataBatchInputSchema = {
-    ...graphIdParamsSchema,
+    graphId: graphIdSchema,
     episodes: z.array(z.object(episodeDataSchema)),
 };
 
@@ -34,25 +36,28 @@ export async function addDataBatch(
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["update:graph"]); // 403 if auth has insufficient scopes
 
+    const { graphId, episodes } = params;
+
+    if (graphId.userId != authInfo.subject) {
+        throw createError(
+            FORBIDDEN,
+            `graphId userId ${graphId.userId} does not match auth subject ${authInfo.subject}`,
+        ); // 403 if has insufficient permissions
+    }
+
+    // Check user has access to org
+    await checkOrganizationUserRoles(
+        ctx.logToClient,
+        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
+        { authInfo },
+    ); // 404 if not part of org, 403 if has insufficient role
+
     const zepClient = await resolveZepClient(ctx.zepClientProvider, authInfo);
 
-    const { episodes } = params;
-
-    const { orgId, graphUUID } = params;
-
-    // Ensure graph exists
-    const graph = await getGraph(
-        {
-            logToClient: ctx.logToClient,
-            zepClientProvider: zepClient,
-        },
-        { orgId, graphUUID },
-        { authInfo },
-    );
     // Add episodes to graph
     return zepClient.graph.addBatch({
         episodes,
-        graphId: graph.graphId!,
+        graphId: graphId.graphId,
     });
 }
 
