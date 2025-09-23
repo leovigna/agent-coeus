@@ -1,11 +1,9 @@
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
-    getCreateOrganizationTool,
     getDeleteOrganizationTool,
     getGetMeProfileTool,
     getGetOrganizationTool,
     getListOrganizationsTool,
-    getUpdateOrganizationTool,
 } from "@coeus-agent/mcp-tools-logto";
 import type { ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import {
@@ -23,6 +21,10 @@ import {
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { SYSTEM_PROMPT } from "./prompts.js";
+import {
+    getCreateOrganizationTool,
+    getUpdateOrganizationTool,
+} from "./sdk/index.js";
 
 export function registerMcpTools(
     server: McpServer,

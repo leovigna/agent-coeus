@@ -4,12 +4,16 @@ import { z } from "zod";
 
 import { logToClient, zepClient } from "./clients/index.js";
 import { SYSTEM_PROMPT } from "./prompts.js";
+import {
+    createOrganizationProcedure,
+    updateOrganizationProcedure,
+} from "./sdk/index.js";
 import { publicProcedure, router } from "./trpc.js";
 
 const logToPlugin = createLogToPlugin({ logToClient });
 const logToRouter = router({
     createOrganization: publicProcedure
-        .concat(logToPlugin.createOrganization)
+        .concat(createOrganizationProcedure)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
     deleteOrganization: publicProcedure
@@ -25,7 +29,7 @@ const logToRouter = router({
         .output(z.any())
         .query(({ ctx: { result } }) => result),
     updateOrganization: publicProcedure
-        .concat(logToPlugin.updateOrganization)
+        .concat(updateOrganizationProcedure)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
     getMeProfile: publicProcedure
