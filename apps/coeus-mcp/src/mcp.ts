@@ -22,6 +22,8 @@ import {
 } from "@coeus-agent/mcp-tools-zep";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
+import { SYSTEM_PROMPT } from "./prompts.js";
+
 export function registerMcpTools(
     server: McpServer,
     clients: {
@@ -57,6 +59,27 @@ export function registerMcpTools(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
         server.registerTool(tool.name, tool.config, tool.cb as unknown as any);
     });
+
+    server.registerPrompt(
+        "sytem",
+        {
+            title: "Sytem Prompt",
+            description: "Main system prompt",
+        },
+        () => {
+            return {
+                messages: [
+                    {
+                        role: "assistant",
+                        content: {
+                            type: "text",
+                            text: SYSTEM_PROMPT,
+                        },
+                    },
+                ],
+            };
+        },
+    );
 
     return server;
 }

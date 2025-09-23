@@ -3,6 +3,7 @@ import { createZepPlugin } from "@coeus-agent/mcp-tools-zep";
 import { z } from "zod";
 
 import { logToClient, zepClient } from "./clients/index.js";
+import { SYSTEM_PROMPT } from "./prompts.js";
 import { publicProcedure, router } from "./trpc.js";
 
 const logToPlugin = createLogToPlugin({ logToClient });
@@ -83,11 +84,30 @@ const zepRouter = router({
         .query(({ ctx: { result } }) => result),
 });
 
+const promptsRouter = router({
+    systemPrompt: publicProcedure
+        .meta({
+            openapi: {
+                method: "GET",
+                path: "/prompt/system",
+                tags: ["prompts"],
+                summary: "Get System Prompt",
+                description: "Returns the system prompt used by default.",
+            },
+        })
+        .input(z.void())
+        .output(z.object({ prompt: z.string() }))
+        .query(() => {
+            return { prompt: SYSTEM_PROMPT };
+        }),
+});
 export const appRouter = router({
     // logto/organization
     logTo: logToRouter,
     // zep
     zep: zepRouter,
+    // prompts
+    prompts: promptsRouter,
 });
 
 export type AppRouter = typeof appRouter;
