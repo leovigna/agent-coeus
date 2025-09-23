@@ -20,6 +20,10 @@ COPY configs/esbuild-config/package.json configs/esbuild-config/
 COPY configs/eslint-config/package.json configs/eslint-config/
 COPY configs/tsconfig/package.json configs/tsconfig/
 COPY configs/vite-config/package.json configs/vite-config/
+# Packages
+COPY packages/mcp-tools-base/package.json packages/mcp-tools-base/
+COPY packages/mcp-tools-logto/package.json packages/mcp-tools-logto/
+COPY packages/mcp-tools-zep/package.json packages/mcp-tools-zep/
 # Apps
 COPY apps/coeus-mcp/package.json apps/coeus-mcp/
 
@@ -36,6 +40,10 @@ COPY configs/esbuild-config configs/esbuild-config
 COPY configs/eslint-config configs/eslint-config
 COPY configs/tsconfig configs/tsconfig
 COPY configs/vite-config configs/vite-config
+# Packages
+COPY packages/mcp-tools-base packages/mcp-tools-base
+COPY packages/mcp-tools-logto packages/mcp-tools-logto
+COPY packages/mcp-tools-zep packages/mcp-tools-zep
 # Apps
 COPY apps/coeus-mcp apps/coeus-mcp
 
@@ -65,6 +73,7 @@ COPY --from=builder /app/apps/coeus-mcp/_cjs/dist/index.cjs .
 
 # Copy MCP Instructions
 COPY apps/coeus-mcp/MCP_INSTRUCTIONS.md .
+COPY apps/coeus-mcp/prompts/SYSTEM_PROMPT.md ./prompts/SYSTEM_PROMPT.md
 
 EXPOSE 3000
 ENV NODE_ENV="production"

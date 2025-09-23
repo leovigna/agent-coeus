@@ -2,18 +2,23 @@
 
 Agent Coeus. The AI Assistant of the gods.
 
-<details>
-<summary>Updating to starter-monorepo:latest</summary>
+## Deploy
 
-This template is actively maintained -- you can update the monorepo:
+### Build Docker Image
+As a sanity check you can build the Docker image locally.
 ```bash
-git remote add template https://github.com/leovigna/starter-monorepo
-git fetch template
-git merge template/main <BRANCH> --allow-unrelated-histories
+docker build .
 ```
 
-</details>
+## Google Cloud Run
+Deploy to Google Cloud Run [from source](https://cloud.google.com/run/docs/deploying-source-code#deploy-from-source)
 
+
+```bash
+gcloud run deploy coeus --env-vars-file=.env.yaml --source .
+```
+
+## Workspace Dev Tools
 Comes out of the box with configuration for helpful devtools
 - [pnpm](https://pnpm.io/): Efficient package manager used for [workspace](https://pnpm.io/workspaces) management configured in [pnpm-workspace.yaml](./pnpm-workspace.yaml) and hoisting configured in [.npmrc](./.npmrc)
 - [fixpack](https://github.com/HenrikJoreteg/fixpack): Standardize package.json key sorting. Configured in [.fixpackrc](.fixpackrc)

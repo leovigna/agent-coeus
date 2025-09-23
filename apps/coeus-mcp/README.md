@@ -3,7 +3,10 @@
 ## Client Configs
 ### Custom ChatGPT
 https://blog.logto.io/gpt-action-oauth
-https://chatgpt.com/gpts/editor/
+
+Current live GPTs
+- [Development](https://chatgpt.com/g/g-68cd5c1588a08191bdbceac311002291-development-coeus-gpt?model=gpt-5)
+- [Staging](https://chatgpt.com/g/g-68bea1c9625881918615156829f9b66c-coeus-gpt?model=gpt-5)
 
 Complete the instructions in this order.
 
