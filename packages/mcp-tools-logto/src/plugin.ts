@@ -5,6 +5,7 @@ import {
     createGetMeProfileProcedure,
     createGetOrganizationProcedure,
     createListOrganizationsProcedure,
+    createSetMeOrgIdProcedure,
     createUpdateOrganizationProcedure,
 } from "./sdk/index.js";
 
@@ -21,6 +22,7 @@ export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
         ctx.logToClient,
     );
     const getMeProfile = createGetMeProfileProcedure(ctx.logToClient);
+    const setMeOrgId = createSetMeOrgIdProcedure(ctx.logToClient);
 
     return {
         createOrganization,
@@ -29,5 +31,6 @@ export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
         listOrganizations,
         updateOrganization,
         getMeProfile,
+        setMeOrgId,
     };
 }
