@@ -10,8 +10,9 @@ import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 
 import { OIDC_BASE_URL, OIDC_CLIENT_ID } from "./envvars.js";
 import { openApiDocument } from "./openapi.js";
-import { appRouter } from "./trpcAppRouter.js";
 import { createContext } from "./trpc.js";
+import { appRouter } from "./trpcAppRouter.js";
+import { webhooksAppRouter, webhooksOpenApiDocument } from "./trpcWebhooks.js";
 
 if (!OIDC_CLIENT_ID) {
     throw new Error("OIDC_CLIENT_ID is not set");
@@ -96,6 +97,17 @@ export async function getExpressApp({
     // Serve Swagger UI with our OpenAPI schema
     app.use("/", swaggerUi.serve);
     app.get("/", swaggerUi.setup(openApiDocument));
+
+    // Webhook endpoints
+    app.use("/webhooks/ui", swaggerUi.serve);
+    app.get("/webhooks/ui", swaggerUi.setup(webhooksOpenApiDocument));
+    app.get("/webhooks/openapi.json", (_: Request, res: Response) => {
+        res.json(webhooksOpenApiDocument);
+    });
+    app.use(
+        "/webhooks",
+        createOpenApiExpressMiddleware({ router: webhooksAppRouter }),
+    );
 
     return app;
 }

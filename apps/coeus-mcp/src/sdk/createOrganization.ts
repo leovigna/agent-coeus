@@ -11,6 +11,7 @@ import {
     createOrganizationToolMetadata as createOrganizationToolMetadataBase,
 } from "@coeus-agent/mcp-tools-logto";
 import { partial } from "lodash-es";
+import { v4 } from "uuid";
 import { z, type ZodRawShape } from "zod";
 
 import { logToClient } from "../clients/index.js";
@@ -21,6 +22,20 @@ export const createOrganizationInputSchema = {
     customData: z
         .object({
             zepApiKey: z.string().optional().describe("Custom Zep API Key"),
+            twentyApiKey: z
+                .string()
+                .optional()
+                .describe("Custom Twenty CRM API Key"),
+        })
+        .transform((obj) => {
+            if (obj.twentyApiKey) {
+                return {
+                    ...obj,
+                    // Add a random webhook secret for Twenty CRM Webhook
+                    twentyWebhookSecret: v4(),
+                };
+            }
+            return obj;
         })
         .optional(),
 };
