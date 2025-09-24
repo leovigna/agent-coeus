@@ -62,16 +62,15 @@ export async function createGraph(
 
 // MCP Tool
 export const createGraphToolMetadata = {
-    name: "zep_create_graph",
+    name: "zep_createGraph",
     config: {
-        title: "create Graph",
-        description:
-            "creates all data from a specific graph. This operation is irreversible.",
+        title: "Create Graph",
+        description: "Create Graph in Zep",
         inputSchema: createGraphInputSchema,
     },
 } as const satisfies ToolMetadata<typeof createGraphInputSchema, ZodRawShape>;
 
-export function getCreateGraphTool(ctx: {
+export function createGraphToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -86,14 +85,14 @@ export function getCreateGraphTool(ctx: {
 export const createGraphProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph",
+        path: "/zep/graphs",
         tags: ["zep"],
         summary: createGraphToolMetadata.config.title,
         description: createGraphToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createCreateGraphProcedure = toProcedurePluginFn(
+export const createGraphProcedureFactory = toProcedurePluginFn(
     createGraphInputSchema,
     createGraph,
     createGraphProcedureMetadata,

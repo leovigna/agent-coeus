@@ -1,28 +1,30 @@
 import type { LogToClient } from "./LogToClient.js";
 import {
-    createCreateOrganizationProcedure,
-    createDeleteOrganizationProcedure,
-    createGetMeProfileProcedure,
-    createGetOrganizationProcedure,
-    createListOrganizationsProcedure,
-    createSetMeOrgIdProcedure,
-    createUpdateOrganizationProcedure,
+    createOrganizationProcedureFactory,
+    deleteOrganizationProcedureFactory,
+    getMeProfileProcedureFactory,
+    getOrganizationProcedureFactory,
+    listOrganizationsProcedureFactory,
+    setMeOrgIdProcedureFactory,
+    updateOrganizationProcedureFactory,
 } from "./sdk/index.js";
 
 export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
-    const createOrganization = createCreateOrganizationProcedure(
+    const createOrganization = createOrganizationProcedureFactory(
         ctx.logToClient,
     );
-    const deleteOrganization = createDeleteOrganizationProcedure(
+    const deleteOrganization = deleteOrganizationProcedureFactory(
         ctx.logToClient,
     );
-    const getOrganization = createGetOrganizationProcedure(ctx.logToClient);
-    const listOrganizations = createListOrganizationsProcedure(ctx.logToClient);
-    const updateOrganization = createUpdateOrganizationProcedure(
+    const getOrganization = getOrganizationProcedureFactory(ctx.logToClient);
+    const listOrganizations = listOrganizationsProcedureFactory(
         ctx.logToClient,
     );
-    const getMeProfile = createGetMeProfileProcedure(ctx.logToClient);
-    const setMeOrgId = createSetMeOrgIdProcedure(ctx.logToClient);
+    const updateOrganization = updateOrganizationProcedureFactory(
+        ctx.logToClient,
+    );
+    const getMeProfile = getMeProfileProcedureFactory(ctx.logToClient);
+    const setMeOrgId = setMeOrgIdProcedureFactory(ctx.logToClient);
 
     return {
         createOrganization,

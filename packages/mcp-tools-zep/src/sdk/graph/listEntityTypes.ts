@@ -52,17 +52,20 @@ export async function listEntityTypes(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.listEntityTypes({ graphId: graphId.graphId });
 }
 
 // MCP Tool
 export const listEntityTypesToolMetadata = {
-    name: "zep_list_entity_types",
+    name: "zep_listEntityTypes",
     config: {
         title: "List Entity Types",
-        description: "Lists all entity types from a specific graph.",
+        description: "List Entity Types in Zep",
         inputSchema: listEntityTypesInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -70,7 +73,7 @@ export const listEntityTypesToolMetadata = {
     ZodRawShape
 >;
 
-export function getListEntityTypesTool(ctx: {
+export function listEntityTypesToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -82,7 +85,7 @@ export function getListEntityTypesTool(ctx: {
 }
 
 // TRPC Procedure
-export const getListEntityTypesProcedureMetadata = {
+export const listEntityTypesProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/zep/graph/entity-types",
@@ -92,8 +95,8 @@ export const getListEntityTypesProcedureMetadata = {
     },
 } as OpenApiMeta;
 
-export const createListEntityTypesProcedure = toProcedurePluginFn(
+export const listEntityTypesProcedureFactory = toProcedurePluginFn(
     listEntityTypesInputSchema,
     listEntityTypes,
-    getListEntityTypesProcedureMetadata,
+    listEntityTypesProcedureMetadata,
 );

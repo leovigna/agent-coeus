@@ -52,10 +52,10 @@ export async function deleteOrganization(
 }
 
 export const deleteOrganizationToolMetadata = {
-    name: "logto_delete_organization",
+    name: "logto_deleteOrganization",
     config: {
         title: "Delete Organization",
-        description: "Delete an organization by its ID.",
+        description: "Delete Organization in LogTo",
         inputSchema: deleteOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -64,7 +64,7 @@ export const deleteOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getDeleteOrganizationTool(client: LogToClient) {
+export function deleteOrganizationToolFactory(client: LogToClient) {
     return {
         ...deleteOrganizationToolMetadata,
         name: deleteOrganizationToolMetadata.name,
@@ -79,14 +79,14 @@ export function getDeleteOrganizationTool(client: LogToClient) {
 export const deleteOrganizationProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/logto/organization/{id}",
+        path: "/logto/organizations/{id}",
         tags: ["logto"],
         summary: deleteOrganizationToolMetadata.config.title,
         description: deleteOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createDeleteOrganizationProcedure = toProcedurePluginFn(
+export const deleteOrganizationProcedureFactory = toProcedurePluginFn(
     deleteOrganizationInputSchema,
     deleteOrganization,
     deleteOrganizationProcedureMetadata,

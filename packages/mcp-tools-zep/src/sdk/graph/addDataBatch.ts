@@ -52,7 +52,10 @@ export async function addDataBatch(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     // Add episodes to graph
     return zepClient.graph.addBatch({
@@ -62,17 +65,16 @@ export async function addDataBatch(
 }
 
 export const addDataBatchToolMetadata = {
-    name: "zep_add_data_batch",
+    name: "zep_addDataBatch",
     config: {
-        title: "Add DataBatch",
-        description:
-            "Add an episode to memory. This is the primary way to add information to the graph.",
+        title: "Add Data Batch",
+        description: "Add Data Batch in Zep",
         inputSchema: addDataBatchInputSchema,
     },
 } as const satisfies ToolMetadata<typeof addDataBatchInputSchema, ZodRawShape>;
 
 // MCP Tool
-export function getAddDataBatchTool(ctx: {
+export function addDataBatchToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -87,14 +89,14 @@ export function getAddDataBatchTool(ctx: {
 export const addDataBatchProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/add-data-batch",
+        path: "/zep/graph/data-batch",
         tags: ["zep"],
         summary: addDataBatchToolMetadata.config.title,
         description: addDataBatchToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createAddDataBatchProcedure = toProcedurePluginFn(
+export const addDataBatchProcedureFactory = toProcedurePluginFn(
     addDataBatchInputSchema,
     addDataBatch,
     addDataBatchProcedureMetadata,

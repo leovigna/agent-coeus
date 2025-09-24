@@ -37,28 +37,28 @@ import { AuthInfo, checkRequiredScopes, toCallToolResultFn, Tool, ToolMetadata, 
 // ... other imports
 
 // 1. Input Schema
-export const {{toolName}}InputSchema = { /* ... */ };
+export const {{action}}InputSchema = { /* ... */ };
 
 // 2. SDK Function
-export async function {{toolName}}(client: Client, params: ..., { authInfo }: { authInfo: AuthInfo }) { /* ... */ }
+export async function {{action}}(client: Client, params: ..., { authInfo }: { authInfo: AuthInfo }) { /* ... */ }
 
 // 3. MCP Tool Metadata
-export const {{toolName}}ToolMetadata = { /* ... */ };
+export const {{action}}ToolMetadata = { /* ... */ };
 
 // 4. MCP Tool Factory
-export function get{{ToolName}}Tool(client: Client) { /* ... */ }
+export function {{action}}ToolFactory(client: Client) { /* ... */ }
 
 // 5. tRPC Procedure Metadata
-export const {{toolName}}ProcedureMetadata = { /* ... */ };
+export const {{action}}ProcedureMetadata = { /* ... */ };
 
 // 6. tRPC Procedure Factory
-export const create{{ToolName}}Procedure = toProcedurePluginFn(...);
+export const {{action}}ProcedureFactory = toProcedurePluginFn(...);
 ```
 
 ---
 
 ### **Step 3: Update Plugin and Barrel Files**
 
-1.  **Update `plugin.ts`:** Add the new `create...Procedure` factory to the `create...Plugin` function.
+1.  **Update `plugin.ts`:** Add the new `{action}ProcedureFactory` factory to the `create...Plugin` function.
 2.  **Update Barrel Files:** Append exports for the new tool to the relevant `index.ts` files.
 3.  **Run the build command** for the target library.

@@ -92,10 +92,10 @@ export async function createOrganization(
 
 // MCP Tool
 export const createOrganizationToolMetadata = {
-    name: "logto_create_organization",
+    name: "logto_createOrganization",
     config: {
         title: "Create Organization",
-        description: "Create a new organization.",
+        description: "Create Organization in LogTo",
         inputSchema: createOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -103,9 +103,10 @@ export const createOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function getCreateOrganizationTool(client: LogToClient) {
+export function createOrganizationToolFactory(client: LogToClient) {
     return {
         ...createOrganizationToolMetadata,
+        name: createOrganizationToolMetadata.name,
         cb: partial(toCallToolResultFn(createOrganization), client),
     } as const satisfies Tool<
         typeof createOrganizationInputSchema,
@@ -117,14 +118,14 @@ export function getCreateOrganizationTool(client: LogToClient) {
 export const createOrganizationProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/logto/organization",
+        path: "/logto/organizations",
         tags: ["logto"],
         summary: createOrganizationToolMetadata.config.title,
         description: createOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createCreateOrganizationProcedure = toProcedurePluginFn(
+export const createOrganizationProcedureFactory = toProcedurePluginFn(
     createOrganizationInputSchema,
     createOrganization,
     createOrganizationProcedureMetadata,

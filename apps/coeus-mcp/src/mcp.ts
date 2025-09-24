@@ -1,29 +1,29 @@
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
-    getDeleteOrganizationTool,
-    getGetMeProfileTool,
-    getGetOrganizationTool,
-    getListOrganizationsTool,
+    deleteOrganizationToolFactory,
+    getMeProfileToolFactory,
+    getOrganizationToolFactory,
+    listOrganizationsToolFactory,
 } from "@coeus-agent/mcp-tools-logto";
 import type { ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import {
-    getAddDataBatchTool,
-    getAddDataTool,
-    getCreateGraphTool,
-    getDeleteGraphTool,
-    getGetGraphEdgesTool,
-    getGetGraphEpisodesTool,
-    getGetGraphTool,
-    getListEntityTypesTool,
-    getListGraphsTool,
-    getSearchGraphTool,
+    addDataBatchToolFactory,
+    addDataToolFactory,
+    createGraphToolFactory,
+    deleteGraphToolFactory,
+    getGraphEdgesToolFactory,
+    getGraphEpisodesToolFactory,
+    getGraphToolFactory,
+    listEntityTypesToolFactory,
+    listGraphsToolFactory,
+    searchGraphToolFactory,
 } from "@coeus-agent/mcp-tools-zep";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { SYSTEM_PROMPT } from "./prompts.js";
 import {
-    getCreateOrganizationTool,
-    getUpdateOrganizationTool,
+    createOrganizationToolFactory,
+    updateOrganizationToolFactory,
 } from "./sdk/index.js";
 
 export function registerMcpTools(
@@ -36,25 +36,31 @@ export function registerMcpTools(
     const { logToClient, zepClient } = clients;
     const tools = [
         // logto/organization
-        getCreateOrganizationTool(logToClient),
-        getGetOrganizationTool(logToClient),
-        getListOrganizationsTool(logToClient),
-        getUpdateOrganizationTool(logToClient),
-        getDeleteOrganizationTool(logToClient),
-        getGetMeProfileTool(logToClient),
+        createOrganizationToolFactory(logToClient),
+        getOrganizationToolFactory(logToClient),
+        listOrganizationsToolFactory(logToClient),
+        updateOrganizationToolFactory(logToClient),
+        deleteOrganizationToolFactory(logToClient),
+        getMeProfileToolFactory(logToClient),
         // zep/graph
-        getCreateGraphTool({ logToClient, zepClientProvider: zepClient }),
-        getGetGraphTool({ logToClient, zepClientProvider: zepClient }),
-        getSearchGraphTool({ logToClient, zepClientProvider: zepClient }),
-        getListEntityTypesTool({ logToClient, zepClientProvider: zepClient }),
-        getListGraphsTool({ logToClient, zepClientProvider: zepClient }),
-        getAddDataTool({ logToClient, zepClientProvider: zepClient }),
-        getAddDataBatchTool({ logToClient, zepClientProvider: zepClient }),
-        getDeleteGraphTool({ logToClient, zepClientProvider: zepClient }),
+        createGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
+        getGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
+        searchGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
+        listEntityTypesToolFactory({
+            logToClient,
+            zepClientProvider: zepClient,
+        }),
+        listGraphsToolFactory({ logToClient, zepClientProvider: zepClient }),
+        addDataToolFactory({ logToClient, zepClientProvider: zepClient }),
+        addDataBatchToolFactory({ logToClient, zepClientProvider: zepClient }),
+        deleteGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
         // zep/edge
-        getGetGraphEdgesTool({ logToClient, zepClientProvider: zepClient }),
+        getGraphEdgesToolFactory({ logToClient, zepClientProvider: zepClient }),
         // zep/episode
-        getGetGraphEpisodesTool({ logToClient, zepClientProvider: zepClient }),
+        getGraphEpisodesToolFactory({
+            logToClient,
+            zepClientProvider: zepClient,
+        }),
     ];
 
     tools.forEach((tool) => {

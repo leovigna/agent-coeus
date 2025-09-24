@@ -51,23 +51,25 @@ export async function deleteGraph(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.delete(graphId.graphId);
 }
 
 // MCP Tool
 export const deleteGraphToolMetadata = {
-    name: "zep_delete_graph",
+    name: "zep_deleteGraph",
     config: {
         title: "Delete Graph",
-        description:
-            "gets all data from a specific graph. This operation is irreversible.",
+        description: "Delete Graph in Zep",
         inputSchema: deleteGraphInputSchema,
     },
 } as const satisfies ToolMetadata<typeof deleteGraphInputSchema, ZodRawShape>;
 
-export function getDeleteGraphTool(ctx: {
+export function deleteGraphToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -82,14 +84,14 @@ export function getDeleteGraphTool(ctx: {
 export const deleteGraphProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/zep/graph",
+        path: "/zep/graphs",
         tags: ["zep"],
         summary: deleteGraphToolMetadata.config.title,
         description: deleteGraphToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createDeleteGraphProcedure = toProcedurePluginFn(
+export const deleteGraphProcedureFactory = toProcedurePluginFn(
     deleteGraphInputSchema,
     deleteGraph,
     deleteGraphProcedureMetadata,

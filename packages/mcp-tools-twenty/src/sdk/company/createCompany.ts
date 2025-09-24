@@ -59,7 +59,7 @@ export const createCompanyToolMetadata = {
     name: "twenty_createCompany",
     config: {
         title: "Create Company",
-        description: "Create Company in Twenty CRM",
+        description: "Create Company in Twenty",
         inputSchema: createCompanyInputSchema,
     },
 } as const satisfies ToolMetadata<typeof createCompanyInputSchema, ZodRawShape>;

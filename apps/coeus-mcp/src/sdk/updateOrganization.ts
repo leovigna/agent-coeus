@@ -36,9 +36,10 @@ export const updateOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function getUpdateOrganizationTool(client: LogToClient) {
+export function updateOrganizationToolFactory(client: LogToClient) {
     return {
         ...updateOrganizationToolMetadata,
+        name: updateOrganizationToolMetadata.name,
         cb: partial(toCallToolResultFn(updateOrganization), client),
     } as const satisfies Tool<
         typeof updateOrganizationInputSchema,
@@ -47,11 +48,11 @@ export function getUpdateOrganizationTool(client: LogToClient) {
 }
 
 // TRPC Procedure
-const createUpdateOrganizationProcedure = toProcedurePluginFn(
+const updateOrganizationProcedureFactory = toProcedurePluginFn(
     updateOrganizationInputSchema,
     updateOrganization,
     updateOrganizationProcedureMetadata,
 );
 
 export const updateOrganizationProcedure =
-    createUpdateOrganizationProcedure(logToClient);
+    updateOrganizationProcedureFactory(logToClient);

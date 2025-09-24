@@ -53,16 +53,19 @@ export async function getGraphEpisodes(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.episode.getByGraphId(graphId.graphId, params);
 }
 
 export const getGraphEpisodesToolMetadata = {
-    name: "zep_get_graph_episodes",
+    name: "zep_getGraphEpisodes",
     config: {
         title: "Get Graph Episodes",
-        description: "Returns episodes by graph id.",
+        description: "Get Graph Episodes in Zep",
         inputSchema: getGraphEpisodesInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -71,7 +74,7 @@ export const getGraphEpisodesToolMetadata = {
 >;
 
 // MCP Tool
-export function getGetGraphEpisodesTool(ctx: {
+export function getGraphEpisodesToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -86,14 +89,14 @@ export function getGetGraphEpisodesTool(ctx: {
 export const getGraphEpisodesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/episode/graph",
+        path: "/zep/graph/episodes",
         tags: ["zep"],
         summary: getGraphEpisodesToolMetadata.config.title,
         description: getGraphEpisodesToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetGraphEpisodesProcedure = toProcedurePluginFn(
+export const getGraphEpisodesProcedureFactory = toProcedurePluginFn(
     getGraphEpisodesInputSchema,
     getGraphEpisodes,
     getGraphEpisodesProcedureMetadata,

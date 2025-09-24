@@ -89,7 +89,10 @@ export async function searchGraph(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.search({
         ...params,
@@ -99,16 +102,15 @@ export async function searchGraph(
 
 // MCP Tool
 export const searchGraphToolMetadata = {
-    name: "zep_search_graph",
+    name: "zep_searchGraph",
     config: {
         title: "Search Graph",
-        description:
-            "Searches for a specific graph. This operation is irreversible.",
+        description: "Search Graph in Zep",
         inputSchema: searchGraphInputSchema,
     },
 } as const satisfies ToolMetadata<typeof searchGraphInputSchema, ZodRawShape>;
 
-export function getSearchGraphTool(ctx: {
+export function searchGraphToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -123,14 +125,14 @@ export function getSearchGraphTool(ctx: {
 export const searchGraphProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/search",
+        path: "/zep/graphs/search",
         tags: ["zep"],
         summary: searchGraphToolMetadata.config.title,
         description: searchGraphToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createSearchGraphProcedure = toProcedurePluginFn(
+export const searchGraphProcedureFactory = toProcedurePluginFn(
     searchGraphInputSchema,
     searchGraph,
     searchGraphProcedureMetadata,

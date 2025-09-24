@@ -73,15 +73,15 @@ export async function listGraphs(
 
 // MCP Tool
 export const listGraphsToolMetadata = {
-    name: "zep_list_graphs",
+    name: "zep_listGraphs",
     config: {
         title: "List Graphs",
-        description: "Lists all graphs for a user in an organization.",
+        description: "List Graphs in Zep",
         inputSchema: listGraphsInputSchema,
     },
 } as const satisfies ToolMetadata<typeof listGraphsInputSchema, ZodRawShape>;
 
-export function getListGraphsTool(ctx: {
+export function listGraphsToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -96,14 +96,14 @@ export function getListGraphsTool(ctx: {
 export const listGraphsProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/list",
+        path: "/zep/graphs/list",
         tags: ["zep"],
         summary: listGraphsToolMetadata.config.title,
         description: listGraphsToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createListGraphsProcedure = toProcedurePluginFn(
+export const listGraphsProcedureFactory = toProcedurePluginFn(
     listGraphsInputSchema,
     listGraphs,
     listGraphsProcedureMetadata,

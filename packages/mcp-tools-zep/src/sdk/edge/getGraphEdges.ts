@@ -65,16 +65,16 @@ export async function getGraphEdges(
 }
 
 export const getGraphEdgesToolMetadata = {
-    name: "zep_get_graph_edges",
+    name: "zep_getGraphEdges",
     config: {
         title: "Get Graph Edges",
-        description: "Returns all edges for a graph.",
+        description: "Get Graph Edges in Zep",
         inputSchema: getGraphEdgesInputSchema,
     },
 } as const satisfies ToolMetadata<typeof getGraphEdgesInputSchema, ZodRawShape>;
 
 // MCP Tool
-export function getGetGraphEdgesTool(ctx: {
+export function getGraphEdgesToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -89,14 +89,14 @@ export function getGetGraphEdgesTool(ctx: {
 export const getGraphEdgesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/edge/graph",
+        path: "/zep/graph/edges",
         tags: ["zep"],
         summary: getGraphEdgesToolMetadata.config.title,
         description: getGraphEdgesToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetGraphEdgesProcedure = toProcedurePluginFn(
+export const getGraphEdgesProcedureFactory = toProcedurePluginFn(
     getGraphEdgesInputSchema,
     getGraphEdges,
     getGraphEdgesProcedureMetadata,

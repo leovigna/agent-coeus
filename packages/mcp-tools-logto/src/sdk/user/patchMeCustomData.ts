@@ -51,17 +51,18 @@ export const setMeOrgIdInputSchema = {
 
 // MCP Tool
 export const setMeOrgIdToolMetadata = {
-    name: "logto_set_me_current_org_id",
+    name: "logto_setMeOrgId",
     config: {
-        title: "Set Me Current Org ID",
-        description: "Set the current orgId of the authenticated user.",
+        title: "Set Me Org Id",
+        description: "Set Me Org Id in LogTo",
         inputSchema: setMeOrgIdInputSchema,
     },
 } as const satisfies ToolMetadata<typeof setMeOrgIdInputSchema, ZodRawShape>;
 
-export function getSetMeOrgIdTool(client: LogToClient) {
+export function setMeOrgIdToolFactory(client: LogToClient) {
     return {
         ...setMeOrgIdToolMetadata,
+        name: setMeOrgIdToolMetadata.name,
         cb: partial(toCallToolResultFn(setMeOrgId), client),
     } as const satisfies Tool<typeof setMeOrgIdInputSchema, ZodRawShape>;
 }
@@ -69,15 +70,15 @@ export function getSetMeOrgIdTool(client: LogToClient) {
 // TRPC Procedure
 export const setMeOrgIdProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: "/logto/users/me/current-org-id",
+        method: "PATCH",
+        path: "/logto/me/current-org-id",
         tags: ["logto"],
         summary: setMeOrgIdToolMetadata.config.title,
         description: setMeOrgIdToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createSetMeOrgIdProcedure = toProcedurePluginFn(
+export const setMeOrgIdProcedureFactory = toProcedurePluginFn(
     setMeOrgIdInputSchema,
     setMeOrgId,
     setMeOrgIdProcedureMetadata,

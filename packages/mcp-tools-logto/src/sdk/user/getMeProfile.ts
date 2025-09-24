@@ -32,17 +32,18 @@ export async function getMeProfile(
 
 // MCP Tool
 export const getMeProfileToolMetadata = {
-    name: "logto_get_me_profile",
+    name: "logto_getMeProfile",
     config: {
         title: "Get Me Profile",
-        description: "Get the profile of the authenticated user.",
+        description: "Get Me Profile in LogTo",
         inputSchema: getMeProfileInputSchema,
     },
 } as const satisfies ToolMetadata<typeof getMeProfileInputSchema, ZodRawShape>;
 
-export function getGetMeProfileTool(client: LogToClient) {
+export function getMeProfileToolFactory(client: LogToClient) {
     return {
         ...getMeProfileToolMetadata,
+        name: getMeProfileToolMetadata.name,
         cb: partial(toCallToolResultFn(getMeProfile), client),
     } as const satisfies Tool<typeof getMeProfileInputSchema, ZodRawShape>;
 }
@@ -50,15 +51,15 @@ export function getGetMeProfileTool(client: LogToClient) {
 // TRPC Procedure
 export const getMeProfileProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: "/logto/users/me/profile",
+        method: "GET",
+        path: "/logto/me/profile",
         tags: ["logto"],
         summary: getMeProfileToolMetadata.config.title,
         description: getMeProfileToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetMeProfileProcedure = toProcedurePluginFn(
+export const getMeProfileProcedureFactory = toProcedurePluginFn(
     getMeProfileInputSchema,
     getMeProfile,
     getMeProfileProcedureMetadata,

@@ -50,23 +50,25 @@ export async function getGraph(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.get(graphId.graphId);
 }
 
 // MCP Tool
 export const getGraphToolMetadata = {
-    name: "zep_get_graph",
+    name: "zep_getGraph",
     config: {
-        title: "get Graph",
-        description:
-            "gets all data from a specific graph. This operation is irreversible.",
+        title: "Get Graph",
+        description: "Get Graph in Zep",
         inputSchema: getGraphInputSchema,
     },
 } as const satisfies ToolMetadata<typeof getGraphInputSchema, ZodRawShape>;
 
-export function getGetGraphTool(ctx: {
+export function getGraphToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -81,14 +83,14 @@ export function getGetGraphTool(ctx: {
 export const getGraphProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph",
+        path: "/zep/graphs",
         tags: ["zep"],
         summary: getGraphToolMetadata.config.title,
         description: getGraphToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetGraphProcedure = toProcedurePluginFn(
+export const getGraphProcedureFactory = toProcedurePluginFn(
     getGraphInputSchema,
     getGraph,
     getGraphProcedureMetadata,

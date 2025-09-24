@@ -68,10 +68,10 @@ export async function updateOrganization(
 }
 
 export const updateOrganizationToolMetadata = {
-    name: "logto_update_organization",
+    name: "logto_updateOrganization",
     config: {
         title: "Update Organization",
-        description: "Update an organization's details.",
+        description: "Update Organization in LogTo",
         inputSchema: updateOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -80,7 +80,7 @@ export const updateOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getUpdateOrganizationTool(client: LogToClient) {
+export function updateOrganizationToolFactory(client: LogToClient) {
     return {
         ...updateOrganizationToolMetadata,
         name: updateOrganizationToolMetadata.name,
@@ -95,14 +95,14 @@ export function getUpdateOrganizationTool(client: LogToClient) {
 export const updateOrganizationProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/logto/organization/{id}",
+        path: "/logto/organizations/{id}",
         tags: ["logto"],
         summary: updateOrganizationToolMetadata.config.title,
         description: updateOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createUpdateOrganizationProcedure = toProcedurePluginFn(
+export const updateOrganizationProcedureFactory = toProcedurePluginFn(
     updateOrganizationInputSchema,
     updateOrganization,
     updateOrganizationProcedureMetadata,

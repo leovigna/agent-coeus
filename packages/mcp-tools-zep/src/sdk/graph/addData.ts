@@ -117,7 +117,10 @@ export async function addData(
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     // Add episode to graph
     return zepClient.graph.add({
@@ -129,17 +132,16 @@ export async function addData(
 }
 
 export const addDataToolMetadata = {
-    name: "zep_add_data",
+    name: "zep_addData",
     config: {
         title: "Add Data",
-        description:
-            "Add an episode to memory. This is the primary way to add information to the graph.",
+        description: "Add Data in Zep",
         inputSchema: addDataInputSchema,
     },
 } as const satisfies ToolMetadata<typeof addDataInputSchema, ZodRawShape>;
 
 // MCP Tool
-export function getAddDataTool(ctx: {
+export function addDataToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -154,14 +156,14 @@ export function getAddDataTool(ctx: {
 export const addDataProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/add-data",
+        path: "/zep/graph/data",
         tags: ["zep"],
         summary: addDataToolMetadata.config.title,
         description: addDataToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createAddDataProcedure = toProcedurePluginFn(
+export const addDataProcedureFactory = toProcedurePluginFn(
     addDataInputSchema,
     addData,
     addDataProcedureMetadata,

@@ -52,10 +52,10 @@ export async function getOrganization(
 }
 
 export const getOrganizationToolMetadata = {
-    name: "logto_get_organization",
+    name: "logto_getOrganization",
     config: {
         title: "Get Organization",
-        description: "Get an organization by its ID.",
+        description: "Get Organization in LogTo",
         inputSchema: getOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -64,7 +64,7 @@ export const getOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getGetOrganizationTool(client: LogToClient) {
+export function getOrganizationToolFactory(client: LogToClient) {
     return {
         ...getOrganizationToolMetadata,
         name: getOrganizationToolMetadata.name,
@@ -76,14 +76,14 @@ export function getGetOrganizationTool(client: LogToClient) {
 export const getOrganizationProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/organization/{id}",
+        path: "/logto/organizations/{id}",
         tags: ["logto"],
         summary: getOrganizationToolMetadata.config.title,
         description: getOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetOrganizationProcedure = toProcedurePluginFn(
+export const getOrganizationProcedureFactory = toProcedurePluginFn(
     getOrganizationInputSchema,
     getOrganization,
     getOrganizationProcedureMetadata,

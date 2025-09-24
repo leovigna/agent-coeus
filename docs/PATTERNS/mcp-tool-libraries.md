@@ -66,13 +66,13 @@ Each tool is defined in a **single file** that contains its core logic (SDK), it
 
 ### **The Consolidated Tool File**
 
-Each `[toolName].ts` file must export the following:
-1.  `inputSchema`: A Zod schema for the tool's input.
-2.  `[toolName]`: The core async SDK function containing the business logic.
-3.  `[toolName]ToolMetadata`: A metadata object for the MCP tool.
-4.  `get[ToolName]Tool`: A factory function that creates the MCP tool.
-5.  `[toolName]ProcedureMetadata`: A metadata object for the tRPC procedure.
-6.  `create[ToolName]Procedure`: A factory function that creates the tRPC procedure plugin.
+Each `[action].ts` file must export the following:
+1.  `{action}InputSchema`: A Zod schema for the tool's input.
+2.  `{action}`: The core async SDK function containing the business logic.
+3.  `{action}ToolMetadata`: A metadata object for the MCP tool.
+4.  `{action}ToolFactory`: A factory function that creates the MCP tool.
+5.  `{action}ProcedureMetadata`: A metadata object for the tRPC procedure.
+6.  `{action}ProcedureFactory`: A factory function that creates the tRPC procedure plugin.
 
 *Example: `sdk/organization/createOrganization.ts`*
 ```typescript
@@ -91,30 +91,30 @@ export async function createOrganization(client: LogToClient, params: ..., { aut
 export const createOrganizationToolMetadata = { /* ... */ };
 
 // 4. MCP Tool Factory
-export function getCreateOrganizationTool(client: LogToClient) { /* ... */ }
+export function createOrganizationToolFactory(client: LogToClient) { /* ... */ }
 
 // 5. tRPC Procedure Metadata
 export const createOrganizationProcedureMetadata = { /* ... */ };
 
 // 6. tRPC Procedure Factory
-export const createCreateOrganizationProcedure = toProcedurePluginFn(...);
+export const createOrganizationProcedureFactory = toProcedurePluginFn(...);
 ```
 
 ### **The Plugin Aggregator**
 
 A `plugin.ts` file at the root of the `src` directory acts as the single entry point for all tRPC procedures in the package.
 
-*   It imports all `create...Procedure` factories from the SDK files.
+*   It imports all `{action}ProcedureFactory` factories from the SDK files.
 *   It exports a single `create...Plugin` function that takes the necessary clients and returns an object containing all the initialized procedure plugins.
 
 *Example: `src/plugin.ts`*
 ```typescript
-import { createCreateOrganizationProcedure, createDeleteOrganizationProcedure, ... } from "./sdk/index.js";
+import { createOrganizationProcedureFactory, deleteOrganizationProcedureFactory, ... } from "./sdk/index.js";
 import type { LogToClient } from "./LogToClient.js";
 
 export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
-    const createOrganization = createCreateOrganizationProcedure(ctx);
-    const deleteOrganization = createDeleteOrganizationProcedure(ctx);
+    const createOrganization = createOrganizationProcedureFactory(ctx.logToClient);
+    const deleteOrganization = deleteOrganizationProcedureFactory(ctx.logToClient);
     // ... and so on for all procedures
 
     return {
