@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -16,15 +16,14 @@ export const listOrganizationsInputSchema = {};
 /**
  * List all organizations the current user belongs to.
  */
-export async function listOrganizations(
+async function _listOrganizations(
     ctx: { logToClient: LogToClient },
     _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { subject, scopes } = authInfo;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["list:orgs"]); // 403 if auth has insufficient scopes
 
     const orgsResponse = await client.GET("/api/users/{userId}/organizations", {
         params: {
@@ -38,6 +37,10 @@ export async function listOrganizations(
     const orgs = orgsResponse.data!;
     return orgs;
 }
+
+export const listOrganizations = withScopeCheck(_listOrganizations, [
+    "list:orgs",
+]);
 
 export const listOrganizationsToolMetadata = {
     name: "logto_listOrganizations",

@@ -3,6 +3,7 @@ import {
     checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -12,10 +13,13 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import {
+    checkOrganizationUserRoles,
+    withOrganizationUserRolesCheck,
+} from "./checkOrganizationUserRoles.js";
 
 export const updateOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
     name: z.string().min(1).max(128).optional().describe("The updated name."),
     description: z
         .string()
@@ -35,7 +39,7 @@ export const updateOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Custom data.
  * @param {boolean} [isMfaRequired] - Is MFA required?
  */
-export async function updateOrganization(
+async function _updateOrganization(
     ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof updateOrganizationInputSchema,
@@ -47,17 +51,17 @@ export async function updateOrganization(
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["write:org"]); // 403 if auth has insufficient scopes
 
-    const { id, ...body } = params;
+    const { orgId, ...body } = params;
     await checkOrganizationUserRoles(
         ctx,
-        { orgId: id, validRoles: ["owner", "admin"] },
+        { orgId, validRoles: ["owner", "admin"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
 
     const orgResponse = await client.PATCH("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
         body: body as never, // The client type expects a specific body type, but the fields are optional
@@ -67,6 +71,11 @@ export async function updateOrganization(
 
     return org;
 }
+
+export const updateOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_updateOrganization, ["owner", "admin"]),
+    ["write:org"],
+);
 
 export const updateOrganizationToolMetadata = {
     name: "logto_updateOrganization",

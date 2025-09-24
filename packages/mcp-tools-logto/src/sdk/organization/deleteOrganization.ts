@@ -3,6 +3,7 @@ import {
     checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -12,10 +13,10 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const deleteOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
 };
 
 /**
@@ -23,34 +24,32 @@ export const deleteOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function deleteOrganization(
+async function _deleteOrganization(
     ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof deleteOrganizationInputSchema,
         ZodTypeAny
     >,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["delete:org"]); // 403 if auth has insufficient scopes
 
-    const { id } = params;
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId: id, validRoles: ["owner"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
-
+    const { orgId } = params;
     const deleteResponse = await client.DELETE("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
     });
     if (!deleteResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
 }
+
+export const deleteOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_deleteOrganization, ["owner"]),
+    ["delete:org"],
+);
 
 export const deleteOrganizationToolMetadata = {
     name: "logto_deleteOrganization",

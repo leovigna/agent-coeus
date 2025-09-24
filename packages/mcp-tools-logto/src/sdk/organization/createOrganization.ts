@@ -3,6 +3,7 @@ import {
     checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -31,7 +32,7 @@ export const createOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Arbitrary custom data.
  * @param {boolean} [isMfaRequired] - Whether MFA is required for the organization.
  */
-export async function createOrganization(
+async function _createOrganization(
     ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof createOrganizationInputSchema,
@@ -40,9 +41,8 @@ export async function createOrganization(
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { subject, scopes } = authInfo;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["create:org"]); // 403 if auth has insufficient scopes
 
     const { name, description, customData, isMfaRequired } = params;
 
@@ -90,6 +90,10 @@ export async function createOrganization(
 
     return org;
 }
+
+export const createOrganization = withScopeCheck(_createOrganization, [
+    "create:org",
+]);
 
 // MCP Tool
 export const createOrganizationToolMetadata = {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import { checkRequiredRole } from "@coeus-agent/mcp-tools-base";
 
@@ -23,4 +24,31 @@ export async function checkOrganizationUserRoles(
     checkRequiredRole(roles, validRoles); // 403 if has insufficient role
 
     return roles;
+}
+
+export function withOrganizationUserRolesCheck<
+    T extends (
+        ctx: { logToClient: LogToClient },
+        params: { orgId: string },
+        extra: { authInfo: AuthInfo },
+        ...args: any[]
+    ) => Promise<any>,
+>(fn: T, validRoles: string[]): T {
+    // @ts-expect-error skip type inference of params
+    return async (
+        ctx: { logToClient: LogToClient },
+        params: { orgId: string },
+        extra: { authInfo: AuthInfo },
+        ...args: any[]
+    ) => {
+        const roles = await getOrganizationUserRoles(
+            ctx,
+            { orgId: params.orgId },
+            { authInfo: extra.authInfo },
+        );
+        checkRequiredRole(roles, validRoles); // 403 if has insufficient role
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument
+        return fn(ctx, params, extra, ...args);
+    };
 }

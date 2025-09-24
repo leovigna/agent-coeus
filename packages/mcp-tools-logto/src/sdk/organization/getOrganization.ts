@@ -12,10 +12,10 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const getOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
 };
 
 /**
@@ -26,20 +26,16 @@ export const getOrganizationInputSchema = {
 async function _getOrganization(
     ctx: { logToClient: LogToClient },
     params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { id } = params;
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId: id, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    const { orgId } = params;
 
     const orgResponse = await client.GET("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
     });
@@ -49,7 +45,14 @@ async function _getOrganization(
     return org;
 }
 
-export const getOrganization = withScopeCheck(_getOrganization, ["read:org"]);
+export const getOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_getOrganization, [
+        "owner",
+        "admin",
+        "member",
+    ]),
+    ["read:org"],
+);
 
 export const getOrganizationToolMetadata = {
     name: "logto_getOrganization",
