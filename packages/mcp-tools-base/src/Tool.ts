@@ -18,11 +18,11 @@ export type ToolExtraParams = Omit<
 };
 export type ToolCallback<Args extends undefined | ZodRawShape = undefined> =
     Args extends ZodRawShape
-        ? (
-              args: z.objectOutputType<Args, ZodTypeAny>,
-              extra: ToolExtraParams,
-          ) => CallToolResult | Promise<CallToolResult>
-        : (extra: ToolExtraParams) => CallToolResult | Promise<CallToolResult>;
+    ? (
+        args: z.objectOutputType<Args, ZodTypeAny>,
+        extra: ToolExtraParams,
+    ) => CallToolResult | Promise<CallToolResult>
+    : (extra: ToolExtraParams) => CallToolResult | Promise<CallToolResult>;
 
 export interface ToolMetadata<
     InputArgs extends ZodRawShape,

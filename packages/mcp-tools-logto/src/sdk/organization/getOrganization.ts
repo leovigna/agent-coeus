@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -23,14 +23,11 @@ export const getOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function getOrganization(
+async function _getOrganization(
     client: LogToClient,
     params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes
-
     const { id } = params;
     await checkOrganizationUserRoles(
         client,
@@ -50,6 +47,8 @@ export async function getOrganization(
 
     return org;
 }
+
+export const getOrganization = withScopeCheck(_getOrganization, ["read:org"]);
 
 export const getOrganizationToolMetadata = {
     name: "logto_getOrganization",
