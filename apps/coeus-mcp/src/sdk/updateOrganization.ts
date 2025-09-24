@@ -20,11 +20,8 @@ export const updateOrganizationInputSchema = {
     ...updateOrganizationInputSchemaBase,
     customData: z.object({
         zepApiKey: z.string().optional().describe("Custom Zep API Key"),
+        twentyApiUrl: z.string().optional().describe("Twenty CRM API URL"),
         twentyApiKey: z.string().optional().describe("Twenty CRM API Key"),
-        twentyWebhookSecret: z
-            .string()
-            .optional()
-            .describe("Twenty CRM Webhook Secret"),
     }),
 };
 // MCP Tool

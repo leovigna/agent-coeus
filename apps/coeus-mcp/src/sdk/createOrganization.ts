@@ -21,11 +21,11 @@ export const createOrganizationInputSchema = {
     customData: z
         .object({
             zepApiKey: z.string().optional().describe("Zep API Key"),
-            twentyApiKey: z.string().optional().describe("Twenty CRM API Key"),
-            twentyWebhookSecret: z
+            twentyApiUrl: z
                 .string()
-                .optional()
-                .describe("Twenty CRM Webhook Secret"),
+                .default("https://api.twenty.com/rest")
+                .describe("Twenty CRM API URL"),
+            twentyApiKey: z.string().optional().describe("Twenty CRM API Key"),
         })
         .optional(),
 };
