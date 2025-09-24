@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import type { components } from "./core-api.js";
 
+// TODO: Should we split into Component, ComponentForUpdate, ComponentForResponse?
 export type Company = components["schemas"]["Company"];
 export type Person = components["schemas"]["Person"];
 export type Task = components["schemas"]["Task"];

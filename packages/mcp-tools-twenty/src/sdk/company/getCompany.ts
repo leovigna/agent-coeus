@@ -13,27 +13,26 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
-import { CompanySchema } from "../../schemas/core-components.js";
 import type { TwentyCoreClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyCoreClient } from "../../TwentyClient.js";
 
-export const createCompanyInputSchema = {
+export const getCompanyInputSchema = {
     orgId: z.string().describe("The ID of the organization."),
-    company: CompanySchema,
+    id: z.string().describe("The ID of the company to get."),
 };
 
-export async function createCompany(
+export async function getCompany(
     ctx: {
         logToClient: LogToClient;
         twentyCoreClientProvider: TwentyCoreClientProvider;
     },
-    params: z.objectOutputType<typeof createCompanyInputSchema, z.ZodTypeAny>,
+    params: z.objectOutputType<typeof getCompanyInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["write:crm"]); // 403 if auth has insufficient scopes
 
-    const { orgId, company } = params;
+    const { orgId, id } = params;
 
     // Check user has access to org
     await checkOrganizationUserRoles(
@@ -47,47 +46,49 @@ export async function createCompany(
         orgId,
     );
 
-    const response = await client.POST("/companies", { body: company });
+    const response = await client.GET("/companies/{id}", {
+        params: { path: { id } },
+    });
     if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
-    const data = response.data!.data!.createCompany!; // parse response (a bit weird due to GraphQL adapter)
+    const data = response.data!.data!.company!; // parse response (a bit weird due to GraphQL adapter)
     return data;
 }
 
 // MCP Tool
-export const createCompanyToolMetadata = {
-    name: "twenty_createCompany",
+export const getCompanyToolMetadata = {
+    name: "twenty_getCompany",
     config: {
-        title: "Create Company",
-        description: "Create Company in Twenty CRM",
-        inputSchema: createCompanyInputSchema,
+        title: "Get Company",
+        description: "Get Company in Twenty CRM",
+        inputSchema: getCompanyInputSchema,
     },
-} as const satisfies ToolMetadata<typeof createCompanyInputSchema, ZodRawShape>;
+} as const satisfies ToolMetadata<typeof getCompanyInputSchema, ZodRawShape>;
 
-export function createCompanyToolFactory(ctx: {
+export function getCompanyToolFactory(ctx: {
     logToClient: LogToClient;
     twentyCoreClientProvider: TwentyCoreClientProvider;
 }) {
     return {
-        ...createCompanyToolMetadata,
-        name: createCompanyToolMetadata.name,
-        cb: partial(toCallToolResultFn(createCompany), ctx),
-    } as const satisfies Tool<typeof createCompanyInputSchema, ZodRawShape>;
+        ...getCompanyToolMetadata,
+        name: getCompanyToolMetadata.name,
+        cb: partial(toCallToolResultFn(getCompany), ctx),
+    } as const satisfies Tool<typeof getCompanyInputSchema, ZodRawShape>;
 }
 
 // TRPC Procedure
-export const createCompanyProcedureMetadata = {
+export const getCompanyProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: "/twenty/company",
+        method: "GET",
+        path: "/twenty/company/{id}",
         tags: ["company"],
-        summary: createCompanyToolMetadata.config.title,
-        description: createCompanyToolMetadata.config.description,
+        summary: getCompanyToolMetadata.config.title,
+        description: getCompanyToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createCompanyProcedureFactory = toProcedurePluginFn(
-    createCompanyInputSchema,
-    createCompany,
-    createCompanyProcedureMetadata,
+export const getCompanyProcedureFactory = toProcedurePluginFn(
+    getCompanyInputSchema,
+    getCompany,
+    getCompanyProcedureMetadata,
 );
