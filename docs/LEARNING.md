@@ -56,6 +56,14 @@
 
 **Future Action:** I will not add any new dependencies to the project unless the user explicitly requests them. I will always work within the constraints of the existing dependencies first.
 
+### Verify Existing Dependencies in `package.json`
+
+**Incident:** I planned to install `zod` because it was a required dependency for the task, but I failed to check if it was already listed in the project's `package.json`.
+
+**Correction:** The user informed me that `zod` was already included as a peer dependency and that I should always check `package.json` before attempting to add a new dependency.
+
+**Future Action:** Before planning to install any new dependency, my first step will be to read the `package.json` file of the relevant package to check if the dependency (or a compatible version) is already listed under `dependencies`, `devDependencies`, or `peerDependencies`. This will prevent redundant installations and ensure I am aware of the existing project setup.
+
 ## SDK Usage
 
 ### Client vs. Provider Pattern
