@@ -14,8 +14,13 @@ The purpose of this package is to keep the implementation of tools modular:
 
 ## SDK Functions
 SDK functions are organized in folders to mimic the default Twenty CRM Data Model:
+
+**Core API**
 - [company](./src/sdk/edge/): CRUD Companies
 - [people](./src/sdk/episode/): CRUD People
 - [tasks](./src/sdk/tasks/): CRUD Tasks
 - [messages](./src/sdk/messages/): CRUD Messages (eg. Gmail)
+
+**Metadata API**
+- [webhook](./src/sdk/webhook): CRUD Webhooks (especially useful on setup)
 
