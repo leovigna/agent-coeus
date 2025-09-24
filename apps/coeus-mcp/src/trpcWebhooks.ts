@@ -1,29 +1,210 @@
+import { createHmac, timingSafeEqual } from "crypto";
+
+import {
+    graphIdParamsSchema,
+    resolveZepClient,
+} from "@coeus-agent/mcp-tools-zep";
+import { Zep } from "@getzep/zep-cloud";
 import { initTRPC } from "@trpc/server";
+import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
+import {
+    BAD_REQUEST,
+    createError,
+    NOT_FOUND,
+    UNAUTHORIZED,
+} from "http-errors-enhanced";
+import { omit } from "lodash-es";
 import { generateOpenApiDocument, type OpenApiMeta } from "trpc-to-openapi";
 import { z } from "zod";
 
-export const webhooksT = initTRPC.meta<OpenApiMeta>().create();
+import { logToClient, zepClient } from "./clients/index.js";
+import {
+    requestHeadersMiddleware,
+    requestRawBodyMiddleware,
+} from "./middleware/requestMiddleware.js";
 
-export const webhooksPublicProcedure = webhooksT.procedure;
+export interface WebhooksContext {
+    /** *** Express Req/Response*****/
+    readonly req: CreateExpressContextOptions["req"];
+    readonly res?: CreateExpressContextOptions["res"];
+}
+
+export const webhooksT = initTRPC
+    .context<WebhooksContext>()
+    .meta<OpenApiMeta>()
+    .create();
+
+export const webhooksPublicProcedure = webhooksT.procedure
+    .concat(requestHeadersMiddleware)
+    .concat(requestRawBodyMiddleware);
+
+export const createWebhooksContext = ({
+    req,
+    res,
+}: CreateExpressContextOptions): WebhooksContext => {
+    return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        req,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        res,
+    } as WebhooksContext;
+};
 
 const webhooksTwentyRouter = webhooksT.router({
     receiveEvent: webhooksPublicProcedure
         .meta({
             openapi: {
                 method: "POST",
-                path: "/twenty/{id}",
+                path: "/twenty/{orgId}",
                 tags: ["twenty"],
                 summary: "",
                 description: "",
             },
         })
-        .input(z.object({ id: z.string() }))
-        .output(z.object({ status: z.string() }))
-        .mutation(({ input }) => {
-            // Handle the incoming webhook event from Twenty CRM
-            console.log("Received Twenty CRM webhook event:", input);
-            // Process the event as needed
-            return { status: "success" };
+        .input(z.object({ orgId: z.string() }).passthrough())
+        .output(z.any())
+        .mutation(async ({ ctx, input }) => {
+            const { headers, rawBody } = ctx;
+            const { orgId } = input;
+
+            // Twenty CRM webhook headers
+            const twentyWebhookNonce = headers["x-twenty-webhook-nonce"] as
+                | string
+                | undefined;
+            const twentyWebhookSignature = headers[
+                "x-twenty-webhook-signature"
+            ] as string | undefined;
+            const twentyWebhookTimestamp = headers[
+                "x-twenty-webhook-timestamp"
+            ] as string | undefined;
+            if (!twentyWebhookNonce) {
+                throw createError(
+                    BAD_REQUEST,
+                    "missing header: x-twenty-webhook-nonce",
+                ); // 400 Missing headers
+            }
+            if (!twentyWebhookTimestamp) {
+                throw createError(
+                    BAD_REQUEST,
+                    "missing header: x-twenty-webhook-timestamp",
+                ); // 400 Missing headers
+            }
+            if (!twentyWebhookSignature) {
+                throw createError(
+                    BAD_REQUEST,
+                    "missing header: x-twenty-webhook-signature",
+                ); // 400 Missing headers
+            }
+
+            // Webhook timestamp must be within 5 minutes
+            if (
+                parseInt(twentyWebhookTimestamp ?? "0") <
+                Date.now() - 5 * 60 * 1000
+            ) {
+                throw createError(
+                    BAD_REQUEST,
+                    `outdated x-twenty-webhook-timestamp: ${twentyWebhookTimestamp}`,
+                ); // 400 Outdated request
+            }
+
+            // TODO: Webhook nonce must be unprocessed
+
+            // Get organization
+            const orgResponse = await logToClient.GET(
+                "/api/organizations/{id}",
+                {
+                    params: { path: { id: orgId } },
+                },
+            );
+            if (!orgResponse.response.ok) {
+                throw createError(NOT_FOUND, `organization ${orgId} not found`); // 404 LogTo API call failed
+            }
+
+            const org = orgResponse.data!;
+            const twentyWebhookSecret = org.customData?.twentyWebhookSecret as
+                | string
+                | undefined;
+
+            if (!twentyWebhookSecret) {
+                throw createError(
+                    BAD_REQUEST,
+                    `organization ${orgId} missing twentyWebhookSecret`,
+                ); // 400 Missing twentyWebhookSecret
+            }
+
+            // Webhook HMAC signature must be valid using twentyWebhookSecret
+            // 2) Compute expected signature: HMAC-SHA256(secret, `${ts}:${rawBody}`) -> hex
+            const toSign = `${twentyWebhookTimestamp}:${rawBody.toString("utf8")}`;
+            const expected = createHmac("sha256", twentyWebhookSecret)
+                .update(toSign)
+                .digest("hex");
+
+            // 3) Constant-time compare
+            const signatureValid =
+                expected.length === twentyWebhookSignature.length &&
+                timingSafeEqual(
+                    Buffer.from(expected),
+                    Buffer.from(twentyWebhookSignature),
+                );
+            if (!signatureValid) {
+                throw createError(
+                    UNAUTHORIZED,
+                    "invalid x-twenty-webhook-signature",
+                ); // 401 Invalid signature
+            }
+
+            // Resolve Zep client
+            const zep = await resolveZepClient(zepClient, orgId);
+
+            // Get graph, create if not exists
+            const graphId = graphIdParamsSchema.parse({
+                orgId,
+                userId: "all",
+                name: "twenty",
+            });
+            try {
+                await zep.graph.get(graphId);
+            } catch (err) {
+                if (err instanceof Zep.NotFoundError) {
+                    // Create graph if not exists
+                    await zep.graph.create({
+                        graphId,
+                        name: "Twenty CRM",
+                        description: "Twenty CRM",
+                    });
+                } else {
+                    throw err;
+                }
+            }
+
+            // Cleanup event (remove orgId, targetUrl, workspaceId, webhookId, objectMetadata)
+            const event = omit(input, [
+                "orgId",
+                "targetUrl",
+                "workspaceId",
+                "webhookId",
+                "objectMetadata",
+            ]);
+
+            /*
+            // TODO: For debugging later, capture events and derive Zod schemas with ChatGPT
+            writeFileSync(
+                `./data/${twentyWebhookNonce}.json`,
+                JSON.stringify(input),
+                "utf-8",
+            );
+            */
+
+            // Store in Zep twenty database
+            // TODO: Populate `createdAt` from event if possible
+            const episode = await zep.graph.add({
+                graphId,
+                data: JSON.stringify(event),
+                sourceDescription: "Twenty CRM",
+                type: "json",
+            });
+
+            return episode;
         }),
 });
 

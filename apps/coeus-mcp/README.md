@@ -1,5 +1,12 @@
 # Zep MCP
 
+## Integrations
+### Zep Cloud
+Add a custom zep cloud project to your organization using the `zepApiKey` when creating an organization.
+
+### Twenty CRM
+Add TwentyCRM integration to your organization using the `twentyApiKey` and `twentyWebhookSecret` when creating an organization.
+
 ## Client Configs
 ### Custom ChatGPT
 https://blog.logto.io/gpt-action-oauth

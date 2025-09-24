@@ -12,7 +12,11 @@ import { OIDC_BASE_URL, OIDC_CLIENT_ID } from "./envvars.js";
 import { openApiDocument } from "./openapi.js";
 import { createContext } from "./trpc.js";
 import { appRouter } from "./trpcAppRouter.js";
-import { webhooksAppRouter, webhooksOpenApiDocument } from "./trpcWebhooks.js";
+import {
+    createWebhooksContext,
+    webhooksAppRouter,
+    webhooksOpenApiDocument,
+} from "./trpcWebhooks.js";
 
 if (!OIDC_CLIENT_ID) {
     throw new Error("OIDC_CLIENT_ID is not set");
@@ -76,7 +80,7 @@ export async function getExpressApp({
     app.use("/mcp", mcpAuth.bearerAuth("jwt"));
 
     // Parse JSON
-    app.use(express.json());
+    // app.use(express.json());
     // Protected endpoints
     // OpenAPI Middleware
     app.use(
@@ -106,7 +110,29 @@ export async function getExpressApp({
     });
     app.use(
         "/webhooks",
-        createOpenApiExpressMiddleware({ router: webhooksAppRouter }),
+        express.raw({ type: "application/json", limit: "2mb" }),
+        (req, res, next) => {
+            if (req.body) {
+                const rawBody = Buffer.from(req.body);
+                // @ts-expect-error capture raw body
+                req.rawBody = rawBody;
+                // Safe to parse JSON for downstream (tRPC OpenAPI expects an object here)
+                try {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    req.body = JSON.parse(rawBody.toString("utf8"));
+                } catch {
+                    return res.status(400).send("invalid json");
+                }
+            }
+            next();
+        },
+    );
+    app.use(
+        "/webhooks",
+        createOpenApiExpressMiddleware({
+            router: webhooksAppRouter,
+            createContext: createWebhooksContext,
+        }),
     );
 
     return app;

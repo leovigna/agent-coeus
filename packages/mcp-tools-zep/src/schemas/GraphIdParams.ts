@@ -1,19 +1,14 @@
 import { z } from "zod";
 
-export const graphIdParamsSchema = {
-    orgId: z
-        .string()
-        .optional()
-        .describe(
-            "Organization unique identifier. If not provided, uses the user's current org.",
-        ),
-    graphUUID: z
-        .string()
-        .optional()
-        .describe(
-            "Graph unique identifier. If not provided, uses the user's default graph.",
-        ),
-};
+export const graphIdParamsSchema = z
+    .object({
+        orgId: z.string().regex(/^[a-z0-9-_]+$/),
+        userId: z.string().regex(/^[a-z0-9]+$/),
+        name: z.string().regex(/^[a-z0-9]+$/),
+    })
+    .transform(({ orgId, userId, name }) => {
+        return `${orgId}:${userId}:${name}`;
+    });
 
 export const graphIdRegex =
     /^(?<orgId>[a-z0-9-_]+):(?<userId>[a-z0-9]+):(?<name>[a-z0-9]+)$/;
