@@ -1,15 +1,15 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
-    checkOrganizationUserRoles,
     getMeOrgId,
+    withOrganizationUserRolesCheck,
 } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
@@ -32,7 +32,7 @@ export const listGraphsInputSchema = {
  * @param param2
  * @returns
  */
-export async function listGraphs(
+async function _listGraphs(
     ctx: {
         logToClient: LogToClient;
         zepClientProvider: ZepClientProvider;
@@ -40,20 +40,12 @@ export async function listGraphs(
     params: z.objectOutputType<typeof listGraphsInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.Graph[]> {
-    const { subject, scopes } = authInfo;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["list:graphs"]); // 403 if auth has insufficient scopes
 
     const { zepClientProvider } = ctx;
 
     const orgId = params.orgId ?? (await getMeOrgId(ctx, { authInfo }));
-
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
 
     const zepClient = await resolveZepClient(zepClientProvider, orgId);
 
@@ -70,6 +62,11 @@ export async function listGraphs(
 
     return filteredGraphs;
 }
+
+export const listGraphs = withScopeCheck(
+    withOrganizationUserRolesCheck(_listGraphs, ["owner", "admin", "member"]),
+    ["list:graphs"],
+);
 
 // MCP Tool
 export const listGraphsToolMetadata = {

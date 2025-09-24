@@ -218,3 +218,11 @@
 **Correction:** The user instructed me not to delete commented-out or unused code, as the developer may want it for later reference.
 
 **Future Action:** I will not delete commented-out code or unused variables unless explicitly instructed to do so. I will preserve the code as it is, trusting that the developer has left it there for a reason.
+
+### Reuse Helpers Across Packages
+
+**Incident:** I re-implemented a `withOrganizationUserRolesCheck` helper function in the `mcp-tools-twenty` package, even though an identical helper already existed in the `mcp-tools-logto` package.
+
+**Correction:** The user pointed out that re-implementing the function was unnecessary and that I should have imported the existing helper from the other package.
+
+**Future Action:** Before creating new helper functions, especially for common tasks like authorization, I will first check other packages in the monorepo to see if a suitable helper already exists. I will prioritize reusing existing code to maintain a DRY (Don't Repeat Yourself) codebase and ensure consistency.

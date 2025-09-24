@@ -1,13 +1,13 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
@@ -22,25 +22,15 @@ export const createCompanyInputSchema = {
     company: CompanySchema,
 };
 
-export async function createCompany(
+async function _createCompany(
     ctx: {
-        logToClient: LogToClient;
         twentyCoreClientProvider: TwentyCoreClientProvider;
     },
     params: z.objectOutputType<typeof createCompanyInputSchema, z.ZodTypeAny>,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["write:crm"]); // 403 if auth has insufficient scopes
-
     const { orgId, company } = params;
-
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
 
     const client = await resolveTwentyCoreClient(
         ctx.twentyCoreClientProvider,
@@ -53,6 +43,15 @@ export async function createCompany(
     const data = response.data!.data!.createCompany!; // parse response (a bit weird due to GraphQL adapter)
     return data;
 }
+
+export const createCompany = withScopeCheck(
+    withOrganizationUserRolesCheck(_createCompany, [
+        "owner",
+        "admin",
+        "member",
+    ]),
+    ["write:crm"],
+);
 
 // MCP Tool
 export const createCompanyToolMetadata = {

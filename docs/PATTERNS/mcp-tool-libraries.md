@@ -125,6 +125,35 @@ export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
 }
 ```
 
+### **Authorization with Higher-Order Functions**
+
+For tools that require authorization (e.g., checking scopes or user roles), we use a pattern of wrapping the core logic with higher-order functions. This keeps the business logic clean and separates authorization concerns.
+
+*   **`withScopeCheck`**: Ensures the authenticated user has the required permissions.
+*   **`withOrganizationUserRolesCheck`**: Ensures the user is a member of the organization with a valid role.
+
+*Example: `sdk/organization/getOrganization.ts`*
+```typescript
+// 1. Core logic is in a private function
+async function _getOrganization(ctx: ..., params: ...) {
+  // ... business logic without auth checks ...
+}
+
+// 2. Core logic is wrapped with authorization helpers
+export const getOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_getOrganization, ["owner", "admin", "member"]),
+    ["read:org"],
+);
+
+// 3. Factories use the wrapped function
+export function getOrganizationToolFactory(ctx: ...) {
+    return {
+        // ...
+        cb: partial(toCallToolResultFn(getOrganization), ctx),
+    };
+}
+```
+
 ### **The Final Router (in `coeus-mcp`)**
 
 The main server application (`coeus-mcp`) consumes these plugins to build its router in a clean, declarative way.

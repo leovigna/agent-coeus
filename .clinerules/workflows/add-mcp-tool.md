@@ -57,7 +57,18 @@ export const {{action}}ProcedureFactory = toProcedurePluginFn(...);
 
 ---
 
-### **Step 3: Update Plugin and Barrel Files**
+### **Step 3: Add Authorization (If Applicable)**
+
+If the tool requires authorization, wrap the core logic function with the appropriate higher-order functions from `@coeus-agent/mcp-tools-base` and `@coeus-agent/mcp-tools-logto`.
+
+```typescript
+export const {{action}} = withScopeCheck(
+    withOrganizationUserRolesCheck(_{{action}}, ["owner", "admin", "member"]),
+    ["scope:required"],
+);
+```
+
+### **Step 4: Update Plugin and Barrel Files**
 
 1.  **Update `plugin.ts`:** Add the new `{action}ProcedureFactory` factory to the `create...Plugin` function.
 2.  **Update Barrel Files:** Append exports for the new tool to the relevant `index.ts` files.

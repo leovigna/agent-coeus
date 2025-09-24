@@ -27,19 +27,19 @@ export async function checkOrganizationUserRoles(
 }
 
 export function withOrganizationUserRolesCheck<
-    T extends (
-        ctx: { logToClient: LogToClient },
-        params: { orgId: string },
-        extra: { authInfo: AuthInfo },
-        ...args: any[]
-    ) => Promise<any>,
->(fn: T, validRoles: string[]): T {
-    // @ts-expect-error skip type inference of params
+    T extends (ctx: any, params: any, extra: any) => Promise<any>,
+>(
+    fn: T,
+    validRoles: string[],
+): (
+    ctx: Parameters<T>[0] & { logToClient: LogToClient },
+    params: Parameters<T>[1] & { orgId: string },
+    extra: Parameters<T>[2] & { authInfo: AuthInfo },
+) => Promise<ReturnType<T>> {
     return async (
         ctx: { logToClient: LogToClient },
         params: { orgId: string },
         extra: { authInfo: AuthInfo },
-        ...args: any[]
     ) => {
         const roles = await getOrganizationUserRoles(
             ctx,
@@ -48,7 +48,7 @@ export function withOrganizationUserRolesCheck<
         );
         checkRequiredRole(roles, validRoles); // 403 if has insufficient role
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument
-        return fn(ctx, params, extra, ...args);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return fn(ctx, params, extra);
     };
 }

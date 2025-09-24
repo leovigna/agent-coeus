@@ -1,13 +1,13 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
@@ -21,25 +21,15 @@ export const getCompanyInputSchema = {
     id: z.string().describe("The ID of the company to get."),
 };
 
-export async function getCompany(
+async function _getCompany(
     ctx: {
-        logToClient: LogToClient;
         twentyCoreClientProvider: TwentyCoreClientProvider;
     },
     params: z.objectOutputType<typeof getCompanyInputSchema, z.ZodTypeAny>,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["write:crm"]); // 403 if auth has insufficient scopes
-
     const { orgId, id } = params;
-
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
 
     const client = await resolveTwentyCoreClient(
         ctx.twentyCoreClientProvider,
@@ -54,6 +44,11 @@ export async function getCompany(
     const data = response.data!.data!.company!; // parse response (a bit weird due to GraphQL adapter)
     return data;
 }
+
+export const getCompany = withScopeCheck(
+    withOrganizationUserRolesCheck(_getCompany, ["owner", "admin", "member"]),
+    ["read:crm"],
+);
 
 // MCP Tool
 export const getCompanyToolMetadata = {
