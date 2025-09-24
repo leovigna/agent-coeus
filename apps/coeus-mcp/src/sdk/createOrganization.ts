@@ -41,11 +41,13 @@ export const createOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function createOrganizationToolFactory(client: LogToClient) {
+export function createOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...createOrganizationToolMetadata,
         name: createOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(createOrganization), client),
+        cb: partial(toCallToolResultFn(createOrganization), ctx),
     } as const satisfies Tool<
         typeof createOrganizationInputSchema,
         ZodRawShape
@@ -59,5 +61,6 @@ const createOrganizationProcedureFactory = toProcedurePluginFn(
     createOrganizationProcedureMetadata,
 );
 
-export const createOrganizationProcedure =
-    createOrganizationProcedureFactory(logToClient);
+export const createOrganizationProcedure = createOrganizationProcedureFactory({
+    logToClient,
+});

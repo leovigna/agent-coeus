@@ -24,19 +24,20 @@ export const deleteOrganizationInputSchema = {
  * @param {string} id - The ID of the organization.
  */
 export async function deleteOrganization(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof deleteOrganizationInputSchema,
         ZodTypeAny
     >,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["delete:org"]); // 403 if auth has insufficient scopes
 
     const { id } = params;
     await checkOrganizationUserRoles(
-        client,
+        ctx,
         { orgId: id, validRoles: ["owner"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
@@ -64,11 +65,13 @@ export const deleteOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function deleteOrganizationToolFactory(client: LogToClient) {
+export function deleteOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...deleteOrganizationToolMetadata,
         name: deleteOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(deleteOrganization), client),
+        cb: partial(toCallToolResultFn(deleteOrganization), ctx),
     } as const satisfies Tool<
         typeof deleteOrganizationInputSchema,
         ZodRawShape

@@ -36,12 +36,12 @@ export function registerMcpTools(
     const { logToClient, zepClient } = clients;
     const tools = [
         // logto/organization
-        createOrganizationToolFactory(logToClient),
-        getOrganizationToolFactory(logToClient),
-        listOrganizationsToolFactory(logToClient),
-        updateOrganizationToolFactory(logToClient),
-        deleteOrganizationToolFactory(logToClient),
-        getMeProfileToolFactory(logToClient),
+        createOrganizationToolFactory({ logToClient }),
+        getOrganizationToolFactory({ logToClient }),
+        listOrganizationsToolFactory({ logToClient }),
+        updateOrganizationToolFactory({ logToClient }),
+        deleteOrganizationToolFactory({ logToClient }),
+        getMeProfileToolFactory({ logToClient }),
         // zep/graph
         createGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
         getGraphToolFactory({ logToClient, zepClientProvider: zepClient }),

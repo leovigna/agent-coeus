@@ -5,9 +5,10 @@ import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import type { LogToClient } from "../../LogToClient.js";
 
 export async function getMeCustomData(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
     checkRequiredScopes(scopes, ["read:user:custom-data"]); // 403 if auth has insufficient scopes

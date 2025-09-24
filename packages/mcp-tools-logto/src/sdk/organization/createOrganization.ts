@@ -32,13 +32,14 @@ export const createOrganizationInputSchema = {
  * @param {boolean} [isMfaRequired] - Whether MFA is required for the organization.
  */
 export async function createOrganization(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof createOrganizationInputSchema,
         ZodTypeAny
     >,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { subject, scopes } = authInfo;
     const userId = subject!;
     checkRequiredScopes(scopes, ["create:org"]); // 403 if auth has insufficient scopes
@@ -103,11 +104,13 @@ export const createOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function createOrganizationToolFactory(client: LogToClient) {
+export function createOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...createOrganizationToolMetadata,
         name: createOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(createOrganization), client),
+        cb: partial(toCallToolResultFn(createOrganization), ctx),
     } as const satisfies Tool<
         typeof createOrganizationInputSchema,
         ZodRawShape

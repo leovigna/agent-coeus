@@ -16,14 +16,14 @@ import { getMeCustomData } from "./getMeCustomData.js";
 export const getMeProfileInputSchema = {};
 
 export async function getMeProfile(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     _: z.objectOutputType<typeof getMeProfileInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
 
-    const userCustomData = (await getMeCustomData(client, {
+    const userCustomData = (await getMeCustomData(ctx, {
         authInfo,
     })) as unknown as { currentOrgId?: string };
 
@@ -40,11 +40,11 @@ export const getMeProfileToolMetadata = {
     },
 } as const satisfies ToolMetadata<typeof getMeProfileInputSchema, ZodRawShape>;
 
-export function getMeProfileToolFactory(client: LogToClient) {
+export function getMeProfileToolFactory(ctx: { logToClient: LogToClient }) {
     return {
         ...getMeProfileToolMetadata,
         name: getMeProfileToolMetadata.name,
-        cb: partial(toCallToolResultFn(getMeProfile), client),
+        cb: partial(toCallToolResultFn(getMeProfile), ctx),
     } as const satisfies Tool<typeof getMeProfileInputSchema, ZodRawShape>;
 }
 

@@ -17,10 +17,11 @@ export const listOrganizationsInputSchema = {};
  * List all organizations the current user belongs to.
  */
 export async function listOrganizations(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { subject, scopes } = authInfo;
     const userId = subject!;
     checkRequiredScopes(scopes, ["list:orgs"]); // 403 if auth has insufficient scopes
@@ -51,11 +52,13 @@ export const listOrganizationsToolMetadata = {
 >;
 
 // MCP Tool
-export function listOrganizationsToolFactory(client: LogToClient) {
+export function listOrganizationsToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...listOrganizationsToolMetadata,
         name: listOrganizationsToolMetadata.name,
-        cb: partial(toCallToolResultFn(listOrganizations), client),
+        cb: partial(toCallToolResultFn(listOrganizations), ctx),
     } as const satisfies Tool<typeof listOrganizationsInputSchema, ZodRawShape>;
 }
 

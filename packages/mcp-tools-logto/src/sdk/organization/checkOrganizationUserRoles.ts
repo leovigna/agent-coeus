@@ -15,15 +15,11 @@ import { getOrganizationUserRoles } from "./getOrganizationUserRoles.js";
  * @returns user roles
  */
 export async function checkOrganizationUserRoles(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { orgId, validRoles }: { orgId: string; validRoles: string[] },
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const roles = await getOrganizationUserRoles(
-        client,
-        { orgId },
-        { authInfo },
-    );
+    const roles = await getOrganizationUserRoles(ctx, { orgId }, { authInfo });
     checkRequiredRole(roles, validRoles); // 403 if has insufficient role
 
     return roles;

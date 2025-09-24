@@ -13,11 +13,11 @@ import { patchMeCustomData } from "./patchMeCustomData.js";
  * @returns
  */
 export async function getMeOrgId(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<string> {
     // Get current orgId
-    const userCustomData = (await getMeCustomData(client, {
+    const userCustomData = (await getMeCustomData(ctx, {
         authInfo,
     })) as unknown as { currentOrgId?: string };
     let orgId = userCustomData.currentOrgId;
@@ -25,7 +25,7 @@ export async function getMeOrgId(
     if (!orgId) {
         // Create personal org
         const org = await createOrganization(
-            client,
+            ctx,
             {
                 name: "Personal",
                 description: "Personal Organization",
@@ -34,7 +34,7 @@ export async function getMeOrgId(
         );
         orgId = org.id;
         // Set as personal org
-        await patchMeCustomData(client, { currentOrgId: orgId }, { authInfo });
+        await patchMeCustomData(ctx, { currentOrgId: orgId }, { authInfo });
     }
 
     return orgId;

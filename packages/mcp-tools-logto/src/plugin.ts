@@ -10,21 +10,13 @@ import {
 } from "./sdk/index.js";
 
 export function createLogToPlugin(ctx: { logToClient: LogToClient }) {
-    const createOrganization = createOrganizationProcedureFactory(
-        ctx.logToClient,
-    );
-    const deleteOrganization = deleteOrganizationProcedureFactory(
-        ctx.logToClient,
-    );
-    const getOrganization = getOrganizationProcedureFactory(ctx.logToClient);
-    const listOrganizations = listOrganizationsProcedureFactory(
-        ctx.logToClient,
-    );
-    const updateOrganization = updateOrganizationProcedureFactory(
-        ctx.logToClient,
-    );
-    const getMeProfile = getMeProfileProcedureFactory(ctx.logToClient);
-    const setMeOrgId = setMeOrgIdProcedureFactory(ctx.logToClient);
+    const createOrganization = createOrganizationProcedureFactory(ctx);
+    const deleteOrganization = deleteOrganizationProcedureFactory(ctx);
+    const getOrganization = getOrganizationProcedureFactory(ctx);
+    const listOrganizations = listOrganizationsProcedureFactory(ctx);
+    const updateOrganization = updateOrganizationProcedureFactory(ctx);
+    const getMeProfile = getMeProfileProcedureFactory(ctx);
+    const setMeOrgId = setMeOrgIdProcedureFactory(ctx);
 
     return {
         createOrganization,

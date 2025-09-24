@@ -44,13 +44,13 @@ export async function listGraphs(
     const userId = subject!;
     checkRequiredScopes(scopes, ["list:graphs"]); // 403 if auth has insufficient scopes
 
-    const { logToClient, zepClientProvider } = ctx;
+    const { zepClientProvider } = ctx;
 
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
+    const orgId = params.orgId ?? (await getMeOrgId(ctx, { authInfo }));
 
     // Check user has access to org
     await checkOrganizationUserRoles(
-        logToClient,
+        ctx,
         { orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role

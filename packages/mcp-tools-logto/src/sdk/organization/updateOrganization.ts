@@ -36,19 +36,20 @@ export const updateOrganizationInputSchema = {
  * @param {boolean} [isMfaRequired] - Is MFA required?
  */
 export async function updateOrganization(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof updateOrganizationInputSchema,
         ZodTypeAny
     >,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { scopes } = authInfo;
     checkRequiredScopes(scopes, ["write:org"]); // 403 if auth has insufficient scopes
 
     const { id, ...body } = params;
     await checkOrganizationUserRoles(
-        client,
+        ctx,
         { orgId: id, validRoles: ["owner", "admin"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
@@ -80,11 +81,13 @@ export const updateOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function updateOrganizationToolFactory(client: LogToClient) {
+export function updateOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...updateOrganizationToolMetadata,
         name: updateOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(updateOrganization), client),
+        cb: partial(toCallToolResultFn(updateOrganization), ctx),
     } as const satisfies Tool<
         typeof updateOrganizationInputSchema,
         ZodRawShape

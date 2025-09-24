@@ -36,7 +36,7 @@ export async function getCompany(
 
     // Check user has access to org
     await checkOrganizationUserRoles(
-        ctx.logToClient,
+        ctx,
         { orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role

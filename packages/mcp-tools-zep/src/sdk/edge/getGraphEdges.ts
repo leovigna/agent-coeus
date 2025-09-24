@@ -51,7 +51,7 @@ export async function getGraphEdges(
 
     // Check user has access to org
     await checkOrganizationUserRoles(
-        ctx.logToClient,
+        ctx,
         { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role

@@ -14,10 +14,11 @@ import type { LogToClient } from "../../LogToClient.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function patchMeCustomData<T extends Record<string, any>>(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     customData: T,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
     checkRequiredScopes(scopes, ["update:user:custom-data"]); // 403 if auth has insufficient scopes
@@ -59,11 +60,11 @@ export const setMeOrgIdToolMetadata = {
     },
 } as const satisfies ToolMetadata<typeof setMeOrgIdInputSchema, ZodRawShape>;
 
-export function setMeOrgIdToolFactory(client: LogToClient) {
+export function setMeOrgIdToolFactory(ctx: { logToClient: LogToClient }) {
     return {
         ...setMeOrgIdToolMetadata,
         name: setMeOrgIdToolMetadata.name,
-        cb: partial(toCallToolResultFn(setMeOrgId), client),
+        cb: partial(toCallToolResultFn(setMeOrgId), ctx),
     } as const satisfies Tool<typeof setMeOrgIdInputSchema, ZodRawShape>;
 }
 

@@ -12,10 +12,11 @@ import type { LogToClient } from "../../LogToClient.js";
  * @returns user roles
  */
 export async function getOrganizationUserRoles(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { orgId }: { orgId: string },
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { subject, scopes } = authInfo;
     const userId = subject!;
     checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes

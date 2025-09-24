@@ -24,13 +24,14 @@ export const getOrganizationInputSchema = {
  * @param {string} id - The ID of the organization.
  */
 async function _getOrganization(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { id } = params;
     await checkOrganizationUserRoles(
-        client,
+        ctx,
         { orgId: id, validRoles: ["owner", "admin", "member"] },
         { authInfo },
     ); // 404 if not part of org, 403 if has insufficient role
@@ -63,11 +64,11 @@ export const getOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getOrganizationToolFactory(client: LogToClient) {
+export function getOrganizationToolFactory(ctx: { logToClient: LogToClient }) {
     return {
         ...getOrganizationToolMetadata,
         name: getOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(getOrganization), client),
+        cb: partial(toCallToolResultFn(getOrganization), ctx),
     } as const satisfies Tool<typeof getOrganizationInputSchema, ZodRawShape>;
 }
 
