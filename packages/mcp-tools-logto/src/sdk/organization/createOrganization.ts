@@ -1,6 +1,5 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
     withScopeCheck,

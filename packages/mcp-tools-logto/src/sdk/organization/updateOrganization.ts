@@ -1,6 +1,5 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
     withScopeCheck,
@@ -13,10 +12,7 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import {
-    checkOrganizationUserRoles,
-    withOrganizationUserRolesCheck,
-} from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const updateOrganizationInputSchema = {
     orgId: z.string().describe("The ID of the organization."),
@@ -45,18 +41,12 @@ async function _updateOrganization(
         typeof updateOrganizationInputSchema,
         ZodTypeAny
     >,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["write:org"]); // 403 if auth has insufficient scopes
 
     const { orgId, ...body } = params;
-    await checkOrganizationUserRoles(
-        ctx,
-        { orgId, validRoles: ["owner", "admin"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
 
     const orgResponse = await client.PATCH("/api/organizations/{id}", {
         params: {

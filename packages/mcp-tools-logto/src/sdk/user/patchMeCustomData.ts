@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -13,15 +13,13 @@ import { z } from "zod";
 import type { LogToClient } from "../../LogToClient.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function patchMeCustomData<T extends Record<string, any>>(
+async function _patchMeCustomData<T extends Record<string, any>>(
     ctx: { logToClient: LogToClient },
     customData: T,
     { authInfo }: { authInfo: AuthInfo },
 ) {
     const { logToClient: client } = ctx;
-    const { scopes } = authInfo;
     const userId = authInfo.subject!;
-    checkRequiredScopes(scopes, ["update:user:custom-data"]); // 403 if auth has insufficient scopes
 
     const userCustomDataResponse = await client.PATCH(
         "/api/users/{userId}/custom-data",
@@ -43,6 +41,10 @@ export async function patchMeCustomData<T extends Record<string, any>>(
 
     return userCustomData as unknown as T;
 }
+
+export const patchMeCustomData = withScopeCheck(_patchMeCustomData, [
+    "update:user:custom-data",
+]);
 
 export const setMeOrgId = patchMeCustomData<{ currentOrgId: string }>;
 
