@@ -13,12 +13,14 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
+import { depthSchema } from "../../schemas/core-components.js";
 import type { TwentyCoreClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyCoreClient } from "../../TwentyClient.js";
 
 export const getCompanyInputSchema = {
     orgId: z.string().describe("The ID of the organization."),
     id: z.string().describe("The ID of the company to get."),
+    depth: depthSchema,
 };
 
 async function _getCompany(
@@ -29,7 +31,7 @@ async function _getCompany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _: { authInfo: AuthInfo },
 ) {
-    const { orgId, id } = params;
+    const { orgId, id, depth } = params;
 
     const client = await resolveTwentyCoreClient(
         ctx.twentyCoreClientProvider,
@@ -37,7 +39,10 @@ async function _getCompany(
     );
 
     const response = await client.GET("/companies/{id}", {
-        params: { path: { id } },
+        params: {
+            path: { id },
+            query: { depth },
+        },
     });
     if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
@@ -75,7 +80,7 @@ export function getCompanyToolFactory(ctx: {
 export const getCompanyProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/twenty/company/{id}",
+        path: "/organization/{orgId}/twenty/companies/{id}",
         tags: ["company"],
         summary: getCompanyToolMetadata.config.title,
         description: getCompanyToolMetadata.config.description,

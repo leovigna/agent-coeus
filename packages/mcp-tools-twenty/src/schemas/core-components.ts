@@ -2,6 +2,99 @@ import { z } from "zod";
 
 import type { components } from "./core-api.js";
 
+export const startingAfterSchema = z
+    .string()
+    .describe(
+        "Returns objects starting after a specific cursor. You can find cursors in **startCursor** and **endCursor** in **pageInfo** in response data",
+    );
+
+export const endingBeforeSchema = z
+    .string()
+    .describe(
+        "Returns objects ending before a specific cursor. You can find cursors in **startCursor** and **endCursor** in **pageInfo** in response data",
+    );
+
+const COMPARATORS = z.enum([
+    "eq",
+    "neq",
+    "in",
+    "containsAny",
+    "is",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "startsWith",
+    "like",
+    "ilike",
+]);
+
+export const filterSchema = z
+    .string()
+    .refine(
+        (value) => {
+            const parts = value.split(",");
+            return parts.every((part) => {
+                const match = /([^[]+)\[([^\]]+)\]:(.*)/.exec(part);
+                if (!match) return false;
+                const [, , comparator] = match;
+                return COMPARATORS.safeParse(comparator).success;
+            });
+        },
+        {
+            message:
+                "Invalid filter format. Expected format: field[COMPARATOR]:value,field2[COMPARATOR]:value2",
+        },
+    )
+    .describe(
+        "Format: field[COMPARATOR]:value,field2[COMPARATOR]:value2. Refer to the filter section at the top of the page for more details.",
+    );
+
+export const depthSchema = z
+    .union([z.literal(0), z.literal(1)])
+    .default(1)
+    .describe(
+        "Determines the level of nested related objects to include in the response. 0: Primary object only, 1: Primary object + direct relations",
+    );
+
+const DIRECTIONS = z.enum([
+    "AscNullsFirst",
+    "AscNullsLast",
+    "DescNullsFirst",
+    "DescNullsLast",
+]);
+
+export const orderBySchema = z
+    .string()
+    .refine(
+        (value) => {
+            const parts = value.split(",");
+            return parts.every((part) => {
+                const match = /([^[]+)(\[([^\]]+)\])?/.exec(part);
+                if (!match) return false;
+                const [, , , direction] = match;
+                if (direction) {
+                    return DIRECTIONS.safeParse(direction).success;
+                }
+                return true;
+            });
+        },
+        {
+            message:
+                "Invalid orderBy format. Expected format: field_name_1,field_name_2[DIRECTION_2]",
+        },
+    )
+    .describe(
+        "Format: field_name_1,field_name_2[DIRECTION_2]. Refer to the filter section at the top of the page for more details.",
+    );
+
+export const limitSchema = z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .describe("Limits the number of objects returned.");
+
 // TODO: Should we split into Component, ComponentForUpdate, ComponentForResponse?
 export type Company = components["schemas"]["Company"];
 export type Person = components["schemas"]["Person"];

@@ -13,7 +13,7 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
-import { CompanySchema } from "../../schemas/core-components.js";
+import { CompanySchema, depthSchema } from "../../schemas/core-components.js";
 import type { TwentyCoreClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyCoreClient } from "../../TwentyClient.js";
 
@@ -21,6 +21,7 @@ export const updateCompanyInputSchema = {
     orgId: z.string().describe("The ID of the organization."),
     id: z.string().describe("The ID of the company to update."),
     company: CompanySchema,
+    depth: depthSchema,
 };
 
 async function _updateCompany(
@@ -31,7 +32,7 @@ async function _updateCompany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _: { authInfo: AuthInfo },
 ) {
-    const { orgId, id, company } = params;
+    const { orgId, id, company, depth } = params;
 
     const client = await resolveTwentyCoreClient(
         ctx.twentyCoreClientProvider,
@@ -39,7 +40,10 @@ async function _updateCompany(
     );
 
     const response = await client.PATCH("/companies/{id}", {
-        params: { path: { id } },
+        params: {
+            path: { id },
+            query: { depth },
+        },
         body: company,
     });
     if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
@@ -82,7 +86,7 @@ export function updateCompanyToolFactory(ctx: {
 export const updateCompanyProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/twenty/company/{id}",
+        path: "/organization/{orgId}/twenty/companies/{id}",
         tags: ["company"],
         summary: updateCompanyToolMetadata.config.title,
         description: updateCompanyToolMetadata.config.description,
