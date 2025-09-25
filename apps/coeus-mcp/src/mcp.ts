@@ -5,6 +5,38 @@ import {
     getOrganizationToolFactory,
     listOrganizationsToolFactory,
 } from "@coeus-agent/mcp-tools-logto";
+import {
+    createCompanyToolFactory,
+    createMessageToolFactory,
+    createNoteToolFactory,
+    createPersonToolFactory,
+    createTaskToolFactory,
+    createWebhookToolFactory,
+    deleteCompanyToolFactory,
+    deleteMessageToolFactory,
+    deleteNoteToolFactory,
+    deletePersonToolFactory,
+    deleteTaskToolFactory,
+    deleteWebhookToolFactory,
+    findCompaniesToolFactory,
+    findMessagesToolFactory,
+    findNotesToolFactory,
+    findPeopleToolFactory,
+    findTasksToolFactory,
+    findWebhooksToolFactory,
+    getCompanyToolFactory,
+    getMessageToolFactory,
+    getNoteToolFactory,
+    getPersonToolFactory,
+    getTaskToolFactory,
+    getWebhookToolFactory,
+    updateCompanyToolFactory,
+    updateMessageToolFactory,
+    updateNoteToolFactory,
+    updatePersonToolFactory,
+    updateTaskToolFactory,
+    updateWebhookToolFactory,
+} from "@coeus-agent/mcp-tools-twenty";
 import type { ZepClientProvider } from "@coeus-agent/mcp-tools-zep";
 import {
     addDataBatchToolFactory,
@@ -20,6 +52,10 @@ import {
 } from "@coeus-agent/mcp-tools-zep";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
+import {
+    twentyCoreClientProvider,
+    twentyMetadataClientProvider,
+} from "./clients/twenty-client.js";
 import { SYSTEM_PROMPT } from "./prompts.js";
 import {
     createOrganizationToolFactory,
@@ -60,6 +96,132 @@ export function registerMcpTools(
         getGraphEpisodesToolFactory({
             logToClient,
             zepClientProvider: zepClient,
+        }),
+        // twenty-core/company
+        createCompanyToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        deleteCompanyToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        findCompaniesToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        getCompanyToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        updateCompanyToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        // twenty-core/person
+        createPersonToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        deletePersonToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        findPeopleToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        getPersonToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        updatePersonToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        // twenty-core/task
+        createTaskToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        deleteTaskToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        findTasksToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        getTaskToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        updateTaskToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        // twenty-core/note
+        createNoteToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        deleteNoteToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        findNotesToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        getNoteToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        updateNoteToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        // twenty-core/message
+        createMessageToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        deleteMessageToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        findMessagesToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        getMessageToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        updateMessageToolFactory({
+            logToClient,
+            twentyCoreClientProvider,
+        }),
+        // twenty-metadata/webhook
+        createWebhookToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
+        }),
+        deleteWebhookToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
+        }),
+        findWebhooksToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
+        }),
+        getWebhookToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
+        }),
+        updateWebhookToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
         }),
     ];
 

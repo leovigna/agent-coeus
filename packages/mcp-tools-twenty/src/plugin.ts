@@ -37,10 +37,9 @@ import type {
     TwentyMetadataClientProvider,
 } from "./TwentyClient.js";
 
-export function createTwentyPlugin(ctx: {
+export function createTwentyCorePlugin(ctx: {
     logToClient: LogToClient;
     twentyCoreClientProvider: TwentyCoreClientProvider;
-    twentyMetadataClientProvider: TwentyMetadataClientProvider;
 }) {
     const createCompany = createCompanyProcedureFactory(ctx);
     const deleteCompany = deleteCompanyProcedureFactory(ctx);
@@ -72,12 +71,6 @@ export function createTwentyPlugin(ctx: {
     const getMessage = getMessageProcedureFactory(ctx);
     const updateMessage = updateMessageProcedureFactory(ctx);
 
-    const createWebhook = createWebhookProcedureFactory(ctx);
-    const deleteWebhook = deleteWebhookProcedureFactory(ctx);
-    const findWebhooks = findWebhooksProcedureFactory(ctx);
-    const getWebhook = getWebhookProcedureFactory(ctx);
-    const updateWebhook = updateWebhookProcedureFactory(ctx);
-
     return {
         createCompany,
         deleteCompany,
@@ -104,6 +97,20 @@ export function createTwentyPlugin(ctx: {
         findMessages,
         getMessage,
         updateMessage,
+    };
+}
+
+export function createTwentyMetadataPlugin(ctx: {
+    logToClient: LogToClient;
+    twentyMetadataClientProvider: TwentyMetadataClientProvider;
+}) {
+    const createWebhook = createWebhookProcedureFactory(ctx);
+    const deleteWebhook = deleteWebhookProcedureFactory(ctx);
+    const findWebhooks = findWebhooksProcedureFactory(ctx);
+    const getWebhook = getWebhookProcedureFactory(ctx);
+    const updateWebhook = updateWebhookProcedureFactory(ctx);
+
+    return {
         createWebhook,
         deleteWebhook,
         findWebhooks,

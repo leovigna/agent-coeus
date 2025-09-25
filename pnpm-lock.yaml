@@ -50,6 +50,9 @@ importers:
       '@coeus-agent/mcp-tools-logto':
         specifier: workspace:*
         version: link:../../packages/mcp-tools-logto
+      '@coeus-agent/mcp-tools-twenty':
+        specifier: workspace:*
+        version: link:../../packages/mcp-tools-twenty
       '@coeus-agent/mcp-tools-zep':
         specifier: workspace:*
         version: link:../../packages/mcp-tools-zep

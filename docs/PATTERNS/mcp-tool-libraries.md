@@ -196,9 +196,11 @@ When an MCP tool library's primary purpose is to expose an existing OpenAPI REST
 1.  **Tenant-Aware Proxy**: The MCP server exposes the service's API under a tenant-specific base path, typically `/organization/{orgId}`. This ensures that all requests are scoped to the correct organization.
 2.  **ClientProvider Pattern**: A `ClientProvider` is used to resolve the correct API client for the given `orgId`. This pattern encapsulates the logic for creating and configuring the client, including authentication.
 3.  **Code Generation**:
+    *   **OpenAPI JSON Spec**: An OpenAPI JSON specification is required to generate types.
     *   **`openapi-typescript`**: Generate TypeScript types from the OpenAPI specification.
-    *   **`openapi-fetch`**: Use the generated types to create a fully typed API client.
+    *   **`openapi-fetch`**: Use the generated types to create a fully typed API client. Note that this is not always used; other SDKs (e.g., the Zep SDK) may be used instead.
 4.  **Zod Schemas**: Create Zod schemas for all API inputs (request bodies and query parameters). These schemas should map directly to the generated TypeScript types and include descriptions from the OpenAPI specification.
+5.  **Client Export**: The MCP tool library should export the typed client and a client factory, as seen in `packages/mcp-tools-twenty/src/TwentyClient.ts`.
 
 This approach provides a robust, type-safe, and maintainable way to expose existing REST services through the MCP server, while still allowing for the addition of custom business logic and authorization as needed.
 

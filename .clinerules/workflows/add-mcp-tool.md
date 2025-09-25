@@ -103,6 +103,50 @@ export const getCompanyProcedureMetadata = { ... };
 export const getCompanyProcedureFactory = toProcedurePluginFn(...);
 ```
 
+**Template for Tenant Proxy Pattern:**
+```typescript
+import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn, withScopeCheck } from "@coeus-agent/mcp-tools-base";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import { partial } from "lodash-es";
+import { z } from "zod";
+
+import { depthSchema } from "../../schemas/core-components.js";
+import { TwentyCoreClientProvider, resolveTwentyCoreClient } from "../../TwentyClient.js";
+
+// 1. Input Schema maps to OpenAPI params
+export const getCompanyInputSchema = {
+    orgId: z.string().describe("The ID of the organization."),
+    id: z.string().describe("The ID of the company to get."),
+    depth: depthSchema,
+};
+
+// 2. SDK Function uses the ClientProvider
+async function _getCompany(
+    ctx: { twentyCoreClientProvider: TwentyCoreClientProvider },
+    params: z.objectOutputType<typeof getCompanyInputSchema, z.ZodTypeAny>,
+    _: { authInfo: AuthInfo },
+) {
+    const { orgId, id, depth } = params;
+    const client = await resolveTwentyCoreClient(ctx.twentyCoreClientProvider, orgId);
+
+    // 3. Mimic the REST API call
+    const response = await client.GET("/companies/{id}", {
+        params: { path: { id }, query: { depth } },
+    });
+    if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR);
+
+    return response.data!.data!.company!;
+}
+
+// 4. Factories and Metadata follow the standard pattern
+export const getCompany = withScopeCheck(...);
+export const getCompanyToolMetadata = { ... };
+export function getCompanyToolFactory(ctx: ...) { ... }
+export const getCompanyProcedureMetadata = { ... };
+export const getCompanyProcedureFactory = toProcedurePluginFn(...);
+```
+
 ---
 
 ### **Step 3: Add Authorization (If Applicable)**
