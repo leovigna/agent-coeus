@@ -105,7 +105,7 @@ export function findNotesToolFactory(ctx: {
 export const findNotesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/notes",
+        path: "/organizations/{orgId}/twenty/notes",
         tags: ["note"],
         summary: findNotesToolMetadata.config.title,
         description: findNotesToolMetadata.config.description,

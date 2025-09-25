@@ -74,7 +74,7 @@ export function createPersonToolFactory(ctx: {
 export const createPersonProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/people",
+        path: "/organizations/{orgId}/twenty/people",
         tags: ["person"],
         summary: createPersonToolMetadata.config.title,
         description: createPersonToolMetadata.config.description,

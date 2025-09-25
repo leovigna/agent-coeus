@@ -52,7 +52,7 @@ export function getMeProfileToolFactory(ctx: { logToClient: LogToClient }) {
 export const getMeProfileProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/me/profile",
+        path: "/me/profile",
         tags: ["logto"],
         summary: getMeProfileToolMetadata.config.title,
         description: getMeProfileToolMetadata.config.description,

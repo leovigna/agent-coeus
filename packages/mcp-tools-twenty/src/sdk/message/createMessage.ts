@@ -78,7 +78,7 @@ export function createMessageToolFactory(ctx: {
 export const createMessageProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/messages",
+        path: "/organizations/{orgId}/twenty/messages",
         tags: ["message"],
         summary: createMessageToolMetadata.config.title,
         description: createMessageToolMetadata.config.description,

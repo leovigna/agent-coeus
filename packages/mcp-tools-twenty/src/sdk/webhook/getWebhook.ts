@@ -77,7 +77,7 @@ export function getWebhookToolFactory(ctx: {
 export const getWebhookProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/webhooks/{id}",
+        path: "/organizations/{orgId}/twenty/webhooks/{id}",
         tags: ["webhook"],
         summary: getWebhookToolMetadata.config.title,
         description: getWebhookToolMetadata.config.description,

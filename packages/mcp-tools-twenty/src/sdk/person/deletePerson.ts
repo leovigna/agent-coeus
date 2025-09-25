@@ -75,7 +75,7 @@ export function deletePersonToolFactory(ctx: {
 export const deletePersonProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/people/{id}",
+        path: "/organizations/{orgId}/twenty/people/{id}",
         tags: ["person"],
         summary: deletePersonToolMetadata.config.title,
         description: deletePersonToolMetadata.config.description,

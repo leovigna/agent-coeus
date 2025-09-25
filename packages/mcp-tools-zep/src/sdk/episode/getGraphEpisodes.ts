@@ -96,7 +96,7 @@ export function getGraphEpisodesToolFactory(ctx: {
 export const getGraphEpisodesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/episodes",
+        path: "/organizations/{orgId}/zep/graph/episodes",
         tags: ["zep"],
         summary: getGraphEpisodesToolMetadata.config.title,
         description: getGraphEpisodesToolMetadata.config.description,

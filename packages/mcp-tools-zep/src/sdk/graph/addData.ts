@@ -159,7 +159,7 @@ export function addDataToolFactory(ctx: {
 export const addDataProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/data",
+        path: "/organizations/{orgId}/zep/graph/data",
         tags: ["zep"],
         summary: addDataToolMetadata.config.title,
         description: addDataToolMetadata.config.description,

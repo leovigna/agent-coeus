@@ -80,7 +80,7 @@ export function deleteOrganizationToolFactory(ctx: {
 export const deleteOrganizationProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/logto/organizations/{id}",
+        path: "/organizations/{orgId}",
         tags: ["logto"],
         summary: deleteOrganizationToolMetadata.config.title,
         description: deleteOrganizationToolMetadata.config.description,

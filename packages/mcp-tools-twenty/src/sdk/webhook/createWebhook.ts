@@ -78,7 +78,7 @@ export function createWebhookToolFactory(ctx: {
 export const createWebhookProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/webhooks",
+        path: "/organizations/{orgId}/twenty/webhooks",
         tags: ["webhook"],
         summary: createWebhookToolMetadata.config.title,
         description: createWebhookToolMetadata.config.description,

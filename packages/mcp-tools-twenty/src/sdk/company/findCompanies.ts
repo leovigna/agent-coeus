@@ -109,7 +109,7 @@ export function findCompaniesToolFactory(ctx: {
 export const findCompaniesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/companies",
+        path: "/organizations/{orgId}/twenty/companies",
         tags: ["company"],
         summary: findCompaniesToolMetadata.config.title,
         description: findCompaniesToolMetadata.config.description,

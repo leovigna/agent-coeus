@@ -96,7 +96,7 @@ export function getGraphEdgesToolFactory(ctx: {
 export const getGraphEdgesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/edges",
+        path: "/organizations/{orgId}/zep/graph/edges",
         tags: ["zep"],
         summary: getGraphEdgesToolMetadata.config.title,
         description: getGraphEdgesToolMetadata.config.description,

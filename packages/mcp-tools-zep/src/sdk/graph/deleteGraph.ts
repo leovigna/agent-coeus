@@ -87,7 +87,7 @@ export function deleteGraphToolFactory(ctx: {
 export const deleteGraphProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/zep/graphs",
+        path: "/organizations/{orgId}/zep/graphs",
         tags: ["zep"],
         summary: deleteGraphToolMetadata.config.title,
         description: deleteGraphToolMetadata.config.description,

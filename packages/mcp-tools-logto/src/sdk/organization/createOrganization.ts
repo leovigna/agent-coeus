@@ -124,7 +124,7 @@ export function createOrganizationToolFactory(ctx: {
 export const createOrganizationProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/logto/organizations",
+        path: "/organizations",
         tags: ["logto"],
         summary: createOrganizationToolMetadata.config.title,
         description: createOrganizationToolMetadata.config.description,

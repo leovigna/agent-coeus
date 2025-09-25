@@ -105,7 +105,7 @@ export function findPeopleToolFactory(ctx: {
 export const findPeopleProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/people",
+        path: "/organizations/{orgId}/twenty/people",
         tags: ["person"],
         summary: findPeopleToolMetadata.config.title,
         description: findPeopleToolMetadata.config.description,

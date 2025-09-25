@@ -74,7 +74,7 @@ export function setMeOrgIdToolFactory(ctx: { logToClient: LogToClient }) {
 export const setMeOrgIdProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/logto/me/current-org-id",
+        path: "/me/current-org-id",
         tags: ["logto"],
         summary: setMeOrgIdToolMetadata.config.title,
         description: setMeOrgIdToolMetadata.config.description,

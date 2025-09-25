@@ -79,7 +79,7 @@ export function deleteWebhookToolFactory(ctx: {
 export const deleteWebhookProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/webhooks/{id}",
+        path: "/organizations/{orgId}/twenty/webhooks/{id}",
         tags: ["webhook"],
         summary: deleteWebhookToolMetadata.config.title,
         description: deleteWebhookToolMetadata.config.description,

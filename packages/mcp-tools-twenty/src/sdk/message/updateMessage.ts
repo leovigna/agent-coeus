@@ -86,7 +86,7 @@ export function updateMessageToolFactory(ctx: {
 export const updateMessageProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/messages/{id}",
+        path: "/organizations/{orgId}/twenty/messages/{id}",
         tags: ["message"],
         summary: updateMessageToolMetadata.config.title,
         description: updateMessageToolMetadata.config.description,

@@ -80,7 +80,7 @@ export function getCompanyToolFactory(ctx: {
 export const getCompanyProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/companies/{id}",
+        path: "/organizations/{orgId}/twenty/companies/{id}",
         tags: ["company"],
         summary: getCompanyToolMetadata.config.title,
         description: getCompanyToolMetadata.config.description,

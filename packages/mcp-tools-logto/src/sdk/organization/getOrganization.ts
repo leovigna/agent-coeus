@@ -79,7 +79,7 @@ export function getOrganizationToolFactory(ctx: { logToClient: LogToClient }) {
 export const getOrganizationProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/organizations/{id}",
+        path: "/organizations/{orgId}",
         tags: ["logto"],
         summary: getOrganizationToolMetadata.config.title,
         description: getOrganizationToolMetadata.config.description,

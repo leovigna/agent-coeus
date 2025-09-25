@@ -105,7 +105,7 @@ export function findMessagesToolFactory(ctx: {
 export const findMessagesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/messages",
+        path: "/organizations/{orgId}/twenty/messages",
         tags: ["message"],
         summary: findMessagesToolMetadata.config.title,
         description: findMessagesToolMetadata.config.description,

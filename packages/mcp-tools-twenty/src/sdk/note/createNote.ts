@@ -74,7 +74,7 @@ export function createNoteToolFactory(ctx: {
 export const createNoteProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/notes",
+        path: "/organizations/{orgId}/twenty/notes",
         tags: ["note"],
         summary: createNoteToolMetadata.config.title,
         description: createNoteToolMetadata.config.description,

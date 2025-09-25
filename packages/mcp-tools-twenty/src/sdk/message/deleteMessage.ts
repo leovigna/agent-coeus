@@ -79,7 +79,7 @@ export function deleteMessageToolFactory(ctx: {
 export const deleteMessageProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/messages/{id}",
+        path: "/organizations/{orgId}/twenty/messages/{id}",
         tags: ["message"],
         summary: deleteMessageToolMetadata.config.title,
         description: deleteMessageToolMetadata.config.description,

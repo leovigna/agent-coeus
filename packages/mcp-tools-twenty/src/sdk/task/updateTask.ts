@@ -82,7 +82,7 @@ export function updateTaskToolFactory(ctx: {
 export const updateTaskProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/tasks/{id}",
+        path: "/organizations/{orgId}/twenty/tasks/{id}",
         tags: ["task"],
         summary: updateTaskToolMetadata.config.title,
         description: updateTaskToolMetadata.config.description,

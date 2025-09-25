@@ -97,7 +97,7 @@ export function updateOrganizationToolFactory(ctx: {
 export const updateOrganizationProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/logto/organizations/{id}",
+        path: "/organizations/{orgId}",
         tags: ["logto"],
         summary: updateOrganizationToolMetadata.config.title,
         description: updateOrganizationToolMetadata.config.description,

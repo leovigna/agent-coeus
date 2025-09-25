@@ -80,7 +80,7 @@ export function getPersonToolFactory(ctx: {
 export const getPersonProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/people/{id}",
+        path: "/organizations/{orgId}/twenty/people/{id}",
         tags: ["person"],
         summary: getPersonToolMetadata.config.title,
         description: getPersonToolMetadata.config.description,

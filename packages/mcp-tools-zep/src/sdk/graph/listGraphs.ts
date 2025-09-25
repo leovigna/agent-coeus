@@ -93,7 +93,7 @@ export function listGraphsToolFactory(ctx: {
 export const listGraphsProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graphs/list",
+        path: "/organizations/{orgId}/zep/graphs/list",
         tags: ["zep"],
         summary: listGraphsToolMetadata.config.title,
         description: listGraphsToolMetadata.config.description,

@@ -86,7 +86,7 @@ export function updateCompanyToolFactory(ctx: {
 export const updateCompanyProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/companies/{id}",
+        path: "/organizations/{orgId}/twenty/companies/{id}",
         tags: ["company"],
         summary: updateCompanyToolMetadata.config.title,
         description: updateCompanyToolMetadata.config.description,

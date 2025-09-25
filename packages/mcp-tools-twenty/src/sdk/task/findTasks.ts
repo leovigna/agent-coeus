@@ -105,7 +105,7 @@ export function findTasksToolFactory(ctx: {
 export const findTasksProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/tasks",
+        path: "/organizations/{orgId}/twenty/tasks",
         tags: ["task"],
         summary: findTasksToolMetadata.config.title,
         description: findTasksToolMetadata.config.description,

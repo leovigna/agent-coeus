@@ -86,7 +86,7 @@ export function getGraphToolFactory(ctx: {
 export const getGraphProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graphs",
+        path: "/organizations/{orgId}/zep/graphs",
         tags: ["zep"],
         summary: getGraphToolMetadata.config.title,
         description: getGraphToolMetadata.config.description,

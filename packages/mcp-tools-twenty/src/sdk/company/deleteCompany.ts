@@ -79,7 +79,7 @@ export function deleteCompanyToolFactory(ctx: {
 export const deleteCompanyProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/companies/{id}",
+        path: "/organizations/{orgId}/twenty/companies/{id}",
         tags: ["company"],
         summary: deleteCompanyToolMetadata.config.title,
         description: deleteCompanyToolMetadata.config.description,

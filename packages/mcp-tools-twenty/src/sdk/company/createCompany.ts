@@ -78,7 +78,7 @@ export function createCompanyToolFactory(ctx: {
 export const createCompanyProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/companies",
+        path: "/organizations/{orgId}/twenty/companies",
         tags: ["company"],
         summary: createCompanyToolMetadata.config.title,
         description: createCompanyToolMetadata.config.description,

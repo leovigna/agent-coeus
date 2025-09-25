@@ -80,7 +80,7 @@ export function getMessageToolFactory(ctx: {
 export const getMessageProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/messages/{id}",
+        path: "/organizations/{orgId}/twenty/messages/{id}",
         tags: ["message"],
         summary: getMessageToolMetadata.config.title,
         description: getMessageToolMetadata.config.description,

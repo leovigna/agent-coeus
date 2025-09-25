@@ -74,7 +74,7 @@ export function createTaskToolFactory(ctx: {
 export const createTaskProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/organization/{orgId}/twenty/tasks",
+        path: "/organizations/{orgId}/twenty/tasks",
         tags: ["task"],
         summary: createTaskToolMetadata.config.title,
         description: createTaskToolMetadata.config.description,

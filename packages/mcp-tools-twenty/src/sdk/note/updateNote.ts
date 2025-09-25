@@ -82,7 +82,7 @@ export function updateNoteToolFactory(ctx: {
 export const updateNoteProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/notes/{id}",
+        path: "/organizations/{orgId}/twenty/notes/{id}",
         tags: ["note"],
         summary: updateNoteToolMetadata.config.title,
         description: updateNoteToolMetadata.config.description,

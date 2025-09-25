@@ -80,7 +80,7 @@ export function getTaskToolFactory(ctx: {
 export const getTaskProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/tasks/{id}",
+        path: "/organizations/{orgId}/twenty/tasks/{id}",
         tags: ["task"],
         summary: getTaskToolMetadata.config.title,
         description: getTaskToolMetadata.config.description,

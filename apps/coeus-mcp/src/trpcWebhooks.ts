@@ -55,7 +55,7 @@ const webhooksTwentyRouter = webhooksT.router({
         .meta({
             openapi: {
                 method: "POST",
-                path: "/twenty/{orgId}",
+                path: "/organizations/{orgId}/twenty",
                 tags: ["twenty"],
                 summary: "",
                 description: "",

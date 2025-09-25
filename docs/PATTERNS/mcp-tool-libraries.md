@@ -193,7 +193,7 @@ When an MCP tool library's primary purpose is to expose an existing OpenAPI REST
 
 **Core Principles:**
 
-1.  **Tenant-Aware Proxy**: The MCP server exposes the service's API under a tenant-specific base path, typically `/organization/{orgId}`. This ensures that all requests are scoped to the correct organization.
+1.  **Tenant-Aware Proxy**: The MCP server exposes the service's API under a tenant-specific base path, typically `/organizations/{orgId}`. This ensures that all requests are scoped to the correct organization.
 2.  **ClientProvider Pattern**: A `ClientProvider` is used to resolve the correct API client for the given `orgId`. This pattern encapsulates the logic for creating and configuring the client, including authentication.
 3.  **Code Generation**:
     *   **OpenAPI JSON Spec**: An OpenAPI JSON specification is required to generate types.

@@ -75,7 +75,7 @@ export function deleteTaskToolFactory(ctx: {
 export const deleteTaskProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/tasks/{id}",
+        path: "/organizations/{orgId}/twenty/tasks/{id}",
         tags: ["task"],
         summary: deleteTaskToolMetadata.config.title,
         description: deleteTaskToolMetadata.config.description,

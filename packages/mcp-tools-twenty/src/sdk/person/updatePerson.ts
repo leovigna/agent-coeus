@@ -82,7 +82,7 @@ export function updatePersonToolFactory(ctx: {
 export const updatePersonProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/people/{id}",
+        path: "/organizations/{orgId}/twenty/people/{id}",
         tags: ["person"],
         summary: updatePersonToolMetadata.config.title,
         description: updatePersonToolMetadata.config.description,

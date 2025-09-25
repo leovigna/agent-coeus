@@ -92,7 +92,7 @@ export function addDataBatchToolFactory(ctx: {
 export const addDataBatchProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/data-batch",
+        path: "/organizations/{orgId}/zep/graph/data-batch",
         tags: ["zep"],
         summary: addDataBatchToolMetadata.config.title,
         description: addDataBatchToolMetadata.config.description,

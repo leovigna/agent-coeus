@@ -84,7 +84,7 @@ export function updateWebhookToolFactory(ctx: {
 export const updateWebhookProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/organization/{orgId}/twenty/webhooks/{id}",
+        path: "/organizations/{orgId}/twenty/webhooks/{id}",
         tags: ["webhook"],
         summary: updateWebhookToolMetadata.config.title,
         description: updateWebhookToolMetadata.config.description,

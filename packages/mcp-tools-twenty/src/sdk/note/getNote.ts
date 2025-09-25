@@ -80,7 +80,7 @@ export function getNoteToolFactory(ctx: {
 export const getNoteProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/organization/{orgId}/twenty/notes/{id}",
+        path: "/organizations/{orgId}/twenty/notes/{id}",
         tags: ["note"],
         summary: getNoteToolMetadata.config.title,
         description: getNoteToolMetadata.config.description,

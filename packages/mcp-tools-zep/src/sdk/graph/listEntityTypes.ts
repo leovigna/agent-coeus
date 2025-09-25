@@ -95,7 +95,7 @@ export function listEntityTypesToolFactory(ctx: {
 export const listEntityTypesProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/entity-types",
+        path: "/organizations/{orgId}/zep/graph/entity-types",
         tags: ["zep"],
         summary: listEntityTypesToolMetadata.config.title,
         description: listEntityTypesToolMetadata.config.description,

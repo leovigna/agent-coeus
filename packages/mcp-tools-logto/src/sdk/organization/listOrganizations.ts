@@ -69,7 +69,7 @@ export function listOrganizationsToolFactory(ctx: {
 export const listOrganizationsProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/organizations",
+        path: "/organizations",
         tags: ["logto"],
         summary: listOrganizationsToolMetadata.config.title,
         description: listOrganizationsToolMetadata.config.description,

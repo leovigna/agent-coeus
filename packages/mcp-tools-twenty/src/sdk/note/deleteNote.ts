@@ -75,7 +75,7 @@ export function deleteNoteToolFactory(ctx: {
 export const deleteNoteProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/organization/{orgId}/twenty/notes/{id}",
+        path: "/organizations/{orgId}/twenty/notes/{id}",
         tags: ["note"],
         summary: deleteNoteToolMetadata.config.title,
         description: deleteNoteToolMetadata.config.description,

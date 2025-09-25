@@ -128,7 +128,7 @@ export function searchGraphToolFactory(ctx: {
 export const searchGraphProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graphs/search",
+        path: "/organizations/{orgId}/zep/graphs/search",
         tags: ["zep"],
         summary: searchGraphToolMetadata.config.title,
         description: searchGraphToolMetadata.config.description,
