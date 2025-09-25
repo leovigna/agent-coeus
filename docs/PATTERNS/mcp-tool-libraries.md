@@ -186,3 +186,62 @@ export const appRouter = router({
     logTo: logToRouter,
     zep: zepRouter,
 });
+
+### **Pattern: OpenAPI REST Service as a Tenant Proxy**
+
+When an MCP tool library's primary purpose is to expose an existing OpenAPI REST service, it should act as a "tenant proxy." This pattern ensures that the MCP server enforces tenancy and security while keeping the tool implementation minimal and consistent with the underlying API.
+
+**Core Principles:**
+
+1.  **Tenant-Aware Proxy**: The MCP server exposes the service's API under a tenant-specific base path, typically `/organization/{orgId}`. This ensures that all requests are scoped to the correct organization.
+2.  **ClientProvider Pattern**: A `ClientProvider` is used to resolve the correct API client for the given `orgId`. This pattern encapsulates the logic for creating and configuring the client, including authentication.
+3.  **Code Generation**:
+    *   **`openapi-typescript`**: Generate TypeScript types from the OpenAPI specification.
+    *   **`openapi-fetch`**: Use the generated types to create a fully typed API client.
+4.  **Zod Schemas**: Create Zod schemas for all API inputs (request bodies and query parameters). These schemas should map directly to the generated TypeScript types and include descriptions from the OpenAPI specification.
+
+This approach provides a robust, type-safe, and maintainable way to expose existing REST services through the MCP server, while still allowing for the addition of custom business logic and authorization as needed.
+
+*Example: `sdk/company/getCompany.ts`*
+```typescript
+import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn, withScopeCheck } from "@coeus-agent/mcp-tools-base";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import { partial } from "lodash-es";
+import { z } from "zod";
+
+import { depthSchema } from "../../schemas/core-components.js";
+import { TwentyCoreClientProvider, resolveTwentyCoreClient } from "../../TwentyClient.js";
+
+// 1. Input Schema maps to OpenAPI params
+export const getCompanyInputSchema = {
+    orgId: z.string().describe("The ID of the organization."),
+    id: z.string().describe("The ID of the company to get."),
+    depth: depthSchema,
+};
+
+// 2. SDK Function uses the ClientProvider
+async function _getCompany(
+    ctx: { twentyCoreClientProvider: TwentyCoreClientProvider },
+    params: z.objectOutputType<typeof getCompanyInputSchema, z.ZodTypeAny>,
+    _: { authInfo: AuthInfo },
+) {
+    const { orgId, id, depth } = params;
+    const client = await resolveTwentyCoreClient(ctx.twentyCoreClientProvider, orgId);
+
+    // 3. Mimic the REST API call
+    const response = await client.GET("/companies/{id}", {
+        params: { path: { id }, query: { depth } },
+    });
+    if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR);
+
+    return response.data!.data!.company!;
+}
+
+// 4. Factories and Metadata follow the standard pattern
+export const getCompany = withScopeCheck(...);
+export const getCompanyToolMetadata = { ... };
+export function getCompanyToolFactory(ctx: ...) { ... }
+export const getCompanyProcedureMetadata = { ... };
+export const getCompanyProcedureFactory = toProcedurePluginFn(...);
+```

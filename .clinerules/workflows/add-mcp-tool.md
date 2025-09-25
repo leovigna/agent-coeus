@@ -21,9 +21,13 @@ This workflow automates the creation of a new tool within an existing MCP tool l
 5.  **Ask the user for the Zod input schema.**
     -   Provide an example: `{ organizationId: z.string().describe("The ID of the organization.") }`
 6.  **Determine the core client interaction logic.**
-    -   **CRITICAL:** Do not guess the implementation.
-    -   **Action:** Ask the user for the exact client method call(s).
-    -   **Alternative Action:** Read existing SDK files in the same feature group to identify patterns.
+-   **CRITICAL:** Do not guess the implementation.
+-   **Action:** Ask the user for the exact client method call(s).
+-   **Alternative Action:** Read existing SDK files in the same feature group to identify patterns.
+-   **For Tenant Proxy Pattern**:
+    -   Identify the corresponding OpenAPI path and method.
+    -   Use the generated `openapi-fetch` client to make the request.
+    -   Map the Zod input schema to the client's request body and query parameters.
 
 ---
 
@@ -53,6 +57,50 @@ export const {{action}}ProcedureMetadata = { /* ... */ };
 
 // 6. tRPC Procedure Factory
 export const {{action}}ProcedureFactory = toProcedurePluginFn(...);
+```
+
+**Template for Tenant Proxy Pattern:**
+```typescript
+import { AuthInfo, toCallToolResultFn, Tool, ToolMetadata, toProcedurePluginFn, withScopeCheck } from "@coeus-agent/mcp-tools-base";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import { partial } from "lodash-es";
+import { z } from "zod";
+
+import { depthSchema } from "../../schemas/core-components.js";
+import { TwentyCoreClientProvider, resolveTwentyCoreClient } from "../../TwentyClient.js";
+
+// 1. Input Schema maps to OpenAPI params
+export const getCompanyInputSchema = {
+    orgId: z.string().describe("The ID of the organization."),
+    id: z.string().describe("The ID of the company to get."),
+    depth: depthSchema,
+};
+
+// 2. SDK Function uses the ClientProvider
+async function _getCompany(
+    ctx: { twentyCoreClientProvider: TwentyCoreClientProvider },
+    params: z.objectOutputType<typeof getCompanyInputSchema, z.ZodTypeAny>,
+    _: { authInfo: AuthInfo },
+) {
+    const { orgId, id, depth } = params;
+    const client = await resolveTwentyCoreClient(ctx.twentyCoreClientProvider, orgId);
+
+    // 3. Mimic the REST API call
+    const response = await client.GET("/companies/{id}", {
+        params: { path: { id }, query: { depth } },
+    });
+    if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR);
+
+    return response.data!.data!.company!;
+}
+
+// 4. Factories and Metadata follow the standard pattern
+export const getCompany = withScopeCheck(...);
+export const getCompanyToolMetadata = { ... };
+export function getCompanyToolFactory(ctx: ...) { ... }
+export const getCompanyProcedureMetadata = { ... };
+export const getCompanyProcedureFactory = toProcedurePluginFn(...);
 ```
 
 ---
