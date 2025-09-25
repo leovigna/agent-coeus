@@ -85,7 +85,7 @@ export const updateWebhookProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/webhooks/{id}",
-        tags: ["webhook"],
+        tags: ["twenty/webhooks"],
         summary: updateWebhookToolMetadata.config.title,
         description: updateWebhookToolMetadata.config.description,
     },

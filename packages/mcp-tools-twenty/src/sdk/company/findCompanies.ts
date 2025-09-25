@@ -110,7 +110,7 @@ export const findCompaniesProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}/twenty/companies",
-        tags: ["company"],
+        tags: ["twenty/companies"],
         summary: findCompaniesToolMetadata.config.title,
         description: findCompaniesToolMetadata.config.description,
     },

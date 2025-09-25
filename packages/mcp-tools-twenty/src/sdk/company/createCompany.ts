@@ -79,7 +79,7 @@ export const createCompanyProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/companies",
-        tags: ["company"],
+        tags: ["twenty/companies"],
         summary: createCompanyToolMetadata.config.title,
         description: createCompanyToolMetadata.config.description,
     },

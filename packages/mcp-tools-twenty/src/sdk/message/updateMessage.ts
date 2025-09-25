@@ -87,7 +87,7 @@ export const updateMessageProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/messages/{id}",
-        tags: ["message"],
+        tags: ["twenty/messages"],
         summary: updateMessageToolMetadata.config.title,
         description: updateMessageToolMetadata.config.description,
     },

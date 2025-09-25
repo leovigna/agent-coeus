@@ -83,7 +83,7 @@ export const updatePersonProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/people/{id}",
-        tags: ["person"],
+        tags: ["twenty/people"],
         summary: updatePersonToolMetadata.config.title,
         description: updatePersonToolMetadata.config.description,
     },

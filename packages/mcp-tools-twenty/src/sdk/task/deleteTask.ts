@@ -76,7 +76,7 @@ export const deleteTaskProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/tasks/{id}",
-        tags: ["task"],
+        tags: ["twenty/tasks"],
         summary: deleteTaskToolMetadata.config.title,
         description: deleteTaskToolMetadata.config.description,
     },

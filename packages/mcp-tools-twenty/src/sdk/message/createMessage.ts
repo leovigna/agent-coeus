@@ -79,7 +79,7 @@ export const createMessageProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/messages",
-        tags: ["message"],
+        tags: ["twenty/messages"],
         summary: createMessageToolMetadata.config.title,
         description: createMessageToolMetadata.config.description,
     },

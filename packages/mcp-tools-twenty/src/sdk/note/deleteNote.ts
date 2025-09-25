@@ -76,7 +76,7 @@ export const deleteNoteProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/notes/{id}",
-        tags: ["note"],
+        tags: ["twenty/notes"],
         summary: deleteNoteToolMetadata.config.title,
         description: deleteNoteToolMetadata.config.description,
     },

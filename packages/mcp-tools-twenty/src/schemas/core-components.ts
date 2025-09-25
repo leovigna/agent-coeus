@@ -51,8 +51,8 @@ export const filterSchema = z
     );
 
 export const depthSchema = z
-    .union([z.literal(0), z.literal(1)])
-    .default(1)
+    .enum(["0", "1"])
+    .transform((val) => parseInt(val) as 0 | 1)
     .describe(
         "Determines the level of nested related objects to include in the response. 0: Primary object only, 1: Primary object + direct relations",
     );

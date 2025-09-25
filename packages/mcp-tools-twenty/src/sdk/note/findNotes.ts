@@ -106,7 +106,7 @@ export const findNotesProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}/twenty/notes",
-        tags: ["note"],
+        tags: ["twenty/notes"],
         summary: findNotesToolMetadata.config.title,
         description: findNotesToolMetadata.config.description,
     },

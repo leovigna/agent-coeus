@@ -75,7 +75,7 @@ export const createNoteProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/notes",
-        tags: ["note"],
+        tags: ["twenty/notes"],
         summary: createNoteToolMetadata.config.title,
         description: createNoteToolMetadata.config.description,
     },

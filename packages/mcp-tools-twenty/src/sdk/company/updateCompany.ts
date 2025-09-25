@@ -87,7 +87,7 @@ export const updateCompanyProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/companies/{id}",
-        tags: ["company"],
+        tags: ["twenty/companies"],
         summary: updateCompanyToolMetadata.config.title,
         description: updateCompanyToolMetadata.config.description,
     },

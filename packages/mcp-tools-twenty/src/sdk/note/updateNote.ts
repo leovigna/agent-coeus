@@ -83,7 +83,7 @@ export const updateNoteProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/notes/{id}",
-        tags: ["note"],
+        tags: ["twenty/notes"],
         summary: updateNoteToolMetadata.config.title,
         description: updateNoteToolMetadata.config.description,
     },

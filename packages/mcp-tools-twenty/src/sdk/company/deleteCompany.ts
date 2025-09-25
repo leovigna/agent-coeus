@@ -80,7 +80,7 @@ export const deleteCompanyProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/companies/{id}",
-        tags: ["company"],
+        tags: ["twenty/companies"],
         summary: deleteCompanyToolMetadata.config.title,
         description: deleteCompanyToolMetadata.config.description,
     },

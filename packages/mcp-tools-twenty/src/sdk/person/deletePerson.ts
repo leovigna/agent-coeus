@@ -76,7 +76,7 @@ export const deletePersonProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/people/{id}",
-        tags: ["person"],
+        tags: ["twenty/people"],
         summary: deletePersonToolMetadata.config.title,
         description: deletePersonToolMetadata.config.description,
     },

@@ -201,6 +201,7 @@ When an MCP tool library's primary purpose is to expose an existing OpenAPI REST
     *   **`openapi-fetch`**: Use the generated types to create a fully typed API client. Note that this is not always used; other SDKs (e.g., the Zep SDK) may be used instead.
 4.  **Zod Schemas**: Create Zod schemas for all API inputs (request bodies and query parameters). These schemas should map directly to the generated TypeScript types and include descriptions from the OpenAPI specification.
 5.  **Client Export**: The MCP tool library should export the typed client and a client factory, as seen in `packages/mcp-tools-twenty/src/TwentyClient.ts`.
+6.  **RESTful Naming**: The OpenAPI tags and paths should follow RESTful conventions, using plural nouns for resources and prefixing the tag with the plugin name (e.g., `tags: ["twenty/people"]`, `path: "/organization/{orgId}/twenty/people"`).
 
 This approach provides a robust, type-safe, and maintainable way to expose existing REST services through the MCP server, while still allowing for the addition of custom business logic and authorization as needed.
 
@@ -244,6 +245,14 @@ async function _getCompany(
 export const getCompany = withScopeCheck(...);
 export const getCompanyToolMetadata = { ... };
 export function getCompanyToolFactory(ctx: ...) { ... }
-export const getCompanyProcedureMetadata = { ... };
+export const getCompanyProcedureMetadata = {
+    openapi: {
+        method: "GET",
+        path: "/organizations/{orgId}/twenty/companies/{id}",
+        tags: ["twenty/companies"],
+        summary: "Get Company",
+        description: "Get Company in Twenty CRM",
+    },
+};
 export const getCompanyProcedureFactory = toProcedurePluginFn(...);
 ```

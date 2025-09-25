@@ -79,7 +79,7 @@ export const createWebhookProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/webhooks",
-        tags: ["webhook"],
+        tags: ["twenty/webhooks"],
         summary: createWebhookToolMetadata.config.title,
         description: createWebhookToolMetadata.config.description,
     },

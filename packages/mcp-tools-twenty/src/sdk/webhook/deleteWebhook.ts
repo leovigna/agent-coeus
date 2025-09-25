@@ -80,7 +80,7 @@ export const deleteWebhookProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/webhooks/{id}",
-        tags: ["webhook"],
+        tags: ["twenty/webhooks"],
         summary: deleteWebhookToolMetadata.config.title,
         description: deleteWebhookToolMetadata.config.description,
     },

@@ -80,7 +80,7 @@ export const deleteMessageProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}/twenty/messages/{id}",
-        tags: ["message"],
+        tags: ["twenty/messages"],
         summary: deleteMessageToolMetadata.config.title,
         description: deleteMessageToolMetadata.config.description,
     },

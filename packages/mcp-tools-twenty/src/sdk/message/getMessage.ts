@@ -81,7 +81,7 @@ export const getMessageProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}/twenty/messages/{id}",
-        tags: ["message"],
+        tags: ["twenty/messages"],
         summary: getMessageToolMetadata.config.title,
         description: getMessageToolMetadata.config.description,
     },

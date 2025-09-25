@@ -81,7 +81,7 @@ export const getPersonProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}/twenty/people/{id}",
-        tags: ["person"],
+        tags: ["twenty/people"],
         summary: getPersonToolMetadata.config.title,
         description: getPersonToolMetadata.config.description,
     },

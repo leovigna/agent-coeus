@@ -83,7 +83,7 @@ export const updateTaskProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}/twenty/tasks/{id}",
-        tags: ["task"],
+        tags: ["twenty/tasks"],
         summary: updateTaskToolMetadata.config.title,
         description: updateTaskToolMetadata.config.description,
     },

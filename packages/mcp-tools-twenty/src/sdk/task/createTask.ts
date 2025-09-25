@@ -75,7 +75,7 @@ export const createTaskProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/tasks",
-        tags: ["task"],
+        tags: ["twenty/tasks"],
         summary: createTaskToolMetadata.config.title,
         description: createTaskToolMetadata.config.description,
     },

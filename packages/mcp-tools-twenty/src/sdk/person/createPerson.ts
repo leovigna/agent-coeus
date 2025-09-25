@@ -75,7 +75,7 @@ export const createPersonProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations/{orgId}/twenty/people",
-        tags: ["person"],
+        tags: ["twenty/people"],
         summary: createPersonToolMetadata.config.title,
         description: createPersonToolMetadata.config.description,
     },

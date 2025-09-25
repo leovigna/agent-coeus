@@ -28,6 +28,7 @@ This workflow automates the creation of a new tool within an existing MCP tool l
     -   Identify the corresponding OpenAPI path and method.
     -   Use the generated `openapi-fetch` client to make the request.
     -   Map the Zod input schema to the client's request body and query parameters.
+    -   Use REST-compliant plural terms for OpenAPI tags, prefixed with the plugin name (e.g., `tags: ["twenty/people"]`).
 
 ---
 
@@ -99,7 +100,15 @@ async function _getCompany(
 export const getCompany = withScopeCheck(...);
 export const getCompanyToolMetadata = { ... };
 export function getCompanyToolFactory(ctx: ...) { ... }
-export const getCompanyProcedureMetadata = { ... };
+export const getCompanyProcedureMetadata = {
+    openapi: {
+        method: "GET",
+        path: "/organizations/{orgId}/twenty/companies/{id}",
+        tags: ["twenty/companies"],
+        summary: "Get Company",
+        description: "Get Company in Twenty CRM",
+    },
+};
 export const getCompanyProcedureFactory = toProcedurePluginFn(...);
 ```
 

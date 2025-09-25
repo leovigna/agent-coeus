@@ -81,7 +81,7 @@ export const getTaskProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}/twenty/tasks/{id}",
-        tags: ["task"],
+        tags: ["twenty/tasks"],
         summary: getTaskToolMetadata.config.title,
         description: getTaskToolMetadata.config.description,
     },
