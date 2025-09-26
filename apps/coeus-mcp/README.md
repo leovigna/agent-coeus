@@ -36,22 +36,29 @@ Complete the instructions in this order.
 ## API Scopes
 
 ### Full Scope Request
-- `offline_access read:user:custom-data update:user:custom-data create:org read:org list:orgs update:org delete:org create:graph read:graph list:graphs update:graph delete:graph`
+- `offline_access read:user:custom-data write:user:custom-data create:org list:orgs read:org write:org delete:org read:graph write:graph delete:graph read:crm write:crm`
 
 ### User Custom Data
+**User Scopes**
 - `read:user:custom-data`
-- `update:user:custom-data`
+- `write:user:custom-data`
 
 ### Org
+**User Scopes**
 - `create:org`
-- `read:org`
 - `list:orgs`
-- `update:org`
+
+**Org Scopes**
+- `read:org`
+- `write:org`
 - `delete:org`
 
-### Graph
-- `create:graph`
+### Zep Graph
+**Org Scopes**
 - `read:graph`
-- `list:graphs`
-- `update:graph`
+- `write:graph`
 - `delete:graph`
+
+### Twenty CRM
+- `read:crm`
+- `write:crm`

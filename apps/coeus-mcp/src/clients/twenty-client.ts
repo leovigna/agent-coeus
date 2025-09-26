@@ -56,7 +56,7 @@ if (!BASE_URL) {
  * @returns
  */
 export const twentyWebhookUrlProvider = (orgId: string) => {
-    const webhookPath = `/webhooks/organizations/${orgId}/twenty`;
+    const webhookPath = `webhooks/organizations/${orgId}/twenty`;
 
     return new URL(webhookPath, BASE_URL).toString();
 };
@@ -85,9 +85,11 @@ export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
         }
 
         const twentyMetadataApiUrl = new URL(
-            "/metadata",
+            "metadata",
             twentyApiUrl,
         ).toString();
+
+        console.debug({ twentyMetadataApiUrl });
 
         return createTwentyMetadataClient({
             baseUrl: twentyMetadataApiUrl,

@@ -42,6 +42,7 @@ async function _createWebhookCoeus(
     _: { authInfo: AuthInfo },
 ) {
     const { orgId } = params;
+    console.debug({ orgId });
 
     const client = await resolveTwentyMetadataClient(
         ctx.twentyMetadataClientProvider,
@@ -52,6 +53,7 @@ async function _createWebhookCoeus(
 
     // Check if existing webhook
     const targetUrl = ctx.twentyWebhookUrlProvider(orgId);
+    console.debug({ targetUrl });
     // Find Twenty Webhook with targetUrl
     const findResponse = await client.GET("/webhooks");
     if (!findResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
@@ -76,6 +78,7 @@ async function _createWebhookCoeus(
     if (!createResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
     const data = createResponse.data!.data!.createOneWebhook!; // parse response (a bit weird due to GraphQL adapter)
+    console.debug(data);
     return omit(data, "secret");
 }
 

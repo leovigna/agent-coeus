@@ -65,7 +65,7 @@ async function _listGraphs(
 
 export const listGraphs = withScopeCheck(
     withOrganizationUserRolesCheck(_listGraphs, ["owner", "admin", "member"]),
-    ["list:graphs"],
+    ["read:graph"],
 );
 
 // MCP Tool

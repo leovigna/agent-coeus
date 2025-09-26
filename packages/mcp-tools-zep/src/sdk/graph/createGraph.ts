@@ -54,7 +54,7 @@ async function _createGraph(
 
 export const createGraph = withScopeCheck(
     withOrganizationUserRolesCheck(_createGraph, ["owner", "admin", "member"]),
-    ["create:graph"],
+    ["write:graph"],
 );
 
 // MCP Tool

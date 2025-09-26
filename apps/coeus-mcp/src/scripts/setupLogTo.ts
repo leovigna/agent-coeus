@@ -239,17 +239,6 @@ async function setResourceScopesToOrganizationRole(
     return resourceScopes;
 }
 
-// Helper to create standard CRUD scopes
-function getCrudScopes(resourceName: string) {
-    return [
-        `list:${resourceName}s`,
-        `create:${resourceName}`,
-        `read:${resourceName}`,
-        `update:${resourceName}`,
-        `delete:${resourceName}`,
-    ];
-}
-
 /**
  * Setup LogTo with standard SaaS resources, scopes, and roles
  * @param client LogTo client
@@ -281,36 +270,49 @@ export async function setupLogTo(
         client,
         mcpResource.id,
         [
-            ...getCrudScopes("org"),
-            ...getCrudScopes("graph"),
+            // user
             "read:user:custom-data",
-            "update:user:custom-data",
+            "write:user:custom-data",
+            // organization
+            "create:org",
+            "list:orgs",
+            "read:org",
+            "write:org",
+            "delete:org",
+            // graph
+            "read:graph",
+            "write:graph",
+            "delete:graph",
+            // crm
+            "read:crm",
+            "write:crm",
         ],
     );
-    const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
+
+    // user
+    const readUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "read:user:custom-data",
+    )!;
+    const writeUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "write:user:custom-data",
+    )!;
+    // organization
     const createOrgScope = resourceScopes.find((s) => s.name === "create:org")!;
+    const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
     const readOrgScope = resourceScopes.find((s) => s.name === "read:org")!;
-    const updateOrgScope = resourceScopes.find((s) => s.name === "update:org")!;
+    const writeOrgScope = resourceScopes.find((s) => s.name === "write:org")!;
     const deleteOrgScope = resourceScopes.find((s) => s.name === "delete:org")!;
-    const listGraphsScope = resourceScopes.find(
-        (s) => s.name === "list:graphs",
-    )!;
-    const createGraphScope = resourceScopes.find(
-        (s) => s.name === "create:graph",
-    )!;
+    // graph
     const readGraphScope = resourceScopes.find((s) => s.name === "read:graph")!;
-    const updateGraphScope = resourceScopes.find(
-        (s) => s.name === "update:graph",
+    const writeGraphScope = resourceScopes.find(
+        (s) => s.name === "write:graph",
     )!;
     const deleteGraphScope = resourceScopes.find(
         (s) => s.name === "delete:graph",
     )!;
-    const readUserCustomDataScope = resourceScopes.find(
-        (s) => s.name === "read:user:custom-data",
-    )!;
-    const updateUserCustomDataScope = resourceScopes.find(
-        (s) => s.name === "update:user:custom-data",
-    )!;
+    // crm
+    const readCrmScope = resourceScopes.find((s) => s.name === "read:crm")!;
+    const writeCrmScope = resourceScopes.find((s) => s.name === "write:crm")!;
 
     // User role (Note: Go to console to set this as default role)
     const roles = await getOrCreateRoles(client, ["user"]);
@@ -330,7 +332,7 @@ export async function setupLogTo(
             createOrgScope.id,
             listOrgsScope.id,
             readUserCustomDataScope.id,
-            updateUserCustomDataScope.id,
+            writeUserCustomDataScope.id,
         ],
     );
 
@@ -343,14 +345,17 @@ export async function setupLogTo(
         client,
         ownerRole.id,
         [
+            // organization
             readOrgScope.id,
-            updateOrgScope.id,
+            writeOrgScope.id,
             deleteOrgScope.id,
-            createGraphScope.id,
-            listGraphsScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
             deleteGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
     // Admin: read:org update:org list:graphs create:graph read:graph update:graph delete:graph
@@ -359,13 +364,16 @@ export async function setupLogTo(
         client,
         adminRole.id,
         [
+            // organization
             readOrgScope.id,
-            updateOrgScope.id,
-            listGraphsScope.id,
-            createGraphScope.id,
+            writeOrgScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
             deleteGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
     // Member: read:org list:graphs create:graph read:graph update:graph
@@ -374,11 +382,14 @@ export async function setupLogTo(
         client,
         memberRole.id,
         [
+            // organization
             readOrgScope.id,
-            listGraphsScope.id,
-            createGraphScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
 

@@ -131,7 +131,7 @@ async function _addData(
 
 export const addData = withScopeCheck(
     withOrganizationUserRolesCheck(_addData, ["owner", "admin", "member"]),
-    ["update:graph"],
+    ["write:graph"],
 );
 
 export const addDataToolMetadata = {

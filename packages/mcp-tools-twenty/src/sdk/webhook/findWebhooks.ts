@@ -8,7 +8,11 @@ import {
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
-import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import {
+    BAD_GATEWAY,
+    createError,
+    INTERNAL_SERVER_ERROR,
+} from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
@@ -52,7 +56,8 @@ async function _findWebhooks(
             },
         },
     });
-    if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
+    if (!response.response.ok)
+        throw createError(BAD_GATEWAY, "twenty/webhooks"); // 502 Twenty API call failed
 
     const data = response.data!.data!.webhooks!; // parse response (a bit weird due to GraphQL adapter)
     return data;

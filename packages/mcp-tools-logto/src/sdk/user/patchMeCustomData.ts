@@ -43,7 +43,7 @@ async function _patchMeCustomData<T extends Record<string, any>>(
 }
 
 export const patchMeCustomData = withScopeCheck(_patchMeCustomData, [
-    "update:user:custom-data",
+    "write:user:custom-data",
 ]);
 
 export const setMeOrgId = patchMeCustomData<{ currentOrgId: string }>;

@@ -64,7 +64,7 @@ async function _addDataBatch(
 
 export const addDataBatch = withScopeCheck(
     withOrganizationUserRolesCheck(_addDataBatch, ["owner", "admin", "member"]),
-    ["update:graph"],
+    ["write:graph"],
 );
 
 export const addDataBatchToolMetadata = {
