@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
+import type { Webhook } from "@coeus-agent/mcp-tools-twenty";
 import { resolveTwentyMetadataClient } from "@coeus-agent/mcp-tools-twenty";
 import {
     graphIdParamsSchema,
@@ -126,7 +127,7 @@ const webhooksTwentyRouter = webhooksT.router({
                     `webhook ${webhookId} not found for organization ${orgId}`,
                 ); // 404 Webhook not found
             }
-            const webhook = webhookResponse.data!.data!.webhook!;
+            const webhook = webhookResponse.data as Webhook; // metadata api does not match OpenAPI spec
             if (!webhook.secret) {
                 throw createError(
                     BAD_REQUEST,
