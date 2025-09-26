@@ -6,6 +6,8 @@ import {
 } from "@coeus-agent/mcp-tools-twenty";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 
+import { BASE_URL } from "../envvars.js";
+
 import { logToClient } from "./logto-client.js";
 
 export const twentyCoreClientProvider: TwentyCoreClientProvider = async (
@@ -39,6 +41,10 @@ export const twentyCoreClientProvider: TwentyCoreClientProvider = async (
     });
 };
 
+if (!BASE_URL) {
+    throw new Error("BASE_URL envvar required for twentyWebhookUrlProvider");
+}
+
 // TODO: Make envvar
 /**
  * Get Twenty Webhook URL for organization
@@ -46,10 +52,9 @@ export const twentyCoreClientProvider: TwentyCoreClientProvider = async (
  * @returns
  */
 export const twentyWebhookUrlProvider = (orgId: string) => {
-    const baseUrl = "https://localhost:3000";
     const webhookPath = `/webhooks/organizations/${orgId}/twenty`;
 
-    return new URL(webhookPath, baseUrl).toString();
+    return new URL(webhookPath, BASE_URL).toString();
 };
 
 export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
