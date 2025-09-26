@@ -52,12 +52,12 @@ temp.*
 **/temp
 
 # local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 .env
 .env.yaml
+.env.development
+.env.development.yaml
+.env.production
+.env.production.yaml
 # dotenv vault
 !.env.vault
 
