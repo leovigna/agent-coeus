@@ -9,10 +9,10 @@ import {
     LOGTO_TENANT_ID,
 } from "../envvars.js";
 
-type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
+export type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
 
 // @ts-ignore unused
-function getLogToClient() {
+export function getLogToClient(): LogToClient {
     if (!LOGTO_TENANT_ID) throw new Error("LOGTO_TENANT_ID is not set");
     if (!LOGTO_M2M_CLIENT_ID) throw new Error("LOGTO_M2M_CLIENT_ID is not set");
     if (!LOGTO_M2M_CLIENT_SECRET)
@@ -61,7 +61,7 @@ export async function getOrCreateApiResource(
  * @param scopes
  * @returns resource scopes
  */
-async function getOrCreateApiResourceScopes(
+export async function getOrCreateApiResourceScopes(
     client: LogToClient,
     resourceId: string,
     scopes: string[],
@@ -258,6 +258,11 @@ export async function setupLogTo(
     client: LogToClient,
     indicatorBaseUrl: string,
 ) {
+    const application = await getOrCreateApplication(client, "Coeus", {
+        description: "Coeus client application",
+        type: "Traditional",
+    });
+
     // Create MCP API resource with CRUD scopes
     const mcpResource = await getOrCreateApiResource(client, {
         name: "mcp",
@@ -385,6 +390,7 @@ export async function setupLogTo(
         ownerResourceScopes,
         adminResourceScopes,
         memberResourceScopes,
+        application,
     };
 }
 
@@ -397,14 +403,48 @@ export async function deleteAllOrgs(client: LogToClient) {
     }
 }
 
+export async function getOrCreateApplication(
+    client: LogToClient,
+    name: string,
+    {
+        description,
+        type,
+    }: {
+        description: string;
+        type:
+        | "Traditional"
+        | "SPA"
+        | "Native"
+        | "MachineToMachine"
+        | "Protected"
+        | "SAML";
+    },
+) {
+    const applications = (await client.GET("/api/applications")).data!;
+    let application = applications.find((app) => app.name === name);
+    application ??= (
+        await client.POST("/api/applications", {
+            body: {
+                name,
+                type,
+                description,
+            },
+        })
+    ).data!;
+    return application;
+}
+
 async function main() {
     if (!LOGTO_API_INDICATOR_BASE_URL)
         throw new Error("LOGTO_API_INDICATOR_BASE_URL is not set");
     const indicatorBaseUrl = new URL(LOGTO_API_INDICATOR_BASE_URL);
     const client = getLogToClient();
+
     const result = await setupLogTo(client, indicatorBaseUrl.toString());
-    console.debug(result);
-    // await deleteAllOrgs(client);
+    console.log(result);
+    console.log(
+        `Application ${result.application.name} (${result.application.id})`,
+    );
 }
 
 main().catch((err) => {

@@ -46,6 +46,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "madge": "madge src/index.ts -c",
+    "setup:logto": "tsx src/scripts/setupLogTo.ts",
     "test": "pnpm run test:ci",
     "test:ci": "vitest --run",
     "test:watch": "vitest",

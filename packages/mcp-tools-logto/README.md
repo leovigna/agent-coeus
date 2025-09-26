@@ -1,6 +1,6 @@
-# MCP Tools LogTo
+# MCP Tools Logto
 
-MCP Tools for interacting with [LogTo](https://logto.io/) Admin API to manage multi-tenant MCP Servers.
+MCP Tools for interacting with [Logto](https://logto.io/) Admin API to manage multi-tenant MCP Servers.
 
 These tools are designed to be usable with [MCP Typescript SDK](https://github.com/modelcontextprotocol/typescript-sdk) but could also support any similar SDK with a similar interface.
 
@@ -13,7 +13,7 @@ The purpose of this package is to keep the implementation of tools modular:
 - [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
 - [@logto/api](https://www.npmjs.com/package/@logto/api)
 
-## LogTo Setup
+## Logto Setup
 
 https://docs.logto.io/authorization/role-based-access-control#default-api-resource-behavior
 

@@ -31,7 +31,7 @@ Complete the instructions in this order.
 - Callback url
     - Go back to main Custom GPT page
     - Copy Callback URL https://chat.openai.com/aip/g-${id}/oauth/callback (WARNING: This changes as you update certain params such as Auth config)
-    - Update LogTo Client Redirect URIs
+    - Update Logto Client Redirect URIs
 
 ## API Scopes
 
