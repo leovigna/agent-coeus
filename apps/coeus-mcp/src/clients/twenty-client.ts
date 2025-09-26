@@ -12,6 +12,7 @@ import {
 } from "http-errors-enhanced";
 
 import { BASE_URL } from "../envvars.js";
+import { createUrl } from "../utils/createUrl.js";
 
 import { logToClient } from "./logto-client.js";
 
@@ -58,7 +59,7 @@ if (!BASE_URL) {
 export const twentyWebhookUrlProvider = (orgId: string) => {
     const webhookPath = `webhooks/organizations/${orgId}/twenty`;
 
-    return new URL(webhookPath, BASE_URL).toString();
+    return createUrl(BASE_URL!, webhookPath).toString();
 };
 
 export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
@@ -84,12 +85,10 @@ export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
             ); // 400 missing Twenty API key
         }
 
-        const twentyMetadataApiUrl = new URL(
-            "metadata",
+        const twentyMetadataApiUrl = createUrl(
             twentyApiUrl,
+            "metadata",
         ).toString();
-
-        console.debug({ twentyMetadataApiUrl });
 
         return createTwentyMetadataClient({
             baseUrl: twentyMetadataApiUrl,

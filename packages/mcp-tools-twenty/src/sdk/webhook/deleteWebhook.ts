@@ -41,7 +41,7 @@ async function _deleteWebhook(
     });
     if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
-    const data = response.data!.data!.deleteOneWebhook!; // parse response (a bit weird due to GraphQL adapter)
+    const data = response.data! as { id: string }; // metadata api does not match OpenAPI spec
     return data;
 }
 

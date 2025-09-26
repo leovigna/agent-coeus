@@ -11,10 +11,11 @@ import {
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
-import { omit, partial } from "lodash-es";
+import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
+import type { Webhook } from "../../schemas/metadata-components.js";
 import type { TwentyMetadataClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyMetadataClient } from "../../TwentyClient.js";
 
@@ -42,7 +43,6 @@ async function _createWebhookCoeus(
     _: { authInfo: AuthInfo },
 ) {
     const { orgId } = params;
-    console.debug({ orgId });
 
     const client = await resolveTwentyMetadataClient(
         ctx.twentyMetadataClientProvider,
@@ -53,17 +53,16 @@ async function _createWebhookCoeus(
 
     // Check if existing webhook
     const targetUrl = ctx.twentyWebhookUrlProvider(orgId);
-    console.debug({ targetUrl });
     // Find Twenty Webhook with targetUrl
     const findResponse = await client.GET("/webhooks");
     if (!findResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
-    const existingWebhooks = findResponse.data!.data!.webhooks!; // parse response (a bit weird due to GraphQL adapter)
+    const existingWebhooks = findResponse.data! as Webhook[]; // metadata api does not match OpenAPI spec
     const existingCoeusWebhook = existingWebhooks.find(
         (wh) => wh.targetUrl === targetUrl,
     );
     if (existingCoeusWebhook) {
-        return omit(existingCoeusWebhook, "secret");
+        return { ...existingCoeusWebhook, secret: "hidden" };
     }
 
     // Create Twenty Webhook
@@ -77,9 +76,8 @@ async function _createWebhookCoeus(
     });
     if (!createResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
-    const data = createResponse.data!.data!.createOneWebhook!; // parse response (a bit weird due to GraphQL adapter)
-    console.debug(data);
-    return omit(data, "secret");
+    const createdWebhook = createResponse.data! as Webhook; // metadata api does not match OpenAPI spec
+    return { ...createdWebhook, secret: "hidden" };
 }
 
 export const createWebhookCoeus = withScopeCheck(

@@ -8,11 +8,7 @@ import {
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
-import {
-    BAD_GATEWAY,
-    createError,
-    INTERNAL_SERVER_ERROR,
-} from "http-errors-enhanced";
+import { BAD_GATEWAY, createError } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
@@ -22,6 +18,7 @@ import {
     limitSchema,
     startingAfterSchema,
 } from "../../schemas/core-components.js";
+import type { Webhook } from "../../schemas/metadata-components.js";
 import type { TwentyMetadataClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyMetadataClient } from "../../TwentyClient.js";
 
@@ -59,8 +56,8 @@ async function _findWebhooks(
     if (!response.response.ok)
         throw createError(BAD_GATEWAY, "twenty/webhooks"); // 502 Twenty API call failed
 
-    const data = response.data!.data!.webhooks!; // parse response (a bit weird due to GraphQL adapter)
-    return data;
+    const data = response.data! as Webhook[]; // metadata api does not match OpenAPI spec
+    return data.map((webhook) => ({ ...webhook, secret: "hidden" }));
 }
 
 export const findWebhooks = withScopeCheck(

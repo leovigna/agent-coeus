@@ -13,6 +13,7 @@ import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
+import type { Webhook } from "../../schemas/metadata-components.js";
 import { WebhookSchema } from "../../schemas/metadata-components.js";
 import type { TwentyMetadataClientProvider } from "../../TwentyClient.js";
 import { resolveTwentyMetadataClient } from "../../TwentyClient.js";
@@ -46,8 +47,8 @@ async function _updateWebhook(
     });
     if (!response.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 Twenty API call failed
 
-    const data = response.data!.data!.updateOneWebhook!; // parse response (a bit weird due to GraphQL adapter)
-    return data;
+    const data = response.data! as Webhook; // metadata api does not match OpenAPI spec
+    return { ...data, secret: "hidden" };
 }
 
 export const updateWebhook = withScopeCheck(

@@ -9,7 +9,7 @@ export const WebhookSchema = z
         targetUrl: z.string().url(),
         operations: z.array(z.string()).default(["*.*"]),
         description: z.string().optional(),
-        secret: z.string().optional(),
+        // secret: z.string().optional(), // secret should not be exposed
     })
     .passthrough()
     .describe("A webhook");

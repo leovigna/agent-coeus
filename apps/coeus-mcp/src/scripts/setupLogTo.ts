@@ -8,6 +8,7 @@ import {
     LOGTO_M2M_CLIENT_SECRET,
     LOGTO_TENANT_ID,
 } from "../envvars.js";
+import { createUrl } from "../utils/createUrl.js";
 
 export type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
 
@@ -255,7 +256,7 @@ export async function setupLogTo(
     // Create MCP API resource with CRUD scopes
     const mcpResource = await getOrCreateApiResource(client, {
         name: "mcp",
-        indicator: new URL("/mcp/", indicatorBaseUrl).toString(),
+        indicator: createUrl(indicatorBaseUrl, "mcp").toString(),
     });
     // Make default resource (to get JWT with this audience)
     await client.PATCH("/api/resources/{id}/is-default", {
