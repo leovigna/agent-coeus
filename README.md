@@ -155,9 +155,9 @@ Cline is the recommended AI coding extension for this project. It is configured 
 - Load [.clinerules](./.clinerules) for development rules & patterns
 - Use [.clinerules/workflows](./.clinerules/workflows/) for specific workflows
 - Read & update [memory-bank](./memory-bank/) (git ignored) for longterm memory across task contexts
-- Read & update [docs](./docs/) for general user facing docs (similar to memory-bank but not git ignored)
-- Read & update [docs/LEARNING.md](./docs/LEARNING.md) whenever user mentions agent committed an error (avoids repetition of bad practices)
-- Follow [docs/PATTERNS/mcp-tool-libraries.md](./docs/PATTERNS/mcp-tool-libraries.md) for creating our standard MCP Tool Library package for each service we connect to
+- Read & update [docs-ai](./docs-ai/) for general user facing AI docs (similar to memory-bank but not git ignored)
+- Read & update [docs-ai/LEARNING.md](./docs-ai/LEARNING.md) whenever user mentions agent committed an error (avoids repetition of bad practices)
+- Follow [docs-ai/PATTERNS/mcp-tool-libraries.md](./docs-ai/PATTERNS/mcp-tool-libraries.md) for creating our standard MCP Tool Library package for each service we connect to
 
 Also see the following resources below for more info
 https://docs.cline.bot/prompting/cline-memory-bank
