@@ -13,6 +13,31 @@ Coeus is an open-source knowledge graph and memory layer for AI agents and teams
 * [Deploy](#deploy)
 * [Contribute](#contribute)
 
+## Getting Started
+
+Try out Coeus on the following platforms!
+* [Coeus GPT](https://chatgpt.com/g/g-68bea1c9625881918615156829f9b66c-coeus-gpt)
+* Coes Telegram Bot (coming soon)
+
+Start with a simple prompt like "Hello!"
+
+### Adding Integrations
+#### Twenty CRM
+Twenty CRM can be used by Coeus to track & update all of your business contacts and synchronize them in Zep for more advanced semantic search. You must create a dedicated Twenty workspace, add an API Key to give Coeus access, and create an integration webhook to notify Coeus when you make changes through the twenty dashboard.
+
+* To enable Twenty CRM Support signup at [twenty.com](http://twenty.com/) (or [self-host](https://twenty.com/developers/section/self-hosting))
+* Create an API Key for your CRM (see [docs](https://twenty.com/developers/section/api-and-webhooks/api))
+* Send the API Key to Coeus "Update my organization's Twenty API Key {twentyApiKey}"
+* Ask Coeus to create an integration webhook "Create the Coeus Integration Webhook"
+
+#### Zep
+> ⚠️ This feature is still in beta. If you chose to use it, we recommend creating a dedicated blank Zep project and adding the Zep API Key as soon as you create your organization
+
+Coeus comes pre-configured with a shared Zep tenant but you can also migrate to your dedicated project for better data custody & custom integrations.
+* Create a project on [app.getzep.com](https://app.getzep.com/)
+* Create an API Key for the project
+* Send the API Key to Coeus "Update my organization's Zep API Key {zepApiKey}"
+
 ## Features
 
 ### Supported Apps
@@ -130,6 +155,8 @@ gcloud run deploy coeus --env-vars-file=.env.yaml --source .
 ```
 
 ## Contribute
+
+> 🚧 Work in Progress
 
 ### Workspace Dev Tools
 Our development environment comes out of the box with configuration for helpful devtools
