@@ -4,31 +4,46 @@ import {
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
 import type { OpenApiMeta } from "trpc-to-openapi";
 import type { z, ZodRawShape, ZodTypeAny } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { getMeCustomData } from "./getMeCustomData.js";
-
 export const getMeProfileInputSchema = {};
 
-export async function getMeProfile(
+async function _getMeProfile(
     ctx: { logToClient: LogToClient },
     _: z.objectOutputType<typeof getMeProfileInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
+    const { logToClient: client } = ctx;
     const { scopes } = authInfo;
     const userId = authInfo.subject!;
 
-    const userCustomData = (await getMeCustomData(ctx, {
-        authInfo,
-    })) as unknown as { currentOrgId?: string };
+    const userCustomDataResponse = await client.GET(
+        "/api/users/{userId}/custom-data",
+        {
+            params: {
+                path: {
+                    userId,
+                },
+            },
+        },
+    );
+    if (!userCustomDataResponse.response.ok)
+        throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+    const userCustomData = userCustomDataResponse.data!;
 
     return { userId, scopes, currentOrgId: userCustomData.currentOrgId };
 }
+
+export const getMeProfile = withScopeCheck(_getMeProfile, [
+    "read:user:custom-data",
+]);
 
 // MCP Tool
 export const getMeProfileToolMetadata = {
@@ -53,7 +68,7 @@ export const getMeProfileProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/me/profile",
-        tags: ["logto"],
+        tags: ["logto/me"],
         summary: getMeProfileToolMetadata.config.title,
         description: getMeProfileToolMetadata.config.description,
     },

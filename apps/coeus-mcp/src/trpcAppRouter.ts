@@ -22,6 +22,7 @@ import { publicProcedure, router } from "./trpc.js";
 
 const logToPlugin = createLogToPlugin({ logToClient });
 const logToRouter = router({
+    // logto/organization
     createOrganization: publicProcedure
         .concat(createOrganizationProcedure)
         .output(z.any())
@@ -42,10 +43,15 @@ const logToRouter = router({
         .concat(updateOrganizationProcedure)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    // logto/me
     getMeProfile: publicProcedure
         .concat(logToPlugin.getMeProfile)
         .output(z.any())
         .query(({ ctx: { result } }) => result),
+    setMeOrgId: publicProcedure
+        .concat(logToPlugin.setMeOrgId)
+        .output(z.any())
+        .mutation(({ ctx: { result } }) => result),
 });
 
 const zepPlugin = createZepPlugin({
@@ -53,17 +59,17 @@ const zepPlugin = createZepPlugin({
     zepClientProvider: zepClient,
 });
 const zepRouter = router({
-    // Edge
+    // zep/edge
     getGraphEdges: publicProcedure
         .concat(zepPlugin.getGraphEdges)
         .output(z.any())
         .query(({ ctx: { result } }) => result),
-    // Episode
+    // zep/episode
     getGraphEpisodes: publicProcedure
         .concat(zepPlugin.getGraphEpisodes)
         .output(z.any())
         .query(({ ctx: { result } }) => result),
-    // Graph
+    // zep/graph
     addData: publicProcedure
         .concat(zepPlugin.addData)
         .output(z.any())
@@ -103,6 +109,7 @@ const twentyCorePlugin = createTwentyCorePlugin({
     twentyCoreClientProvider,
 });
 const twentyCoreRouter = router({
+    // twenty-core/company
     createCompany: publicProcedure
         .concat(twentyCorePlugin.createCompany)
         .output(z.any())
@@ -123,6 +130,7 @@ const twentyCoreRouter = router({
         .concat(twentyCorePlugin.updateCompany)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    // twenty-core/person
     createPerson: publicProcedure
         .concat(twentyCorePlugin.createPerson)
         .output(z.any())
@@ -143,6 +151,7 @@ const twentyCoreRouter = router({
         .concat(twentyCorePlugin.updatePerson)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    // twenty-core/task
     createTask: publicProcedure
         .concat(twentyCorePlugin.createTask)
         .output(z.any())
@@ -163,6 +172,7 @@ const twentyCoreRouter = router({
         .concat(twentyCorePlugin.updateTask)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    // twenty-core/note
     createNote: publicProcedure
         .concat(twentyCorePlugin.createNote)
         .output(z.any())
@@ -183,6 +193,7 @@ const twentyCoreRouter = router({
         .concat(twentyCorePlugin.updateNote)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
+    // twenty-core/message
     createMessage: publicProcedure
         .concat(twentyCorePlugin.createMessage)
         .output(z.any())

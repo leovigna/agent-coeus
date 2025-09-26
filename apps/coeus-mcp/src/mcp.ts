@@ -4,6 +4,7 @@ import {
     getMeProfileToolFactory,
     getOrganizationToolFactory,
     listOrganizationsToolFactory,
+    setMeOrgIdToolFactory,
 } from "@coeus-agent/mcp-tools-logto";
 import {
     createCompanyToolFactory,
@@ -79,7 +80,16 @@ export function registerMcpTools(
         listOrganizationsToolFactory({ logToClient }),
         updateOrganizationToolFactory({ logToClient }),
         deleteOrganizationToolFactory({ logToClient }),
+        // logto/me
         getMeProfileToolFactory({ logToClient }),
+        setMeOrgIdToolFactory({ logToClient }),
+        // zep/edge
+        getGraphEdgesToolFactory({ logToClient, zepClientProvider: zepClient }),
+        // zep/episode
+        getGraphEpisodesToolFactory({
+            logToClient,
+            zepClientProvider: zepClient,
+        }),
         // zep/graph
         createGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
         getGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
@@ -92,13 +102,6 @@ export function registerMcpTools(
         addDataToolFactory({ logToClient, zepClientProvider: zepClient }),
         addDataBatchToolFactory({ logToClient, zepClientProvider: zepClient }),
         deleteGraphToolFactory({ logToClient, zepClientProvider: zepClient }),
-        // zep/edge
-        getGraphEdgesToolFactory({ logToClient, zepClientProvider: zepClient }),
-        // zep/episode
-        getGraphEpisodesToolFactory({
-            logToClient,
-            zepClientProvider: zepClient,
-        }),
         // twenty-core/company
         createCompanyToolFactory({
             logToClient,

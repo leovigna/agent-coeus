@@ -125,7 +125,7 @@ export const createOrganizationProcedureMetadata = {
     openapi: {
         method: "POST",
         path: "/organizations",
-        tags: ["logto"],
+        tags: ["logto/organization"],
         summary: createOrganizationToolMetadata.config.title,
         description: createOrganizationToolMetadata.config.description,
     },

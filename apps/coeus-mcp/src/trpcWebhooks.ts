@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
+import { resolveTwentyMetadataClient } from "@coeus-agent/mcp-tools-twenty";
 import {
     graphIdParamsSchema,
     resolveZepClient,
@@ -17,7 +18,7 @@ import { omit } from "lodash-es";
 import { generateOpenApiDocument, type OpenApiMeta } from "trpc-to-openapi";
 import { z } from "zod";
 
-import { logToClient, zepClient } from "./clients/index.js";
+import { twentyMetadataClientProvider, zepClient } from "./clients/index.js";
 import {
     requestHeadersMiddleware,
     requestRawBodyMiddleware,
@@ -109,28 +110,30 @@ const webhooksTwentyRouter = webhooksT.router({
 
             // TODO: Webhook nonce must be unprocessed
 
-            // Get organization
-            const orgResponse = await logToClient.GET(
-                "/api/organizations/{id}",
-                {
-                    params: { path: { id: orgId } },
-                },
+            // 1) Get Twenty webhook secret for organization
+            const client = await resolveTwentyMetadataClient(
+                twentyMetadataClientProvider,
+                orgId,
             );
-            if (!orgResponse.response.ok) {
-                throw createError(NOT_FOUND, `organization ${orgId} not found`); // 404 LogTo API call failed
+            const webhookId = input.webhookId as string;
+
+            const webhookResponse = await client.GET("/webhooks/{id}", {
+                params: { path: { id: webhookId } },
+            });
+            if (!webhookResponse.response.ok) {
+                throw createError(
+                    NOT_FOUND,
+                    `webhook ${webhookId} not found for organization ${orgId}`,
+                ); // 404 Webhook not found
             }
-
-            const org = orgResponse.data!;
-            const twentyWebhookSecret = org.customData?.twentyWebhookSecret as
-                | string
-                | undefined;
-
-            if (!twentyWebhookSecret) {
+            const webhook = webhookResponse.data!.data!.webhook!;
+            if (!webhook.secret) {
                 throw createError(
                     BAD_REQUEST,
-                    `organization ${orgId} missing twentyWebhookSecret`,
-                ); // 400 Missing twentyWebhookSecret
+                    `organization ${orgId} webhook ${webhookId} is missing secret`,
+                ); // 400 missing Twenty webhook secret
             }
+            const twentyWebhookSecret = webhook.secret;
 
             // Webhook HMAC signature must be valid using twentyWebhookSecret
             // 2) Compute expected signature: HMAC-SHA256(secret, `${ts}:${rawBody}`) -> hex

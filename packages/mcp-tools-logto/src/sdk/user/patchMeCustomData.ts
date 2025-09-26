@@ -75,7 +75,7 @@ export const setMeOrgIdProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/me/current-org-id",
-        tags: ["logto"],
+        tags: ["logto/me"],
         summary: setMeOrgIdToolMetadata.config.title,
         description: setMeOrgIdToolMetadata.config.description,
     },

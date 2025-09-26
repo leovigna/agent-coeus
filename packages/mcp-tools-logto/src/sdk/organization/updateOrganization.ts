@@ -98,7 +98,7 @@ export const updateOrganizationProcedureMetadata = {
     openapi: {
         method: "PATCH",
         path: "/organizations/{orgId}",
-        tags: ["logto"],
+        tags: ["logto/organization"],
         summary: updateOrganizationToolMetadata.config.title,
         description: updateOrganizationToolMetadata.config.description,
     },

@@ -80,7 +80,7 @@ export const getOrganizationProcedureMetadata = {
     openapi: {
         method: "GET",
         path: "/organizations/{orgId}",
-        tags: ["logto"],
+        tags: ["logto/organization"],
         summary: getOrganizationToolMetadata.config.title,
         description: getOrganizationToolMetadata.config.description,
     },

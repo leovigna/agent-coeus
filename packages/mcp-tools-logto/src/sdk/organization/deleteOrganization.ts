@@ -43,6 +43,8 @@ async function _deleteOrganization(
         },
     });
     if (!deleteResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+
+    return { success: true };
 }
 
 export const deleteOrganization = withScopeCheck(
@@ -81,7 +83,7 @@ export const deleteOrganizationProcedureMetadata = {
     openapi: {
         method: "DELETE",
         path: "/organizations/{orgId}",
-        tags: ["logto"],
+        tags: ["logto/organization"],
         summary: deleteOrganizationToolMetadata.config.title,
         description: deleteOrganizationToolMetadata.config.description,
     },

@@ -4,7 +4,12 @@ import {
     type TwentyCoreClientProvider,
     type TwentyMetadataClientProvider,
 } from "@coeus-agent/mcp-tools-twenty";
-import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
+import {
+    BAD_REQUEST,
+    createError,
+    INTERNAL_SERVER_ERROR,
+    NOT_FOUND,
+} from "http-errors-enhanced";
 
 import { BASE_URL } from "../envvars.js";
 
@@ -45,7 +50,6 @@ if (!BASE_URL) {
     throw new Error("BASE_URL envvar required for twentyWebhookUrlProvider");
 }
 
-// TODO: Make envvar
 /**
  * Get Twenty Webhook URL for organization
  * @param orgId
@@ -67,16 +71,17 @@ export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
                 },
             },
         });
-        if (!orgResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+        if (!orgResponse.response.ok)
+            throw createError(NOT_FOUND, `organization ${clientId} not found`); // 404 LogTo API call failed
         const org = orgResponse.data!;
         const twentyApiUrl = (org.customData?.twentyApiUrl ??
             "https://api.twenty.com/rest") as string;
         const twentyApiKey = org.customData?.twentyApiKey as string | undefined;
         if (!twentyApiKey) {
             throw createError(
-                INTERNAL_SERVER_ERROR,
-                `Organization ${clientId} is missing Twenty API key`,
-            ); // 500 missing Twenty API key
+                BAD_REQUEST,
+                `organization ${clientId} is missing Twenty API key`,
+            ); // 400 missing Twenty API key
         }
 
         const twentyMetadataApiUrl = new URL(
