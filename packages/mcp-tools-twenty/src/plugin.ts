@@ -6,6 +6,7 @@ import {
     createNoteProcedureFactory,
     createPersonProcedureFactory,
     createTaskProcedureFactory,
+    createWebhookCoeusProcedureFactory,
     createWebhookProcedureFactory,
     deleteCompanyProcedureFactory,
     deleteMessageProcedureFactory,
@@ -103,8 +104,10 @@ export function createTwentyCorePlugin(ctx: {
 export function createTwentyMetadataPlugin(ctx: {
     logToClient: LogToClient;
     twentyMetadataClientProvider: TwentyMetadataClientProvider;
+    twentyWebhookUrlProvider: (orgId: string) => string;
 }) {
     const createWebhook = createWebhookProcedureFactory(ctx);
+    const createWebhookCoeus = createWebhookCoeusProcedureFactory(ctx);
     const deleteWebhook = deleteWebhookProcedureFactory(ctx);
     const findWebhooks = findWebhooksProcedureFactory(ctx);
     const getWebhook = getWebhookProcedureFactory(ctx);
@@ -112,6 +115,7 @@ export function createTwentyMetadataPlugin(ctx: {
 
     return {
         createWebhook,
+        createWebhookCoeus,
         deleteWebhook,
         findWebhooks,
         getWebhook,

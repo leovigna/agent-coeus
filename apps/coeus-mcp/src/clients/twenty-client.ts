@@ -39,6 +39,19 @@ export const twentyCoreClientProvider: TwentyCoreClientProvider = async (
     });
 };
 
+// TODO: Make envvar
+/**
+ * Get Twenty Webhook URL for organization
+ * @param orgId
+ * @returns
+ */
+export const twentyWebhookUrlProvider = (orgId: string) => {
+    const baseUrl = "https://localhost:3000";
+    const webhookPath = `/webhooks/organizations/${orgId}/twenty`;
+
+    return new URL(webhookPath, baseUrl).toString();
+};
+
 export const twentyMetadataClientProvider: TwentyMetadataClientProvider =
     async (clientId: string) => {
         // Get org custom data

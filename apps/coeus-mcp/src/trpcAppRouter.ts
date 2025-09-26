@@ -10,6 +10,7 @@ import {
     logToClient,
     twentyCoreClientProvider,
     twentyMetadataClientProvider,
+    twentyWebhookUrlProvider,
     zepClient,
 } from "./clients/index.js";
 import { SYSTEM_PROMPT } from "./prompts.js";
@@ -207,10 +208,15 @@ const twentyCoreRouter = router({
 const twentyMetadataPlugin = createTwentyMetadataPlugin({
     logToClient,
     twentyMetadataClientProvider,
+    twentyWebhookUrlProvider,
 });
 const twentyMetadataRouter = router({
     createWebhook: publicProcedure
         .concat(twentyMetadataPlugin.createWebhook)
+        .output(z.any())
+        .mutation(({ ctx: { result } }) => result),
+    createWebhookCoeus: publicProcedure
+        .concat(twentyMetadataPlugin.createWebhookCoeus)
         .output(z.any())
         .mutation(({ ctx: { result } }) => result),
     deleteWebhook: publicProcedure

@@ -11,6 +11,7 @@ import {
     createNoteToolFactory,
     createPersonToolFactory,
     createTaskToolFactory,
+    createWebhookCoeusToolFactory,
     createWebhookToolFactory,
     deleteCompanyToolFactory,
     deleteMessageToolFactory,
@@ -55,6 +56,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
     twentyCoreClientProvider,
     twentyMetadataClientProvider,
+    twentyWebhookUrlProvider,
 } from "./clients/twenty-client.js";
 import { SYSTEM_PROMPT } from "./prompts.js";
 import {
@@ -203,6 +205,11 @@ export function registerMcpTools(
             twentyCoreClientProvider,
         }),
         // twenty-metadata/webhook
+        createWebhookCoeusToolFactory({
+            logToClient,
+            twentyMetadataClientProvider,
+            twentyWebhookUrlProvider,
+        }),
         createWebhookToolFactory({
             logToClient,
             twentyMetadataClientProvider,

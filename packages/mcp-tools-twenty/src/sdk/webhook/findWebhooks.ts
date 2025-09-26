@@ -14,11 +14,8 @@ import type { OpenApiMeta } from "trpc-to-openapi";
 import { z, type ZodRawShape } from "zod";
 
 import {
-    depthSchema,
     endingBeforeSchema,
-    filterSchema,
     limitSchema,
-    orderBySchema,
     startingAfterSchema,
 } from "../../schemas/core-components.js";
 import type { TwentyMetadataClientProvider } from "../../TwentyClient.js";
@@ -28,9 +25,6 @@ export const findWebhooksInputSchema = {
     orgId: z.string().describe("The ID of the organization."),
     startingAfter: startingAfterSchema.optional(),
     endingBefore: endingBeforeSchema.optional(),
-    filter: filterSchema.optional(),
-    depth: depthSchema.optional(),
-    orderBy: orderBySchema.optional(),
     limit: limitSchema.optional(),
 };
 
@@ -42,15 +36,7 @@ async function _findWebhooks(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _: { authInfo: AuthInfo },
 ) {
-    const {
-        orgId,
-        startingAfter,
-        endingBefore,
-        filter,
-        depth,
-        orderBy,
-        limit,
-    } = params;
+    const { orgId, startingAfter, endingBefore, limit } = params;
 
     const client = await resolveTwentyMetadataClient(
         ctx.twentyMetadataClientProvider,
@@ -62,9 +48,6 @@ async function _findWebhooks(
             query: {
                 starting_after: startingAfter,
                 ending_before: endingBefore,
-                filter,
-                depth,
-                order_by: orderBy,
                 limit,
             },
         },
