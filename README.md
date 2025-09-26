@@ -7,6 +7,9 @@ Connect CRMs, Calendars, Email & more
 Coeus is an open-source knowledge graph and memory layer for AI agents and teams. Built on [Zep](https://www.getzep.com/) for shared memory and [MCP](https://modelcontextprotocol.io/) / [OpenAPI](https://www.openapis.org/) for interfaces, it ingests and continuously syncs data across apps into a unified, queryable AI-native data lake.
 
 ## Table of Contents
+* [Getting Started](#getting-started)
+    * [Twenty CRM](#twenty-crm)
+    * [Dedicated Zep Project](#dedicated-zep-project)
 * [Features](#features)
     * [Supported Apps](#supported-apps)
     * [Roadmap Apps](#roadmap-apps)
@@ -21,8 +24,7 @@ Try out Coeus on the following platforms!
 
 Start with a simple prompt like "Hello!"
 
-### Adding Integrations
-#### Twenty CRM
+### Twenty CRM
 Twenty CRM can be used by Coeus to track & update all of your business contacts and synchronize them in Zep for more advanced semantic search. You must create a dedicated Twenty workspace, add an API Key to give Coeus access, and create an integration webhook to notify Coeus when you make changes through the twenty dashboard.
 
 * To enable Twenty CRM Support signup at [twenty.com](http://twenty.com/) (or [self-host](https://twenty.com/developers/section/self-hosting))
@@ -30,10 +32,18 @@ Twenty CRM can be used by Coeus to track & update all of your business contacts 
 * Send the API Key to Coeus "Update my organization's Twenty API Key {twentyApiKey}"
 * Ask Coeus to create an integration webhook "Create the Coeus Integration Webhook"
 
-#### Zep
+### Dedicated Zep Project
 > ⚠️ This feature is still in beta. If you chose to use it, we recommend creating a dedicated blank Zep project and adding the Zep API Key as soon as you create your organization
 
-Coeus comes pre-configured with a shared Zep tenant but you can also migrate to your dedicated project for better data custody & custom integrations.
+Coeus comes pre-configured with a shared Zep project but you can also migrate to your dedicated project for better data custody & custom integrations. Note that even with the shared Zep project, Coeus enforces RBAC at the graph level.
+
+You should consider setting up a dedicated Zep project if you need:
+* Direct unrestricted access to Zep API's
+* Custom integrations with Zep graphs
+* Full custody of Zep data
+* Dedicated billing directly through Zep
+
+The following steps can help you use Coeus with a dedicated organization wide Zep project.
 * Create a project on [app.getzep.com](https://app.getzep.com/)
 * Create an API Key for the project
 * Send the API Key to Coeus "Update my organization's Zep API Key {zepApiKey}"
@@ -65,7 +75,7 @@ Future app integrations that could be implemented based on user feedback.
 ## Self Host
 > 🚧 Work in progress on self host instructions
 
-> 💡Make sure to update **both** envvar files to be able to run local scripts and deploy to Google Cloud Run
+> 💡 If your main concern is custody of your Zep Graph data, you do not necessarily need to self host. See how to setup Coeus with a [dedicated Zep project](#dedicated-zep-project)
 
 The following steps should enable you to run Coeus locally / self host. You will first have to setup several services Coeus relies on.
 
@@ -74,6 +84,8 @@ The following steps should enable you to run Coeus locally / self host. You will
 * [Zep](#setup-zep): Graph Memory Database
 
 ### Environment Variables
+> 💡Make sure to update **both** envvar files to be able to run local scripts and deploy to Google Cloud Run
+
 The following envvars are used by Coeus in [.env.yaml](./.env.example.yaml) (Google Cloud Run) and [./apps/coeus-mcp/.env](./apps/coeus-mcp/.env.example) (local development)
 
 ```.env.yaml
