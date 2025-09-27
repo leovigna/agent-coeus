@@ -39,6 +39,7 @@
     "dev": "tsx --watch ./src/index.ts",
     "build": "npm-run-all -p tsc esbuild",
     "build:watch": "npm-run-all -p tsc:watch esbuild:watch",
+    "generate:openapi": "tsx src/scripts/generateOpenApiSpec.ts",
     "clean": "rimraf _cjs _esm _types .turbo",
     "depcheck": "depcheck",
     "esbuild": "node esbuild.config.mjs",
