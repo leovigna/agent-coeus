@@ -1,5 +1,12 @@
 # Zep MCP
 
+## Integrations
+### Zep Cloud
+Add a custom zep cloud project to your organization using the `zepApiKey` when creating an organization.
+
+### Twenty CRM
+Add TwentyCRM integration to your organization using the `twentyApiKey` and `twentyWebhookSecret` when creating an organization.
+
 ## Client Configs
 ### Custom ChatGPT
 https://blog.logto.io/gpt-action-oauth
@@ -24,27 +31,34 @@ Complete the instructions in this order.
 - Callback url
     - Go back to main Custom GPT page
     - Copy Callback URL https://chat.openai.com/aip/g-${id}/oauth/callback (WARNING: This changes as you update certain params such as Auth config)
-    - Update LogTo Client Redirect URIs
+    - Update Logto Client Redirect URIs
 
 ## API Scopes
 
 ### Full Scope Request
-- `offline_access read:user:custom-data update:user:custom-data create:org read:org list:orgs update:org delete:org create:graph read:graph list:graphs update:graph delete:graph`
+- `offline_access read:user:custom-data write:user:custom-data create:org list:orgs read:org write:org delete:org read:graph write:graph delete:graph read:crm write:crm`
 
 ### User Custom Data
+**User Scopes**
 - `read:user:custom-data`
-- `update:user:custom-data`
+- `write:user:custom-data`
 
 ### Org
+**User Scopes**
 - `create:org`
-- `read:org`
 - `list:orgs`
-- `update:org`
+
+**Org Scopes**
+- `read:org`
+- `write:org`
 - `delete:org`
 
-### Graph
-- `create:graph`
+### Zep Graph
+**Org Scopes**
 - `read:graph`
-- `list:graphs`
-- `update:graph`
+- `write:graph`
 - `delete:graph`
+
+### Twenty CRM
+- `read:crm`
+- `write:crm`

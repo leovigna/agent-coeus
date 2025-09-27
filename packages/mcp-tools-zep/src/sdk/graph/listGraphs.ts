@@ -1,15 +1,15 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import {
-    checkOrganizationUserRoles,
     getMeOrgId,
+    withOrganizationUserRolesCheck,
 } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { partial } from "lodash-es";
@@ -32,7 +32,7 @@ export const listGraphsInputSchema = {
  * @param param2
  * @returns
  */
-export async function listGraphs(
+async function _listGraphs(
     ctx: {
         logToClient: LogToClient;
         zepClientProvider: ZepClientProvider;
@@ -40,20 +40,12 @@ export async function listGraphs(
     params: z.objectOutputType<typeof listGraphsInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.Graph[]> {
-    const { subject, scopes } = authInfo;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["list:graphs"]); // 403 if auth has insufficient scopes
 
-    const { logToClient, zepClientProvider } = ctx;
+    const { zepClientProvider } = ctx;
 
-    const orgId = params.orgId ?? (await getMeOrgId(logToClient, { authInfo }));
-
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        logToClient,
-        { orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    const orgId = params.orgId ?? (await getMeOrgId(ctx, { authInfo }));
 
     const zepClient = await resolveZepClient(zepClientProvider, orgId);
 
@@ -71,17 +63,22 @@ export async function listGraphs(
     return filteredGraphs;
 }
 
+export const listGraphs = withScopeCheck(
+    withOrganizationUserRolesCheck(_listGraphs, ["owner", "admin", "member"]),
+    ["read:graph"],
+);
+
 // MCP Tool
 export const listGraphsToolMetadata = {
-    name: "zep_list_graphs",
+    name: "zep_listGraphs",
     config: {
         title: "List Graphs",
-        description: "Lists all graphs for a user in an organization.",
+        description: "List Graphs in Zep",
         inputSchema: listGraphsInputSchema,
     },
 } as const satisfies ToolMetadata<typeof listGraphsInputSchema, ZodRawShape>;
 
-export function getListGraphsTool(ctx: {
+export function listGraphsToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -96,14 +93,14 @@ export function getListGraphsTool(ctx: {
 export const listGraphsProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/zep/graph/list",
+        path: "/organizations/{orgId}/zep/graphs/list",
         tags: ["zep"],
         summary: listGraphsToolMetadata.config.title,
         description: listGraphsToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createListGraphsProcedure = toProcedurePluginFn(
+export const listGraphsProcedureFactory = toProcedurePluginFn(
     listGraphsInputSchema,
     listGraphs,
     listGraphsProcedureMetadata,

@@ -1,13 +1,13 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
-import { checkOrganizationUserRoles } from "@coeus-agent/mcp-tools-logto";
+import { withOrganizationUserRolesCheck } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { createError, FORBIDDEN } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -19,6 +19,7 @@ import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const searchGraphInputSchema = {
+    orgId: z.string().describe("The ID of the organization."),
     graphId: graphIdSchema,
     query: z
         .string()
@@ -62,7 +63,7 @@ export const searchGraphInputSchema = {
 };
 
 // https://help.getzep.com/sdk-reference/graph/search
-export async function searchGraph(
+async function _searchGraph(
     ctx: {
         logToClient: LogToClient;
         zepClientProvider: ZepClientProvider;
@@ -70,9 +71,6 @@ export async function searchGraph(
     params: z.objectOutputType<typeof searchGraphInputSchema, z.ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.GraphSearchResults> {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["read:graph"]); // 403 if auth has insufficient scopes
-
     const { graphId } = params;
 
     if (graphId.userId != authInfo.subject) {
@@ -82,14 +80,17 @@ export async function searchGraph(
         ); // 403 if has insufficient permissions
     }
 
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        ctx.logToClient,
-        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    if (graphId.orgId != params.orgId) {
+        throw createError(
+            FORBIDDEN,
+            `graph ${graphId.graphId} orgId ${graphId.orgId} does not match orgId param ${params.orgId}`,
+        ); // 403 if has insufficient permissions
+    }
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     return zepClient.graph.search({
         ...params,
@@ -97,18 +98,22 @@ export async function searchGraph(
     });
 }
 
+export const searchGraph = withScopeCheck(
+    withOrganizationUserRolesCheck(_searchGraph, ["owner", "admin", "member"]),
+    ["read:graph"],
+);
+
 // MCP Tool
 export const searchGraphToolMetadata = {
-    name: "zep_search_graph",
+    name: "zep_searchGraph",
     config: {
         title: "Search Graph",
-        description:
-            "Searches for a specific graph. This operation is irreversible.",
+        description: "Search Graph in Zep",
         inputSchema: searchGraphInputSchema,
     },
 } as const satisfies ToolMetadata<typeof searchGraphInputSchema, ZodRawShape>;
 
-export function getSearchGraphTool(ctx: {
+export function searchGraphToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -123,14 +128,14 @@ export function getSearchGraphTool(ctx: {
 export const searchGraphProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/search",
+        path: "/organizations/{orgId}/zep/graphs/search",
         tags: ["zep"],
         summary: searchGraphToolMetadata.config.title,
         description: searchGraphToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createSearchGraphProcedure = toProcedurePluginFn(
+export const searchGraphProcedureFactory = toProcedurePluginFn(
     searchGraphInputSchema,
     searchGraph,
     searchGraphProcedureMetadata,

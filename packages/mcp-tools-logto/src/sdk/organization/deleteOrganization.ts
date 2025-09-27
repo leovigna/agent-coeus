@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -12,10 +12,10 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const deleteOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
 };
 
 /**
@@ -23,39 +23,40 @@ export const deleteOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function deleteOrganization(
-    client: LogToClient,
+async function _deleteOrganization(
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof deleteOrganizationInputSchema,
         ZodTypeAny
     >,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["delete:org"]); // 403 if auth has insufficient scopes
+    const { logToClient: client } = ctx;
 
-    const { id } = params;
-    await checkOrganizationUserRoles(
-        client,
-        { orgId: id, validRoles: ["owner"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
-
+    const { orgId } = params;
     const deleteResponse = await client.DELETE("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
     });
     if (!deleteResponse.response.ok) throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+
+    return { success: true };
 }
 
+export const deleteOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_deleteOrganization, ["owner"]),
+    ["delete:org"],
+);
+
 export const deleteOrganizationToolMetadata = {
-    name: "logto_delete_organization",
+    name: "logto_deleteOrganization",
     config: {
         title: "Delete Organization",
-        description: "Delete an organization by its ID.",
+        description: "Delete Organization in LogTo",
         inputSchema: deleteOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -64,11 +65,13 @@ export const deleteOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getDeleteOrganizationTool(client: LogToClient) {
+export function deleteOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...deleteOrganizationToolMetadata,
         name: deleteOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(deleteOrganization), client),
+        cb: partial(toCallToolResultFn(deleteOrganization), ctx),
     } as const satisfies Tool<
         typeof deleteOrganizationInputSchema,
         ZodRawShape
@@ -79,14 +82,14 @@ export function getDeleteOrganizationTool(client: LogToClient) {
 export const deleteOrganizationProcedureMetadata = {
     openapi: {
         method: "DELETE",
-        path: "/logto/organization/{id}",
-        tags: ["logto"],
+        path: "/organizations/{orgId}",
+        tags: ["logto/organization"],
         summary: deleteOrganizationToolMetadata.config.title,
         description: deleteOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createDeleteOrganizationProcedure = toProcedurePluginFn(
+export const deleteOrganizationProcedureFactory = toProcedurePluginFn(
     deleteOrganizationInputSchema,
     deleteOrganization,
     deleteOrganizationProcedureMetadata,

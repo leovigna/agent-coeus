@@ -1,14 +1,14 @@
 import {
     type AuthInfo,
-    checkRequiredScopes,
     toCallToolResultFn,
     type Tool,
     type ToolMetadata,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import {
-    checkOrganizationUserRoles,
     type LogToClient,
+    withOrganizationUserRolesCheck,
 } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 import { createError, FORBIDDEN } from "http-errors-enhanced";
@@ -21,11 +21,12 @@ import type { ZepClientProvider } from "../../ZepClientProvider.js";
 import { resolveZepClient } from "../../ZepClientProvider.js";
 
 export const addDataBatchInputSchema = {
+    orgId: z.string().describe("The ID of the organization."),
     graphId: graphIdSchema,
     episodes: z.array(z.object(episodeDataSchema)),
 };
 
-export async function addDataBatch(
+async function _addDataBatch(
     ctx: {
         logToClient: LogToClient;
         zepClientProvider: ZepClientProvider;
@@ -33,9 +34,6 @@ export async function addDataBatch(
     params: z.objectOutputType<typeof addDataBatchInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<Zep.Episode[]> {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["update:graph"]); // 403 if auth has insufficient scopes
-
     const { graphId, episodes } = params;
 
     if (graphId.userId != authInfo.subject) {
@@ -45,14 +43,17 @@ export async function addDataBatch(
         ); // 403 if has insufficient permissions
     }
 
-    // Check user has access to org
-    await checkOrganizationUserRoles(
-        ctx.logToClient,
-        { orgId: graphId.orgId, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    if (graphId.orgId != params.orgId) {
+        throw createError(
+            FORBIDDEN,
+            `graph ${graphId.graphId} orgId ${graphId.orgId} does not match orgId param ${params.orgId}`,
+        ); // 403 if has insufficient permissions
+    }
 
-    const zepClient = await resolveZepClient(ctx.zepClientProvider, graphId.orgId);
+    const zepClient = await resolveZepClient(
+        ctx.zepClientProvider,
+        graphId.orgId,
+    );
 
     // Add episodes to graph
     return zepClient.graph.addBatch({
@@ -61,18 +62,22 @@ export async function addDataBatch(
     });
 }
 
+export const addDataBatch = withScopeCheck(
+    withOrganizationUserRolesCheck(_addDataBatch, ["owner", "admin", "member"]),
+    ["write:graph"],
+);
+
 export const addDataBatchToolMetadata = {
-    name: "zep_add_data_batch",
+    name: "zep_addDataBatch",
     config: {
-        title: "Add DataBatch",
-        description:
-            "Add an episode to memory. This is the primary way to add information to the graph.",
+        title: "Add Data Batch",
+        description: "Add Data Batch in Zep",
         inputSchema: addDataBatchInputSchema,
     },
 } as const satisfies ToolMetadata<typeof addDataBatchInputSchema, ZodRawShape>;
 
 // MCP Tool
-export function getAddDataBatchTool(ctx: {
+export function addDataBatchToolFactory(ctx: {
     logToClient: LogToClient;
     zepClientProvider: ZepClientProvider;
 }) {
@@ -87,14 +92,14 @@ export function getAddDataBatchTool(ctx: {
 export const addDataBatchProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/zep/graph/add-data-batch",
+        path: "/organizations/{orgId}/zep/graph/data-batch",
         tags: ["zep"],
         summary: addDataBatchToolMetadata.config.title,
         description: addDataBatchToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createAddDataBatchProcedure = toProcedurePluginFn(
+export const addDataBatchProcedureFactory = toProcedurePluginFn(
     addDataBatchInputSchema,
     addDataBatch,
     addDataBatchProcedureMetadata,

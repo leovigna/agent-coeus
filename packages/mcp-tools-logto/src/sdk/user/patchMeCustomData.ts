@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -13,14 +13,13 @@ import { z } from "zod";
 import type { LogToClient } from "../../LogToClient.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function patchMeCustomData<T extends Record<string, any>>(
-    client: LogToClient,
+async function _patchMeCustomData<T extends Record<string, any>>(
+    ctx: { logToClient: LogToClient },
     customData: T,
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
+    const { logToClient: client } = ctx;
     const userId = authInfo.subject!;
-    checkRequiredScopes(scopes, ["update:user:custom-data"]); // 403 if auth has insufficient scopes
 
     const userCustomDataResponse = await client.PATCH(
         "/api/users/{userId}/custom-data",
@@ -43,6 +42,10 @@ export async function patchMeCustomData<T extends Record<string, any>>(
     return userCustomData as unknown as T;
 }
 
+export const patchMeCustomData = withScopeCheck(_patchMeCustomData, [
+    "write:user:custom-data",
+]);
+
 export const setMeOrgId = patchMeCustomData<{ currentOrgId: string }>;
 
 export const setMeOrgIdInputSchema = {
@@ -51,33 +54,34 @@ export const setMeOrgIdInputSchema = {
 
 // MCP Tool
 export const setMeOrgIdToolMetadata = {
-    name: "logto_set_me_current_org_id",
+    name: "logto_setMeOrgId",
     config: {
-        title: "Set Me Current Org ID",
-        description: "Set the current orgId of the authenticated user.",
+        title: "Set Me Org Id",
+        description: "Set Me Org Id in LogTo",
         inputSchema: setMeOrgIdInputSchema,
     },
 } as const satisfies ToolMetadata<typeof setMeOrgIdInputSchema, ZodRawShape>;
 
-export function getSetMeOrgIdTool(client: LogToClient) {
+export function setMeOrgIdToolFactory(ctx: { logToClient: LogToClient }) {
     return {
         ...setMeOrgIdToolMetadata,
-        cb: partial(toCallToolResultFn(setMeOrgId), client),
+        name: setMeOrgIdToolMetadata.name,
+        cb: partial(toCallToolResultFn(setMeOrgId), ctx),
     } as const satisfies Tool<typeof setMeOrgIdInputSchema, ZodRawShape>;
 }
 
 // TRPC Procedure
 export const setMeOrgIdProcedureMetadata = {
     openapi: {
-        method: "POST",
-        path: "/logto/users/me/current-org-id",
-        tags: ["logto"],
+        method: "PATCH",
+        path: "/me/current-org-id",
+        tags: ["logto/me"],
         summary: setMeOrgIdToolMetadata.config.title,
         description: setMeOrgIdToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createSetMeOrgIdProcedure = toProcedurePluginFn(
+export const setMeOrgIdProcedureFactory = toProcedurePluginFn(
     setMeOrgIdInputSchema,
     setMeOrgId,
     setMeOrgIdProcedureMetadata,

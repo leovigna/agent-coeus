@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -12,10 +12,10 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const updateOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
     name: z.string().min(1).max(128).optional().describe("The updated name."),
     description: z
         .string()
@@ -35,28 +35,23 @@ export const updateOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Custom data.
  * @param {boolean} [isMfaRequired] - Is MFA required?
  */
-export async function updateOrganization(
-    client: LogToClient,
+async function _updateOrganization(
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof updateOrganizationInputSchema,
         ZodTypeAny
     >,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["write:org"]); // 403 if auth has insufficient scopes
+    const { logToClient: client } = ctx;
 
-    const { id, ...body } = params;
-    await checkOrganizationUserRoles(
-        client,
-        { orgId: id, validRoles: ["owner", "admin"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    const { orgId, ...body } = params;
 
     const orgResponse = await client.PATCH("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
         body: body as never, // The client type expects a specific body type, but the fields are optional
@@ -67,11 +62,16 @@ export async function updateOrganization(
     return org;
 }
 
+export const updateOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_updateOrganization, ["owner", "admin"]),
+    ["write:org"],
+);
+
 export const updateOrganizationToolMetadata = {
-    name: "logto_update_organization",
+    name: "logto_updateOrganization",
     config: {
         title: "Update Organization",
-        description: "Update an organization's details.",
+        description: "Update Organization in LogTo",
         inputSchema: updateOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -80,11 +80,13 @@ export const updateOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getUpdateOrganizationTool(client: LogToClient) {
+export function updateOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...updateOrganizationToolMetadata,
         name: updateOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(updateOrganization), client),
+        cb: partial(toCallToolResultFn(updateOrganization), ctx),
     } as const satisfies Tool<
         typeof updateOrganizationInputSchema,
         ZodRawShape
@@ -95,14 +97,14 @@ export function getUpdateOrganizationTool(client: LogToClient) {
 export const updateOrganizationProcedureMetadata = {
     openapi: {
         method: "PATCH",
-        path: "/logto/organization/{id}",
-        tags: ["logto"],
+        path: "/organizations/{orgId}",
+        tags: ["logto/organization"],
         summary: updateOrganizationToolMetadata.config.title,
         description: updateOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createUpdateOrganizationProcedure = toProcedurePluginFn(
+export const updateOrganizationProcedureFactory = toProcedurePluginFn(
     updateOrganizationInputSchema,
     updateOrganization,
     updateOrganizationProcedureMetadata,

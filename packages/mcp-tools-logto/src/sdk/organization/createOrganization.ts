@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -31,17 +31,17 @@ export const createOrganizationInputSchema = {
  * @param {Record<string, unknown>} [customData] - Arbitrary custom data.
  * @param {boolean} [isMfaRequired] - Whether MFA is required for the organization.
  */
-export async function createOrganization(
-    client: LogToClient,
+async function _createOrganization(
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<
         typeof createOrganizationInputSchema,
         ZodTypeAny
     >,
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const { subject, scopes } = authInfo;
+    const { logToClient: client } = ctx;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["create:org"]); // 403 if auth has insufficient scopes
 
     const { name, description, customData, isMfaRequired } = params;
 
@@ -90,12 +90,16 @@ export async function createOrganization(
     return org;
 }
 
+export const createOrganization = withScopeCheck(_createOrganization, [
+    "create:org",
+]);
+
 // MCP Tool
 export const createOrganizationToolMetadata = {
-    name: "logto_create_organization",
+    name: "logto_createOrganization",
     config: {
         title: "Create Organization",
-        description: "Create a new organization.",
+        description: "Create Organization in LogTo",
         inputSchema: createOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -103,10 +107,13 @@ export const createOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function getCreateOrganizationTool(client: LogToClient) {
+export function createOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...createOrganizationToolMetadata,
-        cb: partial(toCallToolResultFn(createOrganization), client),
+        name: createOrganizationToolMetadata.name,
+        cb: partial(toCallToolResultFn(createOrganization), ctx),
     } as const satisfies Tool<
         typeof createOrganizationInputSchema,
         ZodRawShape
@@ -117,14 +124,14 @@ export function getCreateOrganizationTool(client: LogToClient) {
 export const createOrganizationProcedureMetadata = {
     openapi: {
         method: "POST",
-        path: "/logto/organization",
-        tags: ["logto"],
+        path: "/organizations",
+        tags: ["logto/organization"],
         summary: createOrganizationToolMetadata.config.title,
         description: createOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createCreateOrganizationProcedure = toProcedurePluginFn(
+export const createOrganizationProcedureFactory = toProcedurePluginFn(
     createOrganizationInputSchema,
     createOrganization,
     createOrganizationProcedureMetadata,

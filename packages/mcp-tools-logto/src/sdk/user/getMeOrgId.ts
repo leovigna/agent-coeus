@@ -1,9 +1,9 @@
 import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
+import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 
 import type { LogToClient } from "../../LogToClient.js";
 import { createOrganization } from "../organization/createOrganization.js";
 
-import { getMeCustomData } from "./getMeCustomData.js";
 import { patchMeCustomData } from "./patchMeCustomData.js";
 
 /**
@@ -13,19 +13,33 @@ import { patchMeCustomData } from "./patchMeCustomData.js";
  * @returns
  */
 export async function getMeOrgId(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { authInfo }: { authInfo: AuthInfo },
 ): Promise<string> {
+    const { logToClient: client } = ctx;
+    const userId = authInfo.subject!;
     // Get current orgId
-    const userCustomData = (await getMeCustomData(client, {
-        authInfo,
-    })) as unknown as { currentOrgId?: string };
+    const userCustomDataResponse = await client.GET(
+        "/api/users/{userId}/custom-data",
+        {
+            params: {
+                path: {
+                    userId,
+                },
+            },
+        },
+    );
+    if (!userCustomDataResponse.response.ok)
+        throw createError(INTERNAL_SERVER_ERROR); // 500 LogTo API call failed
+    const userCustomData = userCustomDataResponse.data! as unknown as {
+        currentOrgId?: string;
+    };
     let orgId = userCustomData.currentOrgId;
 
     if (!orgId) {
         // Create personal org
         const org = await createOrganization(
-            client,
+            ctx,
             {
                 name: "Personal",
                 description: "Personal Organization",
@@ -34,7 +48,7 @@ export async function getMeOrgId(
         );
         orgId = org.id;
         // Set as personal org
-        await patchMeCustomData(client, { currentOrgId: orgId }, { authInfo });
+        await patchMeCustomData(ctx, { currentOrgId: orgId }, { authInfo });
     }
 
     return orgId;

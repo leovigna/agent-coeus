@@ -20,7 +20,12 @@ export const createOrganizationInputSchema = {
     ...createOrganizationInputSchemaBase,
     customData: z
         .object({
-            zepApiKey: z.string().optional().describe("Custom Zep API Key"),
+            zepApiKey: z.string().optional().describe("Zep API Key"),
+            twentyApiUrl: z
+                .string()
+                .default("https://api.twenty.com/rest")
+                .describe("Twenty CRM API URL"),
+            twentyApiKey: z.string().optional().describe("Twenty CRM API Key"),
         })
         .optional(),
 };
@@ -36,10 +41,13 @@ export const createOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function getCreateOrganizationTool(client: LogToClient) {
+export function createOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...createOrganizationToolMetadata,
-        cb: partial(toCallToolResultFn(createOrganization), client),
+        name: createOrganizationToolMetadata.name,
+        cb: partial(toCallToolResultFn(createOrganization), ctx),
     } as const satisfies Tool<
         typeof createOrganizationInputSchema,
         ZodRawShape
@@ -47,11 +55,12 @@ export function getCreateOrganizationTool(client: LogToClient) {
 }
 
 // TRPC Procedure
-const createCreateOrganizationProcedure = toProcedurePluginFn(
+const createOrganizationProcedureFactory = toProcedurePluginFn(
     createOrganizationInputSchema,
     createOrganization,
     createOrganizationProcedureMetadata,
 );
 
-export const createOrganizationProcedure =
-    createCreateOrganizationProcedure(logToClient);
+export const createOrganizationProcedure = createOrganizationProcedureFactory({
+    logToClient,
+});

@@ -39,6 +39,7 @@
     "dev": "tsx --watch ./src/index.ts",
     "build": "npm-run-all -p tsc esbuild",
     "build:watch": "npm-run-all -p tsc:watch esbuild:watch",
+    "generate:openapi": "tsx src/scripts/generateOpenApiSpec.ts",
     "clean": "rimraf _cjs _esm _types .turbo",
     "depcheck": "depcheck",
     "esbuild": "node esbuild.config.mjs",
@@ -46,6 +47,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "madge": "madge src/index.ts -c",
+    "setup:logto": "tsx src/scripts/setupLogTo.ts",
     "test": "pnpm run test:ci",
     "test:ci": "vitest --run",
     "test:watch": "vitest",
@@ -56,6 +58,7 @@
   "dependencies": {
     "@coeus-agent/mcp-tools-base": "workspace:*",
     "@coeus-agent/mcp-tools-logto": "workspace:*",
+    "@coeus-agent/mcp-tools-twenty": "workspace:*",
     "@coeus-agent/mcp-tools-zep": "workspace:*",
     "@getzep/zep-cloud": "^3.4.1",
     "@logto/api": "^1.31.0",
@@ -71,6 +74,7 @@
     "openapi-fetch": "^0.14.0",
     "swagger-ui-express": "^5.0.1",
     "trpc-to-openapi": "^2.4.0",
+    "uuid": "^13.0.0",
     "zod": "^3.22.4",
     "zod-openapi": "4.2.4"
   },

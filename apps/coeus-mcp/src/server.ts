@@ -10,8 +10,13 @@ import { createOpenApiExpressMiddleware } from "trpc-to-openapi";
 
 import { OIDC_BASE_URL, OIDC_CLIENT_ID } from "./envvars.js";
 import { openApiDocument } from "./openapi.js";
-import { appRouter } from "./trpcAppRouter.js";
 import { createContext } from "./trpc.js";
+import { appRouter } from "./trpcAppRouter.js";
+import {
+    createWebhooksContext,
+    webhooksAppRouter,
+    webhooksOpenApiDocument,
+} from "./trpcWebhooks.js";
 
 if (!OIDC_CLIENT_ID) {
     throw new Error("OIDC_CLIENT_ID is not set");
@@ -34,13 +39,13 @@ export async function getExpressApp({
     mcpServer: McpServer;
     mcpTransport: StreamableHTTPServerTransport;
 }): Promise<Application> {
-    // Connect transport
-    // TODO: Can this be done later? this could make the getExpressApp function sync
-    await mcpServer.connect(mcpTransport);
-
     // Express App
     const app = express();
-    // OAuth Proxy Endpoint (for ChatGPT Actions)
+
+    // CORS Middleware
+    app.use(cors({ origin: "*" }));
+
+    // OIDC Proxy Endpoint (for ChatGPT Actions)
     app.get("/oidc/auth", (req, res) => {
         const target = new URL(req.originalUrl, OIDC_ORIGIN);
         res.redirect(302, target.toString());
@@ -53,49 +58,79 @@ export async function getExpressApp({
             xfwd: true,
         }),
     );
-
-    // CORS Middleware
-    app.use(cors({ origin: "*" }));
-    // Fetch OIDC config
+    // OIDC metadata endpoints
     const oidcConfig = await fetchServerConfig(OIDC_ISSUER_URL.toString(), {
         type: "oidc",
     });
-    // const { jwksUri, issuer } = oidcConfig.metadata;
-    // MCP Auth Middleware
     const mcpAuth = new MCPAuth({
         server: oidcConfig,
     });
-    // Delegated Authorization Server
     app.use(mcpAuth.delegatedRouter()); // .well-known/oauth-authorization-server (OAuth 2.0 Metadata Endpoint)
 
-    // JWT Token verification
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    app.use("/api", mcpAuth.bearerAuth("jwt"));
+    // MCP JSON-RPC endpoint
+    await mcpServer.connect(mcpTransport); // TODO: Can this be done later? this could make the getExpressApp function sync
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     app.use("/mcp", mcpAuth.bearerAuth("jwt"));
-
-    // Parse JSON
-    app.use(express.json());
-    // Protected endpoints
-    // OpenAPI Middleware
-    app.use(
-        "/api",
-        createOpenApiExpressMiddleware({ router: appRouter, createContext }),
-    );
-    // MCP JSON-RPC Endpoint
     app.post("/mcp", async (req, res) => {
         await mcpTransport.handleRequest(req, res, req.body);
     });
 
-    // Public endpoints
-    // OpenAPI spec
-    app.get("/openapi.json", (_: Request, res: Response) => {
+    // API endpoints
+    const apiRouter = express.Router();
+    apiRouter.use(
+        "/ui",
+        swaggerUi.serveFiles(openApiDocument),
+        swaggerUi.setup(openApiDocument),
+    );
+    apiRouter.get("/openapi.json", (_: Request, res: Response) => {
         res.json(openApiDocument);
     });
-    // OpenAPI docs
-    // Serve Swagger UI with our OpenAPI schema
-    app.use("/", swaggerUi.serve);
-    app.get("/", swaggerUi.setup(openApiDocument));
+    apiRouter.use(mcpAuth.bearerAuth("jwt"));
+    apiRouter.use(
+        createOpenApiExpressMiddleware({ router: appRouter, createContext }),
+    );
+    app.use("/api", apiRouter);
+
+    // Webhook endpoints
+    const webhooksRouter = express.Router();
+    webhooksRouter.use(
+        "/ui",
+        swaggerUi.serveFiles(webhooksOpenApiDocument),
+        swaggerUi.setup(webhooksOpenApiDocument),
+    );
+    webhooksRouter.get("/openapi.json", (_: Request, res: Response) => {
+        res.json(webhooksOpenApiDocument);
+    });
+    webhooksRouter.use(
+        express.raw({ type: "application/json", limit: "2mb" }),
+        (req, res, next) => {
+            if (req.body) {
+                const rawBody = Buffer.from(req.body);
+                // @ts-expect-error capture raw body
+                req.rawBody = rawBody;
+                // Safe to parse JSON for downstream (tRPC OpenAPI expects an object here)
+                try {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    req.body = JSON.parse(rawBody.toString("utf8"));
+                } catch {
+                    return res.status(400).send("invalid json");
+                }
+            }
+            next();
+        },
+    );
+    webhooksRouter.use(
+        createOpenApiExpressMiddleware({
+            router: webhooksAppRouter,
+            createContext: createWebhooksContext,
+        }),
+    );
+    app.use("/webhooks", webhooksRouter);
+
+    // Root endpoint
+    app.get("/", (_: Request, res: Response) => {
+        res.redirect("/api/ui");
+    });
 
     return app;
 }

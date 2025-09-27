@@ -20,6 +20,8 @@ export const updateOrganizationInputSchema = {
     ...updateOrganizationInputSchemaBase,
     customData: z.object({
         zepApiKey: z.string().optional().describe("Custom Zep API Key"),
+        twentyApiUrl: z.string().optional().describe("Twenty CRM API URL"),
+        twentyApiKey: z.string().optional().describe("Twenty CRM API Key"),
     }),
 };
 // MCP Tool
@@ -34,10 +36,13 @@ export const updateOrganizationToolMetadata = {
     ZodRawShape
 >;
 
-export function getUpdateOrganizationTool(client: LogToClient) {
+export function updateOrganizationToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...updateOrganizationToolMetadata,
-        cb: partial(toCallToolResultFn(updateOrganization), client),
+        name: updateOrganizationToolMetadata.name,
+        cb: partial(toCallToolResultFn(updateOrganization), ctx),
     } as const satisfies Tool<
         typeof updateOrganizationInputSchema,
         ZodRawShape
@@ -45,11 +50,12 @@ export function getUpdateOrganizationTool(client: LogToClient) {
 }
 
 // TRPC Procedure
-const createUpdateOrganizationProcedure = toProcedurePluginFn(
+const updateOrganizationProcedureFactory = toProcedurePluginFn(
     updateOrganizationInputSchema,
     updateOrganization,
     updateOrganizationProcedureMetadata,
 );
 
-export const updateOrganizationProcedure =
-    createUpdateOrganizationProcedure(logToClient);
+export const updateOrganizationProcedure = updateOrganizationProcedureFactory({
+    logToClient,
+});

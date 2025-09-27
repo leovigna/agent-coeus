@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AuthInfo } from "@coeus-agent/mcp-tools-base";
 import { checkRequiredRole } from "@coeus-agent/mcp-tools-base";
 
@@ -15,16 +16,39 @@ import { getOrganizationUserRoles } from "./getOrganizationUserRoles.js";
  * @returns user roles
  */
 export async function checkOrganizationUserRoles(
-    client: LogToClient,
+    ctx: { logToClient: LogToClient },
     { orgId, validRoles }: { orgId: string; validRoles: string[] },
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const roles = await getOrganizationUserRoles(
-        client,
-        { orgId },
-        { authInfo },
-    );
+    const roles = await getOrganizationUserRoles(ctx, { orgId }, { authInfo });
     checkRequiredRole(roles, validRoles); // 403 if has insufficient role
 
     return roles;
+}
+
+export function withOrganizationUserRolesCheck<
+    T extends (ctx: any, params: any, extra: any) => Promise<any>,
+>(
+    fn: T,
+    validRoles: string[],
+): (
+    ctx: Parameters<T>[0] & { logToClient: LogToClient },
+    params: Parameters<T>[1] & { orgId: string },
+    extra: Parameters<T>[2] & { authInfo: AuthInfo },
+) => Promise<ReturnType<T>> {
+    return async (
+        ctx: { logToClient: LogToClient },
+        params: { orgId: string },
+        extra: { authInfo: AuthInfo },
+    ) => {
+        const roles = await getOrganizationUserRoles(
+            ctx,
+            { orgId: params.orgId },
+            { authInfo: extra.authInfo },
+        );
+        checkRequiredRole(roles, validRoles); // 403 if has insufficient role
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return fn(ctx, params, extra);
+    };
 }

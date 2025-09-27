@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -12,10 +12,10 @@ import { z } from "zod";
 
 import type { LogToClient } from "../../LogToClient.js";
 
-import { checkOrganizationUserRoles } from "./checkOrganizationUserRoles.js";
+import { withOrganizationUserRolesCheck } from "./checkOrganizationUserRoles.js";
 
 export const getOrganizationInputSchema = {
-    id: z.string().describe("The ID of the organization."),
+    orgId: z.string().describe("The ID of the organization."),
 };
 
 /**
@@ -23,25 +23,19 @@ export const getOrganizationInputSchema = {
  *
  * @param {string} id - The ID of the organization.
  */
-export async function getOrganization(
-    client: LogToClient,
+async function _getOrganization(
+    ctx: { logToClient: LogToClient },
     params: z.objectOutputType<typeof getOrganizationInputSchema, ZodTypeAny>,
-    { authInfo }: { authInfo: AuthInfo },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _: { authInfo: AuthInfo },
 ) {
-    const { scopes } = authInfo;
-    checkRequiredScopes(scopes, ["read:org"]); // 403 if auth has insufficient scopes
-
-    const { id } = params;
-    await checkOrganizationUserRoles(
-        client,
-        { orgId: id, validRoles: ["owner", "admin", "member"] },
-        { authInfo },
-    ); // 404 if not part of org, 403 if has insufficient role
+    const { logToClient: client } = ctx;
+    const { orgId } = params;
 
     const orgResponse = await client.GET("/api/organizations/{id}", {
         params: {
             path: {
-                id,
+                id: orgId,
             },
         },
     });
@@ -51,11 +45,20 @@ export async function getOrganization(
     return org;
 }
 
+export const getOrganization = withScopeCheck(
+    withOrganizationUserRolesCheck(_getOrganization, [
+        "owner",
+        "admin",
+        "member",
+    ]),
+    ["read:org"],
+);
+
 export const getOrganizationToolMetadata = {
-    name: "logto_get_organization",
+    name: "logto_getOrganization",
     config: {
         title: "Get Organization",
-        description: "Get an organization by its ID.",
+        description: "Get Organization in LogTo",
         inputSchema: getOrganizationInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -64,11 +67,11 @@ export const getOrganizationToolMetadata = {
 >;
 
 // MCP Tool
-export function getGetOrganizationTool(client: LogToClient) {
+export function getOrganizationToolFactory(ctx: { logToClient: LogToClient }) {
     return {
         ...getOrganizationToolMetadata,
         name: getOrganizationToolMetadata.name,
-        cb: partial(toCallToolResultFn(getOrganization), client),
+        cb: partial(toCallToolResultFn(getOrganization), ctx),
     } as const satisfies Tool<typeof getOrganizationInputSchema, ZodRawShape>;
 }
 
@@ -76,14 +79,14 @@ export function getGetOrganizationTool(client: LogToClient) {
 export const getOrganizationProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/organization/{id}",
-        tags: ["logto"],
+        path: "/organizations/{orgId}",
+        tags: ["logto/organization"],
         summary: getOrganizationToolMetadata.config.title,
         description: getOrganizationToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createGetOrganizationProcedure = toProcedurePluginFn(
+export const getOrganizationProcedureFactory = toProcedurePluginFn(
     getOrganizationInputSchema,
     getOrganization,
     getOrganizationProcedureMetadata,

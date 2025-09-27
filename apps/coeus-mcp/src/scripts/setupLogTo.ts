@@ -8,11 +8,12 @@ import {
     LOGTO_M2M_CLIENT_SECRET,
     LOGTO_TENANT_ID,
 } from "../envvars.js";
+import { createUrl } from "../utils/createUrl.js";
 
-type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
+export type LogToClient = ReturnType<typeof createManagementApi>["apiClient"];
 
 // @ts-ignore unused
-function getLogToClient() {
+export function getLogToClient(): LogToClient {
     if (!LOGTO_TENANT_ID) throw new Error("LOGTO_TENANT_ID is not set");
     if (!LOGTO_M2M_CLIENT_ID) throw new Error("LOGTO_M2M_CLIENT_ID is not set");
     if (!LOGTO_M2M_CLIENT_SECRET)
@@ -61,7 +62,7 @@ export async function getOrCreateApiResource(
  * @param scopes
  * @returns resource scopes
  */
-async function getOrCreateApiResourceScopes(
+export async function getOrCreateApiResourceScopes(
     client: LogToClient,
     resourceId: string,
     scopes: string[],
@@ -239,17 +240,6 @@ async function setResourceScopesToOrganizationRole(
     return resourceScopes;
 }
 
-// Helper to create standard CRUD scopes
-function getCrudScopes(resourceName: string) {
-    return [
-        `list:${resourceName}s`,
-        `create:${resourceName}`,
-        `read:${resourceName}`,
-        `update:${resourceName}`,
-        `delete:${resourceName}`,
-    ];
-}
-
 /**
  * Setup LogTo with standard SaaS resources, scopes, and roles
  * @param client LogTo client
@@ -258,10 +248,15 @@ export async function setupLogTo(
     client: LogToClient,
     indicatorBaseUrl: string,
 ) {
+    const application = await getOrCreateApplication(client, "Coeus", {
+        description: "Coeus client application",
+        type: "Traditional",
+    });
+
     // Create MCP API resource with CRUD scopes
     const mcpResource = await getOrCreateApiResource(client, {
         name: "mcp",
-        indicator: new URL("/mcp/", indicatorBaseUrl).toString(),
+        indicator: createUrl(indicatorBaseUrl, "mcp").toString(),
     });
     // Make default resource (to get JWT with this audience)
     await client.PATCH("/api/resources/{id}/is-default", {
@@ -276,36 +271,49 @@ export async function setupLogTo(
         client,
         mcpResource.id,
         [
-            ...getCrudScopes("org"),
-            ...getCrudScopes("graph"),
+            // user
             "read:user:custom-data",
-            "update:user:custom-data",
+            "write:user:custom-data",
+            // organization
+            "create:org",
+            "list:orgs",
+            "read:org",
+            "write:org",
+            "delete:org",
+            // graph
+            "read:graph",
+            "write:graph",
+            "delete:graph",
+            // crm
+            "read:crm",
+            "write:crm",
         ],
     );
-    const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
+
+    // user
+    const readUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "read:user:custom-data",
+    )!;
+    const writeUserCustomDataScope = resourceScopes.find(
+        (s) => s.name === "write:user:custom-data",
+    )!;
+    // organization
     const createOrgScope = resourceScopes.find((s) => s.name === "create:org")!;
+    const listOrgsScope = resourceScopes.find((s) => s.name === "list:orgs")!;
     const readOrgScope = resourceScopes.find((s) => s.name === "read:org")!;
-    const updateOrgScope = resourceScopes.find((s) => s.name === "update:org")!;
+    const writeOrgScope = resourceScopes.find((s) => s.name === "write:org")!;
     const deleteOrgScope = resourceScopes.find((s) => s.name === "delete:org")!;
-    const listGraphsScope = resourceScopes.find(
-        (s) => s.name === "list:graphs",
-    )!;
-    const createGraphScope = resourceScopes.find(
-        (s) => s.name === "create:graph",
-    )!;
+    // graph
     const readGraphScope = resourceScopes.find((s) => s.name === "read:graph")!;
-    const updateGraphScope = resourceScopes.find(
-        (s) => s.name === "update:graph",
+    const writeGraphScope = resourceScopes.find(
+        (s) => s.name === "write:graph",
     )!;
     const deleteGraphScope = resourceScopes.find(
         (s) => s.name === "delete:graph",
     )!;
-    const readUserCustomDataScope = resourceScopes.find(
-        (s) => s.name === "read:user:custom-data",
-    )!;
-    const updateUserCustomDataScope = resourceScopes.find(
-        (s) => s.name === "update:user:custom-data",
-    )!;
+    // crm
+    const readCrmScope = resourceScopes.find((s) => s.name === "read:crm")!;
+    const writeCrmScope = resourceScopes.find((s) => s.name === "write:crm")!;
 
     // User role (Note: Go to console to set this as default role)
     const roles = await getOrCreateRoles(client, ["user"]);
@@ -325,7 +333,7 @@ export async function setupLogTo(
             createOrgScope.id,
             listOrgsScope.id,
             readUserCustomDataScope.id,
-            updateUserCustomDataScope.id,
+            writeUserCustomDataScope.id,
         ],
     );
 
@@ -338,14 +346,17 @@ export async function setupLogTo(
         client,
         ownerRole.id,
         [
+            // organization
             readOrgScope.id,
-            updateOrgScope.id,
+            writeOrgScope.id,
             deleteOrgScope.id,
-            createGraphScope.id,
-            listGraphsScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
             deleteGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
     // Admin: read:org update:org list:graphs create:graph read:graph update:graph delete:graph
@@ -354,13 +365,16 @@ export async function setupLogTo(
         client,
         adminRole.id,
         [
+            // organization
             readOrgScope.id,
-            updateOrgScope.id,
-            listGraphsScope.id,
-            createGraphScope.id,
+            writeOrgScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
             deleteGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
     // Member: read:org list:graphs create:graph read:graph update:graph
@@ -369,11 +383,14 @@ export async function setupLogTo(
         client,
         memberRole.id,
         [
+            // organization
             readOrgScope.id,
-            listGraphsScope.id,
-            createGraphScope.id,
+            // graph
             readGraphScope.id,
-            updateGraphScope.id,
+            writeGraphScope.id,
+            // crm
+            readCrmScope.id,
+            writeCrmScope.id,
         ],
     );
 
@@ -385,6 +402,7 @@ export async function setupLogTo(
         ownerResourceScopes,
         adminResourceScopes,
         memberResourceScopes,
+        application,
     };
 }
 
@@ -397,14 +415,48 @@ export async function deleteAllOrgs(client: LogToClient) {
     }
 }
 
+export async function getOrCreateApplication(
+    client: LogToClient,
+    name: string,
+    {
+        description,
+        type,
+    }: {
+        description: string;
+        type:
+        | "Traditional"
+        | "SPA"
+        | "Native"
+        | "MachineToMachine"
+        | "Protected"
+        | "SAML";
+    },
+) {
+    const applications = (await client.GET("/api/applications")).data!;
+    let application = applications.find((app) => app.name === name);
+    application ??= (
+        await client.POST("/api/applications", {
+            body: {
+                name,
+                type,
+                description,
+            },
+        })
+    ).data!;
+    return application;
+}
+
 async function main() {
     if (!LOGTO_API_INDICATOR_BASE_URL)
         throw new Error("LOGTO_API_INDICATOR_BASE_URL is not set");
     const indicatorBaseUrl = new URL(LOGTO_API_INDICATOR_BASE_URL);
     const client = getLogToClient();
+
     const result = await setupLogTo(client, indicatorBaseUrl.toString());
-    console.debug(result);
-    // await deleteAllOrgs(client);
+    console.log(result);
+    console.log(
+        `Application ${result.application.name} (${result.application.id})`,
+    );
 }
 
 main().catch((err) => {

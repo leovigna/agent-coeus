@@ -1,8 +1,8 @@
 import type { AuthInfo, Tool, ToolMetadata } from "@coeus-agent/mcp-tools-base";
 import {
-    checkRequiredScopes,
     toCallToolResultFn,
     toProcedurePluginFn,
+    withScopeCheck,
 } from "@coeus-agent/mcp-tools-base";
 import { createError, INTERNAL_SERVER_ERROR } from "http-errors-enhanced";
 import { partial } from "lodash-es";
@@ -16,14 +16,14 @@ export const listOrganizationsInputSchema = {};
 /**
  * List all organizations the current user belongs to.
  */
-export async function listOrganizations(
-    client: LogToClient,
+async function _listOrganizations(
+    ctx: { logToClient: LogToClient },
     _: z.objectOutputType<typeof listOrganizationsInputSchema, ZodTypeAny>,
     { authInfo }: { authInfo: AuthInfo },
 ) {
-    const { subject, scopes } = authInfo;
+    const { logToClient: client } = ctx;
+    const { subject } = authInfo;
     const userId = subject!;
-    checkRequiredScopes(scopes, ["list:orgs"]); // 403 if auth has insufficient scopes
 
     const orgsResponse = await client.GET("/api/users/{userId}/organizations", {
         params: {
@@ -38,11 +38,15 @@ export async function listOrganizations(
     return orgs;
 }
 
+export const listOrganizations = withScopeCheck(_listOrganizations, [
+    "list:orgs",
+]);
+
 export const listOrganizationsToolMetadata = {
-    name: "logto_list_organizations",
+    name: "logto_listOrganizations",
     config: {
         title: "List Organizations",
-        description: "List all organizations the current user belongs to.",
+        description: "List Organizations in LogTo",
         inputSchema: listOrganizationsInputSchema,
     },
 } as const satisfies ToolMetadata<
@@ -51,11 +55,13 @@ export const listOrganizationsToolMetadata = {
 >;
 
 // MCP Tool
-export function getListOrganizationsTool(client: LogToClient) {
+export function listOrganizationsToolFactory(ctx: {
+    logToClient: LogToClient;
+}) {
     return {
         ...listOrganizationsToolMetadata,
         name: listOrganizationsToolMetadata.name,
-        cb: partial(toCallToolResultFn(listOrganizations), client),
+        cb: partial(toCallToolResultFn(listOrganizations), ctx),
     } as const satisfies Tool<typeof listOrganizationsInputSchema, ZodRawShape>;
 }
 
@@ -63,14 +69,14 @@ export function getListOrganizationsTool(client: LogToClient) {
 export const listOrganizationsProcedureMetadata = {
     openapi: {
         method: "GET",
-        path: "/logto/users/me/organization",
-        tags: ["logto"],
+        path: "/organizations",
+        tags: ["logto/organization"],
         summary: listOrganizationsToolMetadata.config.title,
         description: listOrganizationsToolMetadata.config.description,
     },
 } as OpenApiMeta;
 
-export const createListOrganizationsProcedure = toProcedurePluginFn(
+export const listOrganizationsProcedureFactory = toProcedurePluginFn(
     listOrganizationsInputSchema,
     listOrganizations,
     listOrganizationsProcedureMetadata,

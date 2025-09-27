@@ -4,16 +4,16 @@ import type { LogToClient } from "@coeus-agent/mcp-tools-logto";
 import type { Zep } from "@getzep/zep-cloud";
 
 import {
-    createAddDataBatchProcedure,
-    createAddDataProcedure,
-    createCreateGraphProcedure,
-    createDeleteGraphProcedure,
-    createGetGraphEdgesProcedure,
-    createGetGraphEpisodesProcedure,
-    createGetGraphProcedure,
-    createListEntityTypesProcedure,
-    createListGraphsProcedure,
-    createSearchGraphProcedure,
+    addDataBatchProcedureFactory,
+    addDataProcedureFactory,
+    createGraphProcedureFactory,
+    deleteGraphProcedureFactory,
+    getGraphEdgesProcedureFactory,
+    getGraphEpisodesProcedureFactory,
+    getGraphProcedureFactory,
+    listEntityTypesProcedureFactory,
+    listGraphsProcedureFactory,
+    searchGraphProcedureFactory,
 } from "./sdk/index.js";
 import type { ZepClientProvider } from "./ZepClientProvider.js";
 
@@ -22,18 +22,18 @@ export function createZepPlugin(ctx: {
     zepClientProvider: ZepClientProvider;
 }) {
     // Edge
-    const getGraphEdges = createGetGraphEdgesProcedure(ctx);
+    const getGraphEdges = getGraphEdgesProcedureFactory(ctx);
     // Episode
-    const getGraphEpisodes = createGetGraphEpisodesProcedure(ctx);
+    const getGraphEpisodes = getGraphEpisodesProcedureFactory(ctx);
     // Graph
-    const addData = createAddDataProcedure(ctx);
-    const addDataBatch = createAddDataBatchProcedure(ctx);
-    const createGraph = createCreateGraphProcedure(ctx);
-    const deleteGraph = createDeleteGraphProcedure(ctx);
-    const getGraph = createGetGraphProcedure(ctx);
-    const listEntityTypes = createListEntityTypesProcedure(ctx);
-    const listGraphs = createListGraphsProcedure(ctx);
-    const searchGraph = createSearchGraphProcedure(ctx);
+    const addData = addDataProcedureFactory(ctx);
+    const addDataBatch = addDataBatchProcedureFactory(ctx);
+    const createGraph = createGraphProcedureFactory(ctx);
+    const deleteGraph = deleteGraphProcedureFactory(ctx);
+    const getGraph = getGraphProcedureFactory(ctx);
+    const listEntityTypes = listEntityTypesProcedureFactory(ctx);
+    const listGraphs = listGraphsProcedureFactory(ctx);
+    const searchGraph = searchGraphProcedureFactory(ctx);
 
     return {
         getGraphEdges,
